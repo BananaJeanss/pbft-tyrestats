@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Mono } from "next/font/google";
-import "./globals.css";
+import "../globals.css";
+import Navbar from "../components/navbar";
 
 const spaceMono = Space_Mono({
   subsets: ["latin"],
@@ -9,11 +10,11 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "tyrestats",
+  title: "tyrestats Dashboard",
   description: "PBFT Tyre Stats Viewer & Analyzer",
 };
 
-export default function RootLayout({
+export default function MainLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body
         className={`${spaceMono.variable} antialiased`}
       >
+        <Navbar />
         {children}
       </body>
     </html>
