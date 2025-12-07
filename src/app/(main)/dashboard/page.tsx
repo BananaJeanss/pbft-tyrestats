@@ -10,6 +10,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import TyreWearManager from "./tyrewear";
+import { useState } from "react";
 
 // Mock data for the timeline (values represent number of laps)
 const timelineData = [
@@ -22,8 +24,11 @@ const timelineData = [
 ];
 
 export default function Dashboard() {
+  const [tyremanVis, settyremanVis] = useState(true);
+
   return (
     <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
+      {tyremanVis && <TyreWearManager onClose={() => settyremanVis(false)} />}
       <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
         {/* Sidebar Session Selection */}
         <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4">
