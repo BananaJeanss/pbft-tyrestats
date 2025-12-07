@@ -1,11 +1,23 @@
 import { Upload, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useState, useEffect } from "react";
 
-interface TyreWearManagerProps {
-  onClose: () => void;
+export interface TyreWearData {
+  remainingLife: number;
+  lapsDriven: number;
+  wearPerLap: number;
 }
 
-export default function TyreWearManager({ onClose }: TyreWearManagerProps) {
+interface TyreWearManagerProps {
+  tyreType: "soft" | "medium" | "hard" | "wet";
+  onClose: () => void;
+  onSave: (data: TyreWearData) => void;
+}
+
+export default function TyreWearManager({
+  tyreType,
+  onClose,
+  onSave,
+}: TyreWearManagerProps) {
   const [currentPage, setCurrentPage] = useState<
     "options" | "screenshot" | "manual" | "analysis"
   >("options");
@@ -17,6 +29,13 @@ export default function TyreWearManager({ onClose }: TyreWearManagerProps) {
 
   const [manualWear, setManualWear] = useState<string>("");
   const [manualLaps, setManualLaps] = useState<string>("");
+
+  const readableTyreType = {
+    soft: "Soft",
+    medium: "Medium",
+    hard: "Hard",
+    wet: "Wet",
+  };
 
   useEffect(() => {
     if (currentPage === "manual") {
@@ -89,7 +108,25 @@ export default function TyreWearManager({ onClose }: TyreWearManagerProps) {
 
   const CalculateAverageWearPerLap = (wear: number, lapsDriven: number) => {
     if (lapsDriven === 0) return 0;
-    return wear / lapsDriven;
+    return parseFloat((wear / lapsDriven).toFixed(2));
+  };
+
+  const handleSave = () => {
+    if (calculatedWear === null) return;
+
+    const lapsValue =
+      currentPage === "manual" ? parseFloat(manualLaps) : parseFloat(laps);
+    const validLaps = isNaN(lapsValue) ? 0 : lapsValue;
+    const wearPerLap = CalculateAverageWearPerLap(
+      100 - calculatedWear,
+      validLaps
+    );
+
+    onSave({
+      remainingLife: calculatedWear,
+      lapsDriven: validLaps,
+      wearPerLap: wearPerLap,
+    });
   };
 
   return (
@@ -104,7 +141,7 @@ export default function TyreWearManager({ onClose }: TyreWearManagerProps) {
           </div>
           <hr className="border-neutral-700" />
           <h4 className="text-white font-semibold text-2xl text-center">
-            Add Tyre Data for Softs
+            Add Tyre Data for {readableTyreType[tyreType]} Tyres
           </h4>
           <div className="flex flex-row items-center justify-center gap-4 h-8/10">
             <button onClick={() => setCurrentPage("screenshot")}>
@@ -307,7 +344,10 @@ export default function TyreWearManager({ onClose }: TyreWearManagerProps) {
                       </div>
                     </>
                   )}
-                  <button className="mt-4 bg-white text-black font-bold py-2 rounded cursor-pointer hover:bg-neutral-200 transition">
+                  <button
+                    onClick={handleSave}
+                    className="mt-4 bg-white text-black font-bold py-2 rounded cursor-pointer hover:bg-neutral-200 transition"
+                  >
                     Save Data
                   </button>
                 </div>
@@ -418,7 +458,10 @@ export default function TyreWearManager({ onClose }: TyreWearManagerProps) {
             </div>
           )}
           <div className="flex items-center justify-center">
-            <button className="bg-white text-black font-bold py-2 px-4 rounded cursor-pointer hover:bg-neutral-200 transition">
+            <button
+              onClick={handleSave}
+              className="bg-white text-black font-bold py-2 px-4 rounded cursor-pointer hover:bg-neutral-200 transition"
+            >
               Save Data
             </button>
           </div>

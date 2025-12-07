@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Clock, Tag } from "lucide-react";
+import { Calendar, Clock, Settings, Tag } from "lucide-react";
 import Image from "next/image";
 import {
   BarChart,
@@ -10,7 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import TyreWearManager from "./tyrewear";
+import TyreWearManager, { TyreWearData } from "./tyrewear";
 import { useState } from "react";
 
 // Mock data for the timeline (values represent number of laps)
@@ -25,10 +25,36 @@ const timelineData = [
 
 export default function Dashboard() {
   const [tyremanVis, settyremanVis] = useState(true);
+  const [selectedTyre, setSelectedTyre] = useState<
+    "soft" | "medium" | "hard" | "wet" | null
+  >(null);
+
+  const [tyreData, setTyreData] = useState<Record<string, TyreWearData>>({});
+
+  const handleSaveTyreData = (data: TyreWearData) => {
+    if (selectedTyre) {
+      setTyreData((prev) => ({
+        ...prev,
+        [selectedTyre]: data,
+      }));
+      settyremanVis(false);
+    }
+  };
+
+  // return how many laps recommended to run on this tyre, ideally imo 45% is the sweet spot
+  const calcRecommendedLapCount = (wearPerLap: number) => {
+    return Math.floor(40 / wearPerLap);
+  };
 
   return (
     <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
-      {tyremanVis && <TyreWearManager onClose={() => settyremanVis(false)} />}
+      {tyremanVis && selectedTyre && (
+        <TyreWearManager
+          tyreType={selectedTyre}
+          onClose={() => settyremanVis(false)}
+          onSave={handleSaveTyreData}
+        />
+      )}
       <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
         {/* Sidebar Session Selection */}
         <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4">
@@ -131,53 +157,150 @@ export default function Dashboard() {
           <div className="w-full flex flex-row h-2/5 gap-2">
             {/* tyressssssss */}
             <div className="bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
+              <div className="flex flex-row gap-2 justify-between">
+                <p className="text-md font-bold">Tyres</p>
+                <button className="cursor-pointer text-sm">
+                  <Settings className="h-5 w-5" />
+                </button>
+              </div>
               <div className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4">
-                <h3 className="text-red-600 text-2xl border-3 font-extrabold rounded-full px-2">
-                  S
-                </h3>
+                <button
+                  onClick={() => {
+                    setSelectedTyre("soft");
+                    settyremanVis(true);
+                  }}
+                >
+                  <h3 className="text-red-600 text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer">
+                    S
+                  </h3>
+                </button>
                 <div className="flex flex-col">
-                  <p className="text-neutral-400 text-xs">
-                    No Data Yet (Click on the tyre symbol)
-                  </p>
+                  {(tyreData["soft"] && (
+                    <>
+                      {" "}
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["soft"]
+                          ? `Average wear per lap: ${tyreData["soft"].wearPerLap}%`
+                          : "Average wear per lap: N/A"}
+                      </p>
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["soft"]
+                          ? `Recommended Lap Count: ${calcRecommendedLapCount(
+                              tyreData["soft"].wearPerLap
+                            )}`
+                          : "Recommended Lap Count: N/A"}
+                      </p>
+                    </>
+                  )) || (
+                    <p className="text-neutral-400 text-xs">
+                      No Data Yet (Click on the tyre to add data)
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4">
-                <h3 className="text-yellow-500 text-2xl border-3 font-extrabold rounded-full px-2">
-                  M
-                </h3>
+                <button
+                  onClick={() => {
+                    setSelectedTyre("medium");
+                    settyremanVis(true);
+                  }}
+                >
+                  <h3 className="text-yellow-500 text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer">
+                    M
+                  </h3>
+                </button>
                 <div className="flex flex-col">
-                  <p className="text-neutral-400 text-xs">
-                    Average wear per lap: 4.5%
-                  </p>
-                  <p className="text-neutral-400 text-xs">
-                    Recommended Lap Count: 7
-                  </p>
+                  {(tyreData["medium"] && (
+                    <>
+                      {" "}
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["medium"]
+                          ? `Average wear per lap: ${tyreData["medium"].wearPerLap}%`
+                          : "Average wear per lap: N/A"}
+                      </p>
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["medium"]
+                          ? `Recommended Lap Count: ${calcRecommendedLapCount(
+                              tyreData["medium"].wearPerLap
+                            )}`
+                          : "Recommended Lap Count: N/A"}
+                      </p>
+                    </>
+                  )) || (
+                    <p className="text-neutral-400 text-xs">
+                      No Data Yet (Click on the tyre to add data)
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4">
-                <h3 className="text-white text-2xl border-3 font-extrabold rounded-full px-2">
-                  H
-                </h3>
+                <button
+                  onClick={() => {
+                    setSelectedTyre("hard");
+                    settyremanVis(true);
+                  }}
+                >
+                  <h3 className="text-white text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer">
+                    H
+                  </h3>
+                </button>
                 <div className="flex flex-col">
-                  <p className="text-neutral-400 text-xs">
-                    Average wear per lap: 4.5%
-                  </p>
-                  <p className="text-neutral-400 text-xs">
-                    Recommended Lap Count: 7
-                  </p>
+                  {(tyreData["hard"] && (
+                    <>
+                      {" "}
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["hard"]
+                          ? `Average wear per lap: ${tyreData["hard"].wearPerLap}%`
+                          : "Average wear per lap: N/A"}
+                      </p>
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["hard"]
+                          ? `Recommended Lap Count: ${calcRecommendedLapCount(
+                              tyreData["hard"].wearPerLap
+                            )}`
+                          : "Recommended Lap Count: N/A"}
+                      </p>
+                    </>
+                  )) || (
+                    <p className="text-neutral-400 text-xs">
+                      No Data Yet (Click on the tyre to add data)
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4">
-                <h3 className="text-blue-700 text-2xl border-3 font-extrabold rounded-full px-2">
-                  W
-                </h3>
+                <button
+                  onClick={() => {
+                    setSelectedTyre("wet");
+                    settyremanVis(true);
+                  }}
+                >
+                  <h3 className="text-blue-700 text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer">
+                    W
+                  </h3>
+                </button>
                 <div className="flex flex-col">
-                  <p className="text-neutral-400 text-xs">
-                    Average wear per lap: 4.5%
-                  </p>
-                  <p className="text-neutral-400 text-xs">
-                    Recommended Lap Count: 7
-                  </p>
+                  {(tyreData["wet"] && (
+                    <>
+                      {" "}
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["wet"]
+                          ? `Average wear per lap: ${tyreData["wet"].wearPerLap}%`
+                          : "Average wear per lap: N/A"}
+                      </p>
+                      <p className="text-neutral-400 text-xs">
+                        {tyreData["wet"]
+                          ? `Recommended Lap Count: ${calcRecommendedLapCount(
+                              tyreData["wet"].wearPerLap
+                            )}`
+                          : "Recommended Lap Count: N/A"}
+                      </p>
+                    </>
+                  )) || (
+                    <p className="text-neutral-400 text-xs">
+                      No Data Yet (Click on the tyre to add data)
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
