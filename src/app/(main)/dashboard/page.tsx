@@ -1,6 +1,13 @@
 "use client";
 
-import { Calendar, Clock, Settings, Tag } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Settings,
+  Tag,
+  XCircle,
+} from "lucide-react";
 import Image from "next/image";
 import {
   BarChart,
@@ -13,14 +20,16 @@ import {
 import TyreWearManager, { TyreWearData } from "./tyrewear";
 import { useState } from "react";
 import TyreSettings, { TyrePreferences } from "./tyresettings";
+import RaceSettings, { RaceConfiguration } from "./racesettings";
 
 // Mock data for the timeline (values represent number of laps)
 const timelineData = [
   {
     name: "Strategy",
-    soft: 12, // First stint
-    medium: 23, // Second stint
+    soft: 6, // First stint
+    medium: 12, // Second stint
     hard: 15, // Third stint
+    wet: 0, // Wet stint
   },
 ];
 
@@ -41,6 +50,13 @@ export default function Dashboard() {
   const [tyreData, setTyreData] = useState<Record<string, TyreWearData>>({});
   const [preferredSwitchoverPoint, setPreferredSwitchoverPoint] = useState(40);
 
+  const [timelineGenerated, setTimelineGenerates] = useState(false);
+
+  const [raceSettingsVis, setRaceSettingsVis] = useState(false);
+  const [raceConfig, setRaceConfig] = useState<
+    Record<string, RaceConfiguration>
+  >({});
+
   const handleSaveTyreData = (data: TyreWearData) => {
     if (selectedTyre) {
       setTyreData((prev) => ({
@@ -57,8 +73,38 @@ export default function Dashboard() {
     return Math.floor((100 - preferredSwitchoverPoint) / wearPerLap);
   };
 
+  const validateTimelineData = () => {
+    // per FIT regulations 2 or more compounds must be used
+    const usedTyres = Object.values(timelineData[0]).filter(
+      (val) => typeof val === "number" && val > 0
+    ).length;
+    if (usedTyres <= 2) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const generateOptimalTimeline = () => {
+    // generates the optimal timeline to use in a race, following 2 compound rule
+  };
+
   return (
     <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
+      {raceSettingsVis && (
+        <RaceSettings
+          currentConfig={raceConfig[selectedTyre || ""]}
+          onClose={function (): void {
+            setRaceSettingsVis(false);
+          }}
+          onSave={function (config: RaceConfiguration): void {
+            setRaceConfig((prev) => ({
+              ...prev,
+              [selectedTyre || ""]: config,
+            }));
+          }}
+        />
+      )}
       {tyresettingsVis && (
         <TyreSettings
           currentPreferences={{ preferredSwitchoverPoint }}
@@ -77,6 +123,7 @@ export default function Dashboard() {
           onSave={handleSaveTyreData}
         />
       )}
+
       <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
         {/* Sidebar Session Selection */}
         <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4">
@@ -121,59 +168,94 @@ export default function Dashboard() {
 
           {/* Timeline Section */}
           <div className="w-full bg-neutral-900 p-4 rounded-lg flex flex-col gap-2">
-            <h3 className="text-lg font-bold">Timeline</h3>
-
-            <div className="h-16 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  layout="vertical"
-                  data={timelineData}
-                  margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                >
-                  {/* Hide axes for a clean look */}
-                  <XAxis type="number" domain={[0, "dataMax"]} hide />
-                  <YAxis type="category" dataKey="name" hide />
-
-                  <Tooltip
-                    cursor={{ fill: "transparent" }}
-                    contentStyle={{
-                      backgroundColor: "#171717",
-                      border: "1px solid #404040",
-                      borderRadius: "0.5rem",
-                      color: "#fff",
-                    }}
-                    itemStyle={{ color: "#fff" }}
-                  />
-
-                  {/* Stacked bars create the timeline segments */}
-                  {/* radius prop rounds the corners: [topLeft, topRight, bottomRight, bottomLeft] */}
-                  <Bar
-                    dataKey="soft"
-                    stackId="a"
-                    fill="#dc2626"
-                    radius={[4, 0, 0, 4]}
-                    name="Soft (Laps 1-12)"
-                  />
-                  <Bar
-                    dataKey="medium"
-                    stackId="a"
-                    fill="#eab308"
-                    name="Medium (Laps 13-35)"
-                  />
-                  <Bar
-                    dataKey="hard"
-                    stackId="a"
-                    fill="#ffffff"
-                    radius={[0, 4, 4, 0]}
-                    name="Hard (Laps 36-50)"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="w-full flex flex-row justify-between">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                Timeline (
+                {validateTimelineData() ? (
+                  <>
+                    <CheckCircle2 className="inline h-5 w-5 text-green-500 mr-1" />
+                    <p>FIT Valid</p>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="inline h-5 w-5 text-red-500" />
+                    <p>FIT Invalid - At least 2 tyre compounds must be used</p>
+                  </>
+                )}
+                )
+              </h3>
+              <button
+                className="cursor-pointer"
+                onClick={() => {
+                  setRaceSettingsVis(true);
+                }}
+              >
+                <Settings />
+              </button>
             </div>
+            {timelineGenerated ? (
+              <div className="h-16 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    layout="vertical"
+                    data={timelineData}
+                    margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                  >
+                    {/* Hide axes for a clean look */}
+                    <XAxis type="number" domain={[0, "dataMax"]} hide />
+                    <YAxis type="category" dataKey="name" hide />
+
+                    <Tooltip
+                      cursor={{ fill: "transparent" }}
+                      contentStyle={{
+                        backgroundColor: "#171717",
+                        border: "1px solid #404040",
+                        borderRadius: "0.5rem",
+                        color: "#fff",
+                      }}
+                      itemStyle={{ color: "#fff" }}
+                    />
+
+                    {/* Stacked bars create the timeline segments */}
+                    {/* radius prop rounds the corners: [topLeft, topRight, bottomRight, bottomLeft] */}
+                    <Bar
+                      dataKey="soft"
+                      stackId="a"
+                      fill="#dc2626"
+                      radius={[4, 0, 0, 4]}
+                      name="Soft (Laps 1-12)"
+                    />
+                    <Bar
+                      dataKey="medium"
+                      stackId="a"
+                      fill="#eab308"
+                      name="Medium (Laps 13-35)"
+                    />
+                    <Bar
+                      dataKey="hard"
+                      stackId="a"
+                      fill="#ffffff"
+                      radius={[0, 4, 4, 0]}
+                      name="Hard (Laps 36-50)"
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-16 w-full">
+                <p className="text-neutral-400 text-sm">
+                  Timeline will be auto-generated once the race settings and at
+                  least one tyre compound data has been added.
+                </p>
+              </div>
+            )}
 
             <div className="flex justify-between text-xs text-neutral-500 px-1">
               <span>Start</span>
-              <span>Finish (Lap 50)</span>
+              <span>
+                Finish (Lap{" "}
+                {Object.values(raceConfig)[0]?.RaceLaps || "Not Set"})
+              </span>
             </div>
           </div>
           <div className="w-full flex flex-row h-2/5 gap-2">
@@ -215,7 +297,16 @@ export default function Dashboard() {
                           Recommended Lap Count:{" "}
                           {calcRecommendedLapCount(
                             tyreData[tyre.id].wearPerLap
-                          )}
+                          )}{" "}
+                          (
+                          {(
+                            100 -
+                            tyreData[tyre.id].wearPerLap *
+                              calcRecommendedLapCount(
+                                tyreData[tyre.id].wearPerLap
+                              )
+                          ).toFixed(2)}
+                          %)
                         </p>
                       </>
                     ) : (
