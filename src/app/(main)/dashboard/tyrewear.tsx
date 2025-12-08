@@ -43,8 +43,8 @@ export default function TyreWearManager({
       const lapsCount = parseFloat(manualLaps);
 
       if (!isNaN(wear) && !isNaN(lapsCount) && lapsCount > 0) {
-        // manualWear is "Used %", calculatedWear is "Remaining %"
-        setCalculatedWear(100 - wear);
+        // manualWear is "Remaining %", calculatedWear is "Remaining %"
+        setCalculatedWear(wear);
       } else {
         setCalculatedWear(null);
       }
@@ -372,10 +372,9 @@ export default function TyreWearManager({
           <div className="flex flex-row items-center justify-center gap-4 h-8/10">
             <input
               type="number"
-              placeholder="Tyre Wear (%)"
+              placeholder="Remaining Life (%)"
               min="0"
               max="100"
-              step="0.1"
               value={manualWear}
               onKeyDown={(e) => {
                 // Prevent scientific notation and signs

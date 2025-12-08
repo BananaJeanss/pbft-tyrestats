@@ -43,7 +43,7 @@ export default function Dashboard() {
   const [tyrePreferences, setTyrePreferences] =
     useState<TyrePreferences>(DEFAULT_PREFERENCES);
 
-  const [timelineData, setTimelineData] = useState([
+  const [timelineData, setTimelineData] = useState<any[]>([
     {
       name: "Strategy",
       soft: 0,
@@ -52,6 +52,7 @@ export default function Dashboard() {
       wet: 0,
     },
   ]);
+  const [timelineStints, setTimelineStints] = useState<any[]>([]);
 
   const [timelineGenerated, setTimelineGenerates] = useState(false);
 
@@ -121,6 +122,11 @@ export default function Dashboard() {
 
   const validateTimelineData = () => {
     // per FIT regulations 2 or more compounds must be used
+    if (timelineStints.length > 0) {
+      const compounds = new Set(timelineStints.map((s) => s.tyreId));
+      return compounds.size >= 2;
+    }
+
     const usedTyres = Object.values(timelineData[0]).filter(
       (val) => typeof val === "number" && val > 0
     ).length;
@@ -175,34 +181,50 @@ export default function Dashboard() {
       return compounds.size >= 2;
     };
 
-    const findCombination = (
-      depth: number,
-      currentLaps: number,
-      currentStints: any[]
-    ): boolean => {
+    // Scoring weights for compounds (Higher is faster/better)
+    const PACE_SCORE: Record<string, number> = {
+      soft: 3,
+      medium: 2,
+      hard: 1,
+    };
+
+    const calculateScore = (stints: any[]) => {
+      // Heavy penalty for pit stops to prioritize fewer stops
+      // 500 points is more than max possible points from laps (e.g. 100 laps * 3 pts = 300)
+      const stopPenalty = (stints.length - 1) * 500;
+
+      const performanceScore = stints.reduce((acc, stint) => {
+        return acc + stint.laps * (PACE_SCORE[stint.tyreId] || 0);
+      }, 0);
+
+      return performanceScore - stopPenalty;
+    };
+
+    const validStrategies: { stints: any[]; score: number }[] = [];
+
+    const findAllCombinations = (currentLaps: number, currentStints: any[]) => {
       // Base case: Race finished
       if (currentLaps >= totalLaps) {
         if (isValidComposition(currentStints)) {
           // If we overshot, trim the last stint
           const excess = currentLaps - totalLaps;
-          const lastStint = currentStints[currentStints.length - 1];
-          lastStint.laps -= excess;
+          const finalStints = JSON.parse(JSON.stringify(currentStints));
+          finalStints[finalStints.length - 1].laps -= excess;
 
-          bestStrategy = currentStints;
-          return true; // Found a valid one
+          validStrategies.push({
+            stints: finalStints,
+            score: calculateScore(finalStints),
+          });
         }
-        return false;
+        return;
       }
 
-      if (currentStints.length >= 4) return false;
+      if (currentStints.length >= 12) return;
 
-      const sortedTyres = [...availableTyres].sort(
-        (a, b) => b.maxLaps - a.maxLaps
-      );
-
-      for (const tyre of sortedTyres) {
+      // Try all available tyres
+      for (const tyre of availableTyres) {
         const remainingRace = totalLaps - currentLaps;
-        const stretchLimit = Math.floor(tyre.maxLaps * 1.2); // Allow pushing past preference
+        const stretchLimit = Math.floor(tyre.maxLaps * 1.2); // Allow pushing past preference by 20%
 
         let stintLength = tyre.maxLaps;
 
@@ -214,58 +236,48 @@ export default function Dashboard() {
         // Optimization: Don't add a stint if it's tiny unless it finishes the race
         if (stintLength < 3 && remainingRace > stintLength) continue;
 
-        if (
-          findCombination(depth + 1, currentLaps + stintLength, [
-            ...currentStints,
-            { tyreId: tyre.id, laps: stintLength, color: tyre.color },
-          ])
-        ) {
-          return true;
-        }
+        findAllCombinations(currentLaps + stintLength, [
+          ...currentStints,
+          { tyreId: tyre.id, laps: stintLength, color: tyre.color },
+        ]);
       }
-
-      return false;
     };
 
-    findCombination(0, 0, []);
+    findAllCombinations(0, []);
+
+    if (validStrategies.length > 0) {
+      // Sort by score descending (Highest score wins)
+      validStrategies.sort((a, b) => b.score - a.score);
+      bestStrategy = validStrategies[0].stints;
+    }
 
     // 4. Map to Timeline Data
     if (bestStrategy) {
       const newTimelineData: any = { name: "Strategy" };
+      const newStints: any[] = [];
+      let cumulativeLaps = 0;
 
-      // Initialize all to 0
-      newTimelineData.soft = 0;
-      newTimelineData.medium = 0;
-      newTimelineData.hard = 0;
-      newTimelineData.wet = 0;
+      bestStrategy.forEach((stint, index) => {
+        const key = `stint_${index}`;
+        newTimelineData[key] = stint.laps;
 
-      const formattedTimeline = (bestStrategy as any[]).map((stint, index) => {
-        const entry: any = { name: `Stint ${index + 1}` };
-        // Reset others
-        entry.soft = 0;
-        entry.medium = 0;
-        entry.hard = 0;
-        entry.wet = 0;
+        const startLap = cumulativeLaps + 1;
+        cumulativeLaps += stint.laps;
+        const endLap = cumulativeLaps;
 
-        // Set active
-        entry[stint.tyreId] = stint.laps;
-        return entry;
+        newStints.push({
+          key,
+          tyreId: stint.tyreId,
+          laps: stint.laps,
+          color: stint.color,
+          label: `${
+            stint.tyreId.charAt(0).toUpperCase() + stint.tyreId.slice(1)
+          } (Laps ${startLap}-${endLap})`,
+        });
       });
 
-      const strategyData = {
-        name: "Strategy",
-        soft: 0,
-        medium: 0,
-        hard: 0,
-        wet: 0,
-      };
-
-      (bestStrategy as any[]).forEach((stint) => {
-        // @ts-ignore - dynamic key
-        strategyData[stint.tyreId] += stint.laps;
-      });
-
-      setTimelineData([strategyData]);
+      setTimelineData([newTimelineData]);
+      setTimelineStints(newStints);
       setTimelineGenerates(true);
     }
   };
@@ -289,6 +301,7 @@ export default function Dashboard() {
           wet: 0,
         },
       ]);
+      setTimelineStints([]);
     }
   }, [tyreData, raceConfig, tyrePreferences]);
 
@@ -432,26 +445,21 @@ export default function Dashboard() {
 
                     {/* Stacked bars create the timeline segments */}
                     {/* radius prop rounds the corners: [topLeft, topRight, bottomRight, bottomLeft] */}
-                    <Bar
-                      dataKey="soft"
-                      stackId="a"
-                      fill="#dc2626"
-                      radius={[4, 0, 0, 4]}
-                      name="Soft (Laps 1-12)"
-                    />
-                    <Bar
-                      dataKey="medium"
-                      stackId="a"
-                      fill="#eab308"
-                      name="Medium (Laps 13-35)"
-                    />
-                    <Bar
-                      dataKey="hard"
-                      stackId="a"
-                      fill="#ffffff"
-                      radius={[0, 4, 4, 0]}
-                      name="Hard (Laps 36-50)"
-                    />
+                    {timelineStints.map((stint, index) => (
+                      <Bar
+                        key={stint.key}
+                        dataKey={stint.key}
+                        stackId="a"
+                        fill={stint.color}
+                        radius={[
+                          index === 0 ? 4 : 0,
+                          index === timelineStints.length - 1 ? 4 : 0,
+                          index === timelineStints.length - 1 ? 4 : 0,
+                          index === 0 ? 4 : 0,
+                        ]}
+                        name={stint.label}
+                      />
+                    ))}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
