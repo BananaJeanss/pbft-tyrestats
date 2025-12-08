@@ -11,6 +11,10 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "tyrestats",
   description: "PBFT Tyre Stats Viewer & Analyzer",
+  
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -20,11 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${spaceMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${spaceMono.variable} antialiased`}>{children}</body>
     </html>
   );
 }

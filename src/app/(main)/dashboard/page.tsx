@@ -1,29 +1,18 @@
 "use client";
 
-import {
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Settings,
-  Tag,
-  XCircle,
-} from "lucide-react";
-import Image from "next/image";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import TyreWearManager, { TyreWearData } from "./tyrewear";
+import { Settings } from "lucide-react";
+import TyreWearManager, { TyreWearData } from "./components/TyreWearManager";
 import { useEffect, useState } from "react";
 import TyreSettings, {
   TyrePreferences,
   DEFAULT_PREFERENCES,
-} from "./tyresettings";
-import RaceSettings, { RaceConfiguration } from "./racesettings";
+} from "./components/TyreSettings";
+import RaceSettings, { RaceConfiguration } from "./components/RaceSettings";
+import DashSidebar from "./components/DashSidebar";
+import AIStrategySuggestion from "./components/AIStrategySuggestion";
+import DashNotes from "./components/DashNotes";
+import { generateOptimalTimeline, getEffectiveTyreData } from "./TyreMath";
+import DashTimeline from "./components/DashTimeline";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -71,215 +60,12 @@ export default function Dashboard() {
     }
   };
 
-  // return how many laps recommended to run on this tyre, ideally imo 45% is the sweet spot
+  // return how many laps recommended to run on this tyre based on switchover point
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
     return Math.floor(
       (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
     );
-  };
-
-  const getEffectiveTyreData = (tyreId: string) => {
-    // 1. Real data
-    if (tyreData[tyreId]) {
-      return { ...tyreData[tyreId], isEstimated: false };
-    }
-
-    // 2. Skip wets
-    if (tyreId === "wet") return null;
-
-    // 3. Estimate
-    const { softToMediumRatio, mediumToHardRatio } = tyrePreferences;
-    let estimatedWearPerLap = 0;
-
-    if (tyreData["medium"]) {
-      const wm = tyreData["medium"].wearPerLap;
-      if (tyreId === "soft") estimatedWearPerLap = wm * softToMediumRatio;
-      else if (tyreId === "hard") estimatedWearPerLap = wm / mediumToHardRatio;
-    } else if (tyreData["soft"]) {
-      const ws = tyreData["soft"].wearPerLap;
-      if (tyreId === "medium") estimatedWearPerLap = ws / softToMediumRatio;
-      else if (tyreId === "hard")
-        estimatedWearPerLap = ws / (softToMediumRatio * mediumToHardRatio);
-    } else if (tyreData["hard"]) {
-      const wh = tyreData["hard"].wearPerLap;
-      if (tyreId === "medium") estimatedWearPerLap = wh * mediumToHardRatio;
-      else if (tyreId === "soft")
-        estimatedWearPerLap = wh * mediumToHardRatio * softToMediumRatio;
-    }
-
-    if (estimatedWearPerLap > 0) {
-      return {
-        wearPerLap: estimatedWearPerLap,
-        remainingLife: 100,
-        lapsDriven: 0,
-        isEstimated: true,
-      };
-    }
-
-    return null;
-  };
-
-  const validateTimelineData = () => {
-    // per FIT regulations 2 or more compounds must be used
-    if (timelineStints.length > 0) {
-      const compounds = new Set(timelineStints.map((s) => s.tyreId));
-      return compounds.size >= 2;
-    }
-
-    const usedTyres = Object.values(timelineData[0]).filter(
-      (val) => typeof val === "number" && val > 0
-    ).length;
-    if (usedTyres < 2) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
-  const generateOptimalTimeline = () => {
-    // 1. Get Race Laps
-    const config = Object.values(raceConfig)[0];
-    const totalLaps = config?.RaceLaps ? config.RaceLaps : 50;
-
-    if (!totalLaps || totalLaps <= 0) return;
-
-    // 2. Get Available Tyre Data & Max Laps
-    const availableTyres: { id: string; maxLaps: number; color: string }[] = [];
-
-    TYRE_TYPES.forEach((t) => {
-      if (t.id === "wet") return; // Skip wet for dry strategy generation
-      const data = getEffectiveTyreData(t.id);
-      if (data && data.wearPerLap > 0) {
-        const usablePercentage = 100 - tyrePreferences.preferredSwitchoverPoint;
-        // Allow a buffer for "stretching" (e.g. +10% extra wear if needed to finish)
-        const maxLaps = Math.floor(usablePercentage / data.wearPerLap);
-
-        availableTyres.push({
-          id: t.id,
-          maxLaps: maxLaps,
-          color:
-            t.id === "soft"
-              ? "#dc2626"
-              : t.id === "medium"
-              ? "#eab308"
-              : "#ffffff",
-        });
-      }
-    });
-
-    if (availableTyres.length === 0) return;
-
-    // 3. Find Strategy
-    let bestStrategy: { tyreId: string; laps: number; color: string }[] | null =
-      null;
-
-    // Helper to check if a strategy is valid (uses 2+ compounds)
-    const isValidComposition = (stints: typeof bestStrategy) => {
-      if (!stints) return false;
-      const compounds = new Set(stints.map((s) => s.tyreId));
-      return compounds.size >= 2;
-    };
-
-    // Scoring weights for compounds (Higher is faster/better)
-    const PACE_SCORE: Record<string, number> = {
-      soft: 3,
-      medium: 2,
-      hard: 1,
-    };
-
-    const calculateScore = (stints: any[]) => {
-      // Heavy penalty for pit stops to prioritize fewer stops
-      // 500 points is more than max possible points from laps (e.g. 100 laps * 3 pts = 300)
-      const stopPenalty = (stints.length - 1) * 500;
-
-      const performanceScore = stints.reduce((acc, stint) => {
-        return acc + stint.laps * (PACE_SCORE[stint.tyreId] || 0);
-      }, 0);
-
-      return performanceScore - stopPenalty;
-    };
-
-    const validStrategies: { stints: any[]; score: number }[] = [];
-
-    const findAllCombinations = (currentLaps: number, currentStints: any[]) => {
-      // Base case: Race finished
-      if (currentLaps >= totalLaps) {
-        if (isValidComposition(currentStints)) {
-          // If we overshot, trim the last stint
-          const excess = currentLaps - totalLaps;
-          const finalStints = JSON.parse(JSON.stringify(currentStints));
-          finalStints[finalStints.length - 1].laps -= excess;
-
-          validStrategies.push({
-            stints: finalStints,
-            score: calculateScore(finalStints),
-          });
-        }
-        return;
-      }
-
-      if (currentStints.length >= 12) return;
-
-      // Try all available tyres
-      for (const tyre of availableTyres) {
-        const remainingRace = totalLaps - currentLaps;
-        const stretchLimit = Math.floor(tyre.maxLaps * 1.2); // Allow pushing past preference by 20%
-
-        let stintLength = tyre.maxLaps;
-
-        // If we can finish the race with this tyre within stretch limit, do it.
-        if (remainingRace <= stretchLimit) {
-          stintLength = remainingRace;
-        }
-
-        // Optimization: Don't add a stint if it's tiny unless it finishes the race
-        if (stintLength < 3 && remainingRace > stintLength) continue;
-
-        findAllCombinations(currentLaps + stintLength, [
-          ...currentStints,
-          { tyreId: tyre.id, laps: stintLength, color: tyre.color },
-        ]);
-      }
-    };
-
-    findAllCombinations(0, []);
-
-    if (validStrategies.length > 0) {
-      // Sort by score descending (Highest score wins)
-      validStrategies.sort((a, b) => b.score - a.score);
-      bestStrategy = validStrategies[0].stints;
-    }
-
-    // 4. Map to Timeline Data
-    if (bestStrategy) {
-      const newTimelineData: any = { name: "Strategy" };
-      const newStints: any[] = [];
-      let cumulativeLaps = 0;
-
-      bestStrategy.forEach((stint, index) => {
-        const key = `stint_${index}`;
-        newTimelineData[key] = stint.laps;
-
-        const startLap = cumulativeLaps + 1;
-        cumulativeLaps += stint.laps;
-        const endLap = cumulativeLaps;
-
-        newStints.push({
-          key,
-          tyreId: stint.tyreId,
-          laps: stint.laps,
-          color: stint.color,
-          label: `${
-            stint.tyreId.charAt(0).toUpperCase() + stint.tyreId.slice(1)
-          } (Laps ${startLap}-${endLap})`,
-        });
-      });
-
-      setTimelineData([newTimelineData]);
-      setTimelineStints(newStints);
-      setTimelineGenerates(true);
-    }
   };
 
   useEffect(() => {
@@ -288,7 +74,16 @@ export default function Dashboard() {
     const hasTyreData = Object.keys(tyreData).length > 0;
 
     if (hasRaceConfig && hasTyreData) {
-      generateOptimalTimeline();
+      const result = generateOptimalTimeline(
+        raceConfig,
+        tyrePreferences,
+        tyreData
+      );
+      if (result) {
+        setTimelineData(result.timelineData);
+        setTimelineStints(result.timelineStints);
+        setTimelineGenerates(true);
+      }
     } else {
       // Reset timeline if requirements are not met
       setTimelineGenerates(false);
@@ -342,39 +137,7 @@ export default function Dashboard() {
 
       <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
         {/* Sidebar Session Selection */}
-        <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4">
-          <div className="w-full h-2/12 bg-neutral-900 rounded-md p-2 flex flex-row gap-4">
-            <Image
-              src="/placeholder.png"
-              alt="Track Logo"
-              className="h-full w-2/8 rounded-md"
-              width={256}
-              height={256}
-            />
-            <div className="flex flex-col">
-              <h2 className="text-white text-lg font-semibold">
-                Track Name/Session Name
-              </h2>
-              <hr className="my-2 border-neutral-700" />
-              <span className="flex flex-col">
-                <div className="flex flex-row items-center text-neutral-400 text-sm">
-                  <Calendar className="inline h-4 w-4 mr-2 text-neutral-400" />
-                  Date
-                </div>
-                <div className="flex flex-row items-center text-neutral-400 text-sm">
-                  <Clock className="inline h-4 w-4 mr-2 text-neutral-400" />
-                  Edited on 12/12/2025
-                </div>
-                <div className="flex flex-row items-center text-neutral-400 text-sm">
-                  <Tag className="inline h-4 w-4 mr-2 text-neutral-400" />
-                  <div className="border rounded-4xl flex flex-row px-2 text-sm">
-                    tag1
-                  </div>
-                </div>
-              </span>
-            </div>
-          </div>
-        </div>
+        <DashSidebar />
         {/* Main Dashboard Thingy */}
         <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
           <h2 className="text-white font-semibold text-2xl">
@@ -383,109 +146,16 @@ export default function Dashboard() {
           <hr className="border-neutral-700" />
 
           {/* Timeline Section */}
-          <div className="w-full bg-neutral-900 p-4 rounded-lg flex flex-col gap-2">
-            <div className="w-full flex flex-row justify-between">
-              <h3 className="text-lg font-bold flex items-center gap-2">
-                Timeline (
-                {validateTimelineData() ? (
-                  <>
-                    <CheckCircle2 className="inline h-5 w-5 text-green-500 mr-1" />
-                    <p
-                      title="2 or more tyre compounds used"
-                      className="cursor-help"
-                    >
-                      FIT Valid
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="inline h-5 w-5 text-red-500" />
-                    <p
-                      title="Less than 2 different compounds used"
-                      className="cursor-help"
-                    >
-                      FIT Invalid - At least 2 tyre compounds must be used
-                    </p>
-                  </>
-                )}
-                )
-              </h3>
-              <button
-                className="cursor-pointer"
-                onClick={() => {
-                  setRaceSettingsVis(true);
-                }}
-              >
-                <Settings />
-              </button>
-            </div>
+          <DashTimeline
+            timelineGenerated={timelineGenerated}
+            timelineData={timelineData}
+            timelineStints={timelineStints}
+            tyreData={tyreData}
+            setRaceSettingsVis={setRaceSettingsVis}
+            raceConfig={raceConfig}
+          />
 
-            {timelineGenerated ? (
-              <div className="h-16 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    layout="vertical"
-                    data={timelineData}
-                    margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                  >
-                    {/* Hide axes for a clean look */}
-                    <XAxis type="number" domain={[0, "dataMax"]} hide />
-                    <YAxis type="category" dataKey="name" hide />
-
-                    <Tooltip
-                      cursor={{ fill: "transparent" }}
-                      contentStyle={{
-                        backgroundColor: "#171717",
-                        border: "1px solid #404040",
-                        borderRadius: "0.5rem",
-                        color: "#fff",
-                      }}
-                      itemStyle={{ color: "#fff" }}
-                    />
-
-                    {/* Stacked bars create the timeline segments */}
-                    {/* radius prop rounds the corners: [topLeft, topRight, bottomRight, bottomLeft] */}
-                    {timelineStints.map((stint, index) => (
-                      <Bar
-                        key={stint.key}
-                        dataKey={stint.key}
-                        stackId="a"
-                        fill={stint.color}
-                        radius={[
-                          index === 0 ? 4 : 0,
-                          index === timelineStints.length - 1 ? 4 : 0,
-                          index === timelineStints.length - 1 ? 4 : 0,
-                          index === 0 ? 4 : 0,
-                        ]}
-                        name={stint.label}
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            ) : (
-              <div className="h-16 w-full">
-                <p className="text-neutral-400 text-sm">
-                  Timeline will be auto-generated once{" "}
-                  {!Object.values(raceConfig)[0]?.RaceLaps &&
-                  Object.keys(tyreData).length === 0
-                    ? "the race settings and at least one tyre compound data has"
-                    : !Object.values(raceConfig)[0]?.RaceLaps
-                    ? "the race settings have"
-                    : "at least one tyre compound data has"}{" "}
-                  been added.
-                </p>
-              </div>
-            )}
-
-            <div className="flex justify-between text-xs text-neutral-500 px-1">
-              <span>Start</span>
-              <span>
-                Finish (Lap{" "}
-                {Object.values(raceConfig)[0]?.RaceLaps || "Not Set"})
-              </span>
-            </div>
-          </div>
+          {/* top tiles section - tyres and ai */}
           <div className="w-full flex flex-row h-2/5 gap-2">
             {/* tyressssssss */}
             <div className="bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
@@ -499,7 +169,11 @@ export default function Dashboard() {
                 </button>
               </div>
               {TYRE_TYPES.map((tyre) => {
-                const effectiveData = getEffectiveTyreData(tyre.id);
+                const effectiveData = getEffectiveTyreData(
+                  tyre.id,
+                  tyreData,
+                  tyrePreferences
+                );
                 return (
                   <div
                     key={tyre.id}
@@ -549,20 +223,11 @@ export default function Dashboard() {
               })}
             </div>
             {/* AI strategy overview cause i cant think of anything better */}
-            <div className="bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">
-              <h3 className="text-lg font-bold">AI Strategy Overview</h3>
-              <p>ai text output go here</p>
-            </div>
+            <AIStrategySuggestion />
           </div>
 
           {/* Notes section*/}
-          <div className="bg-neutral-900 rounded-lg p-4 w-2/7 h-2/5 flex flex-col gap-2">
-            <h3 className="font-semibold">Notes</h3>
-            <textarea
-              className="w-full h-full bg-neutral-800 rounded-md p-2 text-white resize-none focus:outline-none focus:ring-2 focus:ring-neutral-600"
-              placeholder="Add your notes here..."
-            />
-          </div>
+          <DashNotes />
         </div>
       </div>
     </div>
