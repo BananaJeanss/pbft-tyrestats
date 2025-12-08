@@ -18,20 +18,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import TyreWearManager, { TyreWearData } from "./tyrewear";
-import { useState } from "react";
-import TyreSettings, { TyrePreferences } from "./tyresettings";
+import { useEffect, useState } from "react";
+import TyreSettings, {
+  TyrePreferences,
+  DEFAULT_PREFERENCES,
+} from "./tyresettings";
 import RaceSettings, { RaceConfiguration } from "./racesettings";
-
-// Mock data for the timeline (values represent number of laps)
-const timelineData = [
-  {
-    name: "Strategy",
-    soft: 6, // First stint
-    medium: 12, // Second stint
-    hard: 15, // Third stint
-    wet: 0, // Wet stint
-  },
-];
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -48,7 +40,18 @@ export default function Dashboard() {
   >(null);
 
   const [tyreData, setTyreData] = useState<Record<string, TyreWearData>>({});
-  const [preferredSwitchoverPoint, setPreferredSwitchoverPoint] = useState(40);
+  const [tyrePreferences, setTyrePreferences] =
+    useState<TyrePreferences>(DEFAULT_PREFERENCES);
+
+  const [timelineData, setTimelineData] = useState([
+    {
+      name: "Strategy",
+      soft: 0,
+      medium: 0,
+      hard: 0,
+      wet: 0,
+    },
+  ]);
 
   const [timelineGenerated, setTimelineGenerates] = useState(false);
 
@@ -70,7 +73,50 @@ export default function Dashboard() {
   // return how many laps recommended to run on this tyre, ideally imo 45% is the sweet spot
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
-    return Math.floor((100 - preferredSwitchoverPoint) / wearPerLap);
+    return Math.floor(
+      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
+    );
+  };
+
+  const getEffectiveTyreData = (tyreId: string) => {
+    // 1. Real data
+    if (tyreData[tyreId]) {
+      return { ...tyreData[tyreId], isEstimated: false };
+    }
+
+    // 2. Skip wets
+    if (tyreId === "wet") return null;
+
+    // 3. Estimate
+    const { softToMediumRatio, mediumToHardRatio } = tyrePreferences;
+    let estimatedWearPerLap = 0;
+
+    if (tyreData["medium"]) {
+      const wm = tyreData["medium"].wearPerLap;
+      if (tyreId === "soft") estimatedWearPerLap = wm * softToMediumRatio;
+      else if (tyreId === "hard") estimatedWearPerLap = wm / mediumToHardRatio;
+    } else if (tyreData["soft"]) {
+      const ws = tyreData["soft"].wearPerLap;
+      if (tyreId === "medium") estimatedWearPerLap = ws / softToMediumRatio;
+      else if (tyreId === "hard")
+        estimatedWearPerLap = ws / (softToMediumRatio * mediumToHardRatio);
+    } else if (tyreData["hard"]) {
+      const wh = tyreData["hard"].wearPerLap;
+      if (tyreId === "medium") estimatedWearPerLap = wh * mediumToHardRatio;
+      else if (tyreId === "soft")
+        estimatedWearPerLap = wh * mediumToHardRatio * softToMediumRatio;
+    }
+
+    if (estimatedWearPerLap > 0) {
+      return {
+        wearPerLap: estimatedWearPerLap,
+        remainingLife: 100,
+        lapsDriven: 0,
+        isEstimated: true,
+      };
+    }
+
+    return null;
   };
 
   const validateTimelineData = () => {
@@ -78,7 +124,7 @@ export default function Dashboard() {
     const usedTyres = Object.values(timelineData[0]).filter(
       (val) => typeof val === "number" && val > 0
     ).length;
-    if (usedTyres <= 2) {
+    if (usedTyres < 2) {
       return false;
     } else {
       return true;
@@ -86,8 +132,165 @@ export default function Dashboard() {
   };
 
   const generateOptimalTimeline = () => {
-    // generates the optimal timeline to use in a race, following 2 compound rule
+    // 1. Get Race Laps
+    const config = Object.values(raceConfig)[0];
+    const totalLaps = config?.RaceLaps ? config.RaceLaps : 50;
+
+    if (!totalLaps || totalLaps <= 0) return;
+
+    // 2. Get Available Tyre Data & Max Laps
+    const availableTyres: { id: string; maxLaps: number; color: string }[] = [];
+
+    TYRE_TYPES.forEach((t) => {
+      if (t.id === "wet") return; // Skip wet for dry strategy generation
+      const data = getEffectiveTyreData(t.id);
+      if (data && data.wearPerLap > 0) {
+        const usablePercentage = 100 - tyrePreferences.preferredSwitchoverPoint;
+        // Allow a buffer for "stretching" (e.g. +10% extra wear if needed to finish)
+        const maxLaps = Math.floor(usablePercentage / data.wearPerLap);
+
+        availableTyres.push({
+          id: t.id,
+          maxLaps: maxLaps,
+          color:
+            t.id === "soft"
+              ? "#dc2626"
+              : t.id === "medium"
+              ? "#eab308"
+              : "#ffffff",
+        });
+      }
+    });
+
+    if (availableTyres.length === 0) return;
+
+    // 3. Find Strategy
+    let bestStrategy: { tyreId: string; laps: number; color: string }[] | null =
+      null;
+
+    // Helper to check if a strategy is valid (uses 2+ compounds)
+    const isValidComposition = (stints: typeof bestStrategy) => {
+      if (!stints) return false;
+      const compounds = new Set(stints.map((s) => s.tyreId));
+      return compounds.size >= 2;
+    };
+
+    const findCombination = (
+      depth: number,
+      currentLaps: number,
+      currentStints: any[]
+    ): boolean => {
+      // Base case: Race finished
+      if (currentLaps >= totalLaps) {
+        if (isValidComposition(currentStints)) {
+          // If we overshot, trim the last stint
+          const excess = currentLaps - totalLaps;
+          const lastStint = currentStints[currentStints.length - 1];
+          lastStint.laps -= excess;
+
+          bestStrategy = currentStints;
+          return true; // Found a valid one
+        }
+        return false;
+      }
+
+      if (currentStints.length >= 4) return false;
+
+      const sortedTyres = [...availableTyres].sort(
+        (a, b) => b.maxLaps - a.maxLaps
+      );
+
+      for (const tyre of sortedTyres) {
+        const remainingRace = totalLaps - currentLaps;
+        const stretchLimit = Math.floor(tyre.maxLaps * 1.2); // Allow pushing past preference
+
+        let stintLength = tyre.maxLaps;
+
+        // If we can finish the race with this tyre within stretch limit, do it.
+        if (remainingRace <= stretchLimit) {
+          stintLength = remainingRace;
+        }
+
+        // Optimization: Don't add a stint if it's tiny unless it finishes the race
+        if (stintLength < 3 && remainingRace > stintLength) continue;
+
+        if (
+          findCombination(depth + 1, currentLaps + stintLength, [
+            ...currentStints,
+            { tyreId: tyre.id, laps: stintLength, color: tyre.color },
+          ])
+        ) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    findCombination(0, 0, []);
+
+    // 4. Map to Timeline Data
+    if (bestStrategy) {
+      const newTimelineData: any = { name: "Strategy" };
+
+      // Initialize all to 0
+      newTimelineData.soft = 0;
+      newTimelineData.medium = 0;
+      newTimelineData.hard = 0;
+      newTimelineData.wet = 0;
+
+      const formattedTimeline = (bestStrategy as any[]).map((stint, index) => {
+        const entry: any = { name: `Stint ${index + 1}` };
+        // Reset others
+        entry.soft = 0;
+        entry.medium = 0;
+        entry.hard = 0;
+        entry.wet = 0;
+
+        // Set active
+        entry[stint.tyreId] = stint.laps;
+        return entry;
+      });
+
+      const strategyData = {
+        name: "Strategy",
+        soft: 0,
+        medium: 0,
+        hard: 0,
+        wet: 0,
+      };
+
+      (bestStrategy as any[]).forEach((stint) => {
+        // @ts-ignore - dynamic key
+        strategyData[stint.tyreId] += stint.laps;
+      });
+
+      setTimelineData([strategyData]);
+      setTimelineGenerates(true);
+    }
   };
+
+  useEffect(() => {
+    const config = Object.values(raceConfig)[0];
+    const hasRaceConfig = config && config.RaceLaps > 0;
+    const hasTyreData = Object.keys(tyreData).length > 0;
+
+    if (hasRaceConfig && hasTyreData) {
+      generateOptimalTimeline();
+    } else {
+      // Reset timeline if requirements are not met
+      setTimelineGenerates(false);
+      setTimelineData([
+        {
+          name: "Strategy",
+          soft: 0,
+          medium: 0,
+          hard: 0,
+          wet: 0,
+        },
+      ]);
+    }
+  }, [tyreData, raceConfig, tyrePreferences]);
 
   return (
     <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
@@ -107,12 +310,12 @@ export default function Dashboard() {
       )}
       {tyresettingsVis && (
         <TyreSettings
-          currentPreferences={{ preferredSwitchoverPoint }}
+          currentPreferences={tyrePreferences}
           onClose={function (): void {
             settyresettingsVis(false);
           }}
           onSave={function (prefs: TyrePreferences): void {
-            setPreferredSwitchoverPoint(prefs.preferredSwitchoverPoint);
+            setTyrePreferences(prefs);
           }}
         />
       )}
@@ -174,12 +377,22 @@ export default function Dashboard() {
                 {validateTimelineData() ? (
                   <>
                     <CheckCircle2 className="inline h-5 w-5 text-green-500 mr-1" />
-                    <p>FIT Valid</p>
+                    <p
+                      title="2 or more tyre compounds used"
+                      className="cursor-help"
+                    >
+                      FIT Valid
+                    </p>
                   </>
                 ) : (
                   <>
                     <XCircle className="inline h-5 w-5 text-red-500" />
-                    <p>FIT Invalid - At least 2 tyre compounds must be used</p>
+                    <p
+                      title="Less than 2 different compounds used"
+                      className="cursor-help"
+                    >
+                      FIT Invalid - At least 2 tyre compounds must be used
+                    </p>
                   </>
                 )}
                 )
@@ -193,6 +406,7 @@ export default function Dashboard() {
                 <Settings />
               </button>
             </div>
+
             {timelineGenerated ? (
               <div className="h-16 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -244,8 +458,14 @@ export default function Dashboard() {
             ) : (
               <div className="h-16 w-full">
                 <p className="text-neutral-400 text-sm">
-                  Timeline will be auto-generated once the race settings and at
-                  least one tyre compound data has been added.
+                  Timeline will be auto-generated once{" "}
+                  {!Object.values(raceConfig)[0]?.RaceLaps &&
+                  Object.keys(tyreData).length === 0
+                    ? "the race settings and at least one tyre compound data has"
+                    : !Object.values(raceConfig)[0]?.RaceLaps
+                    ? "the race settings have"
+                    : "at least one tyre compound data has"}{" "}
+                  been added.
                 </p>
               </div>
             )}
@@ -270,53 +490,55 @@ export default function Dashboard() {
                   <Settings className="h-5 w-5" />
                 </button>
               </div>
-              {TYRE_TYPES.map((tyre) => (
-                <div
-                  key={tyre.id}
-                  className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
-                >
-                  <button
-                    onClick={() => {
-                      setSelectedTyre(tyre.id);
-                      settyremanVis(true);
-                    }}
+              {TYRE_TYPES.map((tyre) => {
+                const effectiveData = getEffectiveTyreData(tyre.id);
+                return (
+                  <div
+                    key={tyre.id}
+                    className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
                   >
-                    <h3
-                      className={`${tyre.color} text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
+                    <button
+                      onClick={() => {
+                        setSelectedTyre(tyre.id);
+                        settyremanVis(true);
+                      }}
                     >
-                      {tyre.label}
-                    </h3>
-                  </button>
-                  <div className="flex flex-col">
-                    {tyreData[tyre.id] ? (
-                      <>
+                      <h3
+                        className={`${tyre.color} text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
+                      >
+                        {tyre.label}
+                      </h3>
+                    </button>
+                    <div className="flex flex-col">
+                      {effectiveData ? (
+                        <>
+                          <p className="text-neutral-400 text-xs">
+                            {effectiveData.isEstimated ? "Est. " : ""}Average
+                            wear per lap: {effectiveData.wearPerLap.toFixed(2)}%
+                          </p>
+                          <p className="text-neutral-400 text-xs">
+                            Recommended Lap Count:{" "}
+                            {calcRecommendedLapCount(effectiveData.wearPerLap)}{" "}
+                            (
+                            {(
+                              100 -
+                              effectiveData.wearPerLap *
+                                calcRecommendedLapCount(
+                                  effectiveData.wearPerLap
+                                )
+                            ).toFixed(2)}
+                            %)
+                          </p>
+                        </>
+                      ) : (
                         <p className="text-neutral-400 text-xs">
-                          Average wear per lap: {tyreData[tyre.id].wearPerLap}%
+                          No Data Yet (Click on the tyre to add data)
                         </p>
-                        <p className="text-neutral-400 text-xs">
-                          Recommended Lap Count:{" "}
-                          {calcRecommendedLapCount(
-                            tyreData[tyre.id].wearPerLap
-                          )}{" "}
-                          (
-                          {(
-                            100 -
-                            tyreData[tyre.id].wearPerLap *
-                              calcRecommendedLapCount(
-                                tyreData[tyre.id].wearPerLap
-                              )
-                          ).toFixed(2)}
-                          %)
-                        </p>
-                      </>
-                    ) : (
-                      <p className="text-neutral-400 text-xs">
-                        No Data Yet (Click on the tyre to add data)
-                      </p>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {/* AI strategy overview cause i cant think of anything better */}
             <div className="bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">

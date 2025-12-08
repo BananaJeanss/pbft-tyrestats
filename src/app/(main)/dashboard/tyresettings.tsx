@@ -3,10 +3,14 @@ import { useState } from "react";
 
 export interface TyrePreferences {
   preferredSwitchoverPoint: number; // percentage (e.g. 40%)
+  softToMediumRatio: number;
+  mediumToHardRatio: number;
 }
 
 export const DEFAULT_PREFERENCES: TyrePreferences = {
   preferredSwitchoverPoint: 40,
+  softToMediumRatio: 1.4,
+  mediumToHardRatio: 2.1,
 };
 
 interface TyreSettingsProps {
@@ -66,6 +70,62 @@ export default function TyreSettings({
             </div>
             <p className="text-xs text-neutral-500">
               Used to calculate recommended lap counts.
+            </p>
+          </div>
+
+          <hr className="border-neutral-800" />
+
+          {/* Estimation Ratios */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-md font-bold text-white">Life Estimation Ratios</h3>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-neutral-300">
+                Soft to Medium Ratio
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-neutral-500 text-sm">1 Soft Lap = </span>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={prefs.softToMediumRatio}
+                  onChange={(e) =>
+                    setPrefs({
+                      ...prefs,
+                      softToMediumRatio: parseFloat(e.target.value) || 1,
+                    })
+                  }
+                  className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-20 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                />
+                <span className="text-neutral-500 text-sm">Medium Laps</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-neutral-300">
+                Medium to Hard Ratio
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-neutral-500 text-sm">
+                  1 Medium Lap ={" "}
+                </span>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={prefs.mediumToHardRatio}
+                  onChange={(e) =>
+                    setPrefs({
+                      ...prefs,
+                      mediumToHardRatio: parseFloat(e.target.value) || 1,
+                    })
+                  }
+                  className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-20 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                />
+                <span className="text-neutral-500 text-sm">Hard Laps</span>
+              </div>
+            </div>
+            <p className="text-xs text-neutral-500">
+              Used to estimate tyre life when data is missing.
             </p>
           </div>
         </div>
