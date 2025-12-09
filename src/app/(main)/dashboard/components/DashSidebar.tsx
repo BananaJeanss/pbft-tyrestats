@@ -21,7 +21,7 @@ export default function DashSidebar() {
             Track Name/Session Name
           </h2>
           <hr className="my-2 border-neutral-700" />
-          <span className="flex flex-col">
+          <span className="flex flex-col justify-between">
             <div className="flex flex-row items-center text-neutral-400 text-sm">
               <Calendar className="inline h-4 w-4 mr-2 text-neutral-400" />
               Date
@@ -29,12 +29,6 @@ export default function DashSidebar() {
             <div className="flex flex-row items-center text-neutral-400 text-sm">
               <Clock className="inline h-4 w-4 mr-2 text-neutral-400" />
               Edited on 12/12/2025
-            </div>
-            <div className="flex flex-row items-center text-neutral-400 text-sm">
-              <Tag className="inline h-4 w-4 mr-2 text-neutral-400" />
-              <div className="border rounded-4xl flex flex-row px-2 text-sm">
-                tag1
-              </div>
             </div>
           </span>
         </div>

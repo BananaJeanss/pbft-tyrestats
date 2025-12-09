@@ -33,7 +33,7 @@ interface DashTimelineProps {
   }[];
   tyreData: Record<string, any>;
   setRaceSettingsVis: (vis: boolean) => void;
-  raceConfig: Record<string, RaceConfiguration>;
+  raceConfig: RaceConfiguration;
 }
 
 export default function DashTimeline({
@@ -126,10 +126,10 @@ export default function DashTimeline({
         <div className="h-16 w-full">
           <p className="text-neutral-400 text-sm">
             Timeline will be auto-generated once{" "}
-            {!Object.values(raceConfig)[0]?.RaceLaps &&
+            {!raceConfig?.RaceLaps &&
             Object.keys(tyreData).length === 0
               ? "the race settings and at least one tyre compound data has"
-              : !Object.values(raceConfig)[0]?.RaceLaps
+              : !raceConfig?.RaceLaps
               ? "the race settings have"
               : "at least one tyre compound data has"}{" "}
             been added.
@@ -140,7 +140,7 @@ export default function DashTimeline({
       <div className="flex justify-between text-xs text-neutral-500 px-1">
         <span>Start</span>
         <span>
-          Finish (Lap {Object.values(raceConfig)[0]?.RaceLaps || "Not Set"})
+          Finish (Lap {raceConfig?.RaceLaps || "Not Set"})
         </span>
       </div>
     </div>

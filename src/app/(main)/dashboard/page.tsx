@@ -1,18 +1,19 @@
 "use client";
 
-import { Settings } from "lucide-react";
+import { Pencil, Settings } from "lucide-react";
 import TyreWearManager, { TyreWearData } from "./components/TyreWearManager";
 import { useEffect, useState } from "react";
 import TyreSettings, {
   TyrePreferences,
   DEFAULT_PREFERENCES,
 } from "./components/TyreSettings";
-import RaceSettings, { RaceConfiguration } from "./components/RaceSettings";
+import RaceSettings, { RaceConfiguration, DEFAULT_RACECONFIGURATION } from "./components/RaceSettings";
 import DashSidebar from "./components/DashSidebar";
 import AIStrategySuggestion from "./components/AIStrategySuggestion";
 import DashNotes from "./components/DashNotes";
 import { generateOptimalTimeline, getEffectiveTyreData } from "./TyreMath";
 import DashTimeline from "./components/DashTimeline";
+import SessionSettingsPage, { SessionSettings } from "./components/SessionSettings";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -41,13 +42,16 @@ export default function Dashboard() {
       wet: 0,
     },
   ]);
-  const [timelineStints, setTimelineStints] = useState<any[]>([]);
 
+  const [timelineStints, setTimelineStints] = useState<any[]>([]);
   const [timelineGenerated, setTimelineGenerates] = useState(false);
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
-  const [raceConfig, setRaceConfig] = useState<
-    Record<string, RaceConfiguration>
+  const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(DEFAULT_RACECONFIGURATION);
+
+  const [sessionSettingsVis, setSessionSettingsVis] = useState(false);
+  const [sessionSettings, setSessionSettings] = useState<
+    Record<string, SessionSettings>
   >({});
 
   const handleSaveTyreData = (data: TyreWearData) => {
@@ -69,8 +73,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    const config = Object.values(raceConfig)[0];
-    const hasRaceConfig = config && config.RaceLaps > 0;
+    const hasRaceConfig = raceConfig && raceConfig.RaceLaps > 0;
     const hasTyreData = Object.keys(tyreData).length > 0;
 
     if (hasRaceConfig && hasTyreData) {
@@ -104,15 +107,12 @@ export default function Dashboard() {
     <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
       {raceSettingsVis && (
         <RaceSettings
-          currentConfig={raceConfig[selectedTyre || ""]}
+          currentConfig={raceConfig}
           onClose={function (): void {
             setRaceSettingsVis(false);
           }}
           onSave={function (config: RaceConfiguration): void {
-            setRaceConfig((prev) => ({
-              ...prev,
-              [selectedTyre || ""]: config,
-            }));
+            setRaceConfig(config);
           }}
         />
       )}
@@ -134,14 +134,31 @@ export default function Dashboard() {
           onSave={handleSaveTyreData}
         />
       )}
+      {sessionSettingsVis && (
+        <SessionSettingsPage
+          onClose={() => setSessionSettingsVis(false)}
+          onSave={(settings: SessionSettings) => {
+            setSessionSettings((prev) => ({
+              ...prev,
+              "current": settings,
+            }));
+          }}
+        />
+      )}
 
       <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
         {/* Sidebar Session Selection */}
         <DashSidebar />
         {/* Main Dashboard Thingy */}
         <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
-          <h2 className="text-white font-semibold text-2xl">
-            Track Name/Session Name
+          <h2 className="text-white font-semibold text-2xl flex flex-row gap-2 items-center">
+            {sessionSettings["current"]?.name || "Session/Race Name"}
+            <button
+              className="cursor-pointer text-neutral-500 hover:text-neutral-300"
+              onClick={() => setSessionSettingsVis(true)}
+            >
+              <Pencil />
+            </button>
           </h2>
           <hr className="border-neutral-700" />
 

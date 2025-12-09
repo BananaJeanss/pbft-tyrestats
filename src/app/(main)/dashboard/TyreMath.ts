@@ -55,13 +55,12 @@ export const getEffectiveTyreData = (
 };
 
 export const generateOptimalTimeline = (
-  raceConfig: Record<string, RaceConfiguration>,
+  raceConfig: RaceConfiguration,
   tyrePreferences: TyrePreferences,
   tyreData: Record<string, TyreWearData>
 ) => {
   // 1. Get Race Laps
-  const config = Object.values(raceConfig)[0];
-  const totalLaps = config?.RaceLaps ? config.RaceLaps : 50;
+  const totalLaps = raceConfig?.RaceLaps ? raceConfig.RaceLaps : 50;
 
   if (!totalLaps || totalLaps <= 0) return null;
 
