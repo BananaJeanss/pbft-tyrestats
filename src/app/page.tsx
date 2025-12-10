@@ -8,6 +8,12 @@ const loginButtonStyles =
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black text-white">
+      <Image
+        src="/tslogow.png"
+        alt="Tyrestats Logo which is very cool and awesome"
+        width={256}
+        height={256}
+      />
       <h1 className="text-4xl font-bold underline mb-2">tyrestats</h1>
       <p>PB Formula Truck raceday statistics dashboard & analyzer</p>
       <hr className="my-4 w-1/2 border-zinc-300" />

@@ -64,6 +64,8 @@ export default function Dashboard() {
 
   const [currentNotes, setCurrentNotes] = useState("");
 
+  const [currentSuggestion, setCurrentSuggestion] = useState("");
+
   // 1. Add state to track which ID is open
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
@@ -86,6 +88,7 @@ export default function Dashboard() {
               raceConfig,
               tyrePreferences,
               currentNotes,
+              currentSuggestion,
               meta: {
                 ...(sessionSettings["current"] || s.meta),
                 lastModified: new Date().toISOString(),
@@ -159,6 +162,7 @@ export default function Dashboard() {
     setCurrentNotes(session.currentNotes || "");
     setRaceConfig(session.raceConfig || DEFAULT_RACECONFIGURATION);
     setTyrePreferences(session.tyrePreferences || DEFAULT_PREFERENCES);
+    setCurrentSuggestion(session.currentSuggestion || "");
 
     setSessionSettings({ current: session.meta });
   };
@@ -315,7 +319,15 @@ export default function Dashboard() {
                   })}
                 </div>
                 {/* AI strategy overview cause i cant think of anything better */}
-                <AIStrategySuggestion />
+                <AIStrategySuggestion
+                  tyreData={tyreData}
+                  raceConfig={raceConfig}
+                  tyrePreferences={tyrePreferences}
+                  existingSuggestion={currentSuggestion}
+                  onSave={(suggestion: string) =>
+                    setCurrentSuggestion(suggestion)
+                  }
+                />
               </div>
 
               {/* Notes section*/}
