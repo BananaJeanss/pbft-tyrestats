@@ -7,13 +7,19 @@ import TyreSettings, {
   TyrePreferences,
   DEFAULT_PREFERENCES,
 } from "./components/TyreSettings";
-import RaceSettings, { RaceConfiguration, DEFAULT_RACECONFIGURATION } from "./components/RaceSettings";
+import RaceSettings, {
+  RaceConfiguration,
+  DEFAULT_RACECONFIGURATION,
+} from "./components/RaceSettings";
 import DashSidebar from "./components/DashSidebar";
 import AIStrategySuggestion from "./components/AIStrategySuggestion";
 import DashNotes from "./components/DashNotes";
 import { generateOptimalTimeline, getEffectiveTyreData } from "./TyreMath";
 import DashTimeline from "./components/DashTimeline";
-import SessionSettingsPage, { SessionSettings } from "./components/SessionSettings";
+import SessionSettingsPage, {
+  SessionSettings,
+} from "./components/SessionSettings";
+import { useLocalStorage } from "../../../hooks/useLocalStorage";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -47,12 +53,55 @@ export default function Dashboard() {
   const [timelineGenerated, setTimelineGenerates] = useState(false);
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
-  const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(DEFAULT_RACECONFIGURATION);
+  const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(
+    DEFAULT_RACECONFIGURATION
+  );
 
   const [sessionSettingsVis, setSessionSettingsVis] = useState(false);
   const [sessionSettings, setSessionSettings] = useState<
     Record<string, SessionSettings>
   >({});
+
+  const [currentNotes, setCurrentNotes] = useState("");
+
+  // 1. Add state to track which ID is open
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
+  // 2. Get access to the global sessions list
+  const [sessions, setSessions] = useLocalStorage<any[]>(
+    "tyrestats_sessions",
+    []
+  );
+
+  // auto-Save Effect
+  useEffect(() => {
+    if (!currentSessionId) return;
+
+    setSessions((prevSessions) =>
+      prevSessions.map((s) =>
+        s.id === currentSessionId
+          ? {
+              ...s,
+              tyreData,
+              raceConfig,
+              tyrePreferences,
+              currentNotes,
+              meta: {
+                ...(sessionSettings["current"] || s.meta),
+                lastModified: new Date().toISOString(),
+              },
+            }
+          : s
+      )
+    );
+  }, [
+    tyreData,
+    raceConfig,
+    tyrePreferences,
+    currentNotes,
+    sessionSettings,
+    currentSessionId,
+  ]);
 
   const handleSaveTyreData = (data: TyreWearData) => {
     if (selectedTyre) {
@@ -103,150 +152,188 @@ export default function Dashboard() {
     }
   }, [tyreData, raceConfig, tyrePreferences]);
 
+  const loadSession = (session: any) => {
+    setCurrentSessionId(session.id);
+
+    setTyreData(session.tyreData || {});
+    setCurrentNotes(session.currentNotes || "");
+    setRaceConfig(session.raceConfig || DEFAULT_RACECONFIGURATION);
+    setTyrePreferences(session.tyrePreferences || DEFAULT_PREFERENCES);
+
+    setSessionSettings({ current: session.meta });
+  };
+
   return (
-    <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
-      {raceSettingsVis && (
-        <RaceSettings
-          currentConfig={raceConfig}
-          onClose={function (): void {
-            setRaceSettingsVis(false);
-          }}
-          onSave={function (config: RaceConfiguration): void {
-            setRaceConfig(config);
-          }}
-        />
-      )}
-      {tyresettingsVis && (
-        <TyreSettings
-          currentPreferences={tyrePreferences}
-          onClose={function (): void {
-            settyresettingsVis(false);
-          }}
-          onSave={function (prefs: TyrePreferences): void {
-            setTyrePreferences(prefs);
-          }}
-        />
-      )}
-      {tyremanVis && selectedTyre && (
-        <TyreWearManager
-          tyreType={selectedTyre}
-          onClose={() => settyremanVis(false)}
-          onSave={handleSaveTyreData}
-        />
-      )}
-      {sessionSettingsVis && (
-        <SessionSettingsPage
-          onClose={() => setSessionSettingsVis(false)}
-          onSave={(settings: SessionSettings) => {
-            setSessionSettings((prev) => ({
-              ...prev,
-              "current": settings,
-            }));
-          }}
-        />
-      )}
+    <>
+      {currentSessionId && (
+        <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
+          {raceSettingsVis && (
+            <RaceSettings
+              currentConfig={raceConfig}
+              onClose={function (): void {
+                setRaceSettingsVis(false);
+              }}
+              onSave={function (config: RaceConfiguration): void {
+                setRaceConfig(config);
+              }}
+            />
+          )}
+          {tyresettingsVis && (
+            <TyreSettings
+              currentPreferences={tyrePreferences}
+              onClose={function (): void {
+                settyresettingsVis(false);
+              }}
+              onSave={function (prefs: TyrePreferences): void {
+                setTyrePreferences(prefs);
+              }}
+            />
+          )}
+          {tyremanVis && selectedTyre && (
+            <TyreWearManager
+              tyreType={selectedTyre}
+              onClose={() => settyremanVis(false)}
+              onSave={handleSaveTyreData}
+            />
+          )}
+          {sessionSettingsVis && (
+            <SessionSettingsPage
+              onClose={() => setSessionSettingsVis(false)}
+              onSave={(settings: SessionSettings) => {
+                setSessionSettings((prev) => ({
+                  ...prev,
+                  current: settings,
+                }));
+              }}
+            />
+          )}
 
-      <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
-        {/* Sidebar Session Selection */}
-        <DashSidebar />
-        {/* Main Dashboard Thingy */}
-        <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
-          <h2 className="text-white font-semibold text-2xl flex flex-row gap-2 items-center">
-            {sessionSettings["current"]?.name || "Session/Race Name"}
-            <button
-              className="cursor-pointer text-neutral-500 hover:text-neutral-300"
-              onClick={() => setSessionSettingsVis(true)}
-            >
-              <Pencil />
-            </button>
-          </h2>
-          <hr className="border-neutral-700" />
+          <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
+            <DashSidebar
+              currentSessionId={currentSessionId}
+              onSelectSession={loadSession}
+            />
 
-          {/* Timeline Section */}
-          <DashTimeline
-            timelineGenerated={timelineGenerated}
-            timelineData={timelineData}
-            timelineStints={timelineStints}
-            tyreData={tyreData}
-            setRaceSettingsVis={setRaceSettingsVis}
-            raceConfig={raceConfig}
-          />
-
-          {/* top tiles section - tyres and ai */}
-          <div className="w-full flex flex-row h-2/5 gap-2">
-            {/* tyressssssss */}
-            <div className="bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
-              <div className="flex flex-row gap-2 justify-between">
-                <p className="text-md font-bold">Tyres</p>
+            {/* Main Dashboard Thingy */}
+            <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
+              <h2 className="text-white font-semibold text-2xl flex flex-row gap-2 items-center">
+                {sessionSettings["current"]?.name || "Session/Race Name"}
                 <button
-                  className="cursor-pointer text-sm"
-                  onClick={() => settyresettingsVis(true)}
+                  className="cursor-pointer text-neutral-500 hover:text-neutral-300"
+                  onClick={() => setSessionSettingsVis(true)}
                 >
-                  <Settings className="h-5 w-5" />
+                  <Pencil />
                 </button>
-              </div>
-              {TYRE_TYPES.map((tyre) => {
-                const effectiveData = getEffectiveTyreData(
-                  tyre.id,
-                  tyreData,
-                  tyrePreferences
-                );
-                return (
-                  <div
-                    key={tyre.id}
-                    className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
-                  >
-                    <button
-                      onClick={() => {
-                        setSelectedTyre(tyre.id);
-                        settyremanVis(true);
-                      }}
-                    >
-                      <h3
-                        className={`${tyre.color} text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
-                      >
-                        {tyre.label}
-                      </h3>
-                    </button>
-                    <div className="flex flex-col">
-                      {effectiveData ? (
-                        <>
-                          <p className="text-neutral-400 text-xs">
-                            {effectiveData.isEstimated ? "Est. " : ""}Average
-                            wear per lap: {effectiveData.wearPerLap.toFixed(2)}%
-                          </p>
-                          <p className="text-neutral-400 text-xs">
-                            Recommended Lap Count:{" "}
-                            {calcRecommendedLapCount(effectiveData.wearPerLap)}{" "}
-                            (
-                            {(
-                              100 -
-                              effectiveData.wearPerLap *
-                                calcRecommendedLapCount(
-                                  effectiveData.wearPerLap
-                                )
-                            ).toFixed(2)}
-                            %)
-                          </p>
-                        </>
-                      ) : (
-                        <p className="text-neutral-400 text-xs">
-                          No Data Yet (Click on the tyre to add data)
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            {/* AI strategy overview cause i cant think of anything better */}
-            <AIStrategySuggestion />
-          </div>
+              </h2>
+              <hr className="border-neutral-700" />
 
-          {/* Notes section*/}
-          <DashNotes />
+              {/* Timeline Section */}
+              <DashTimeline
+                timelineGenerated={timelineGenerated}
+                timelineData={timelineData}
+                timelineStints={timelineStints}
+                tyreData={tyreData}
+                setRaceSettingsVis={setRaceSettingsVis}
+                raceConfig={raceConfig}
+              />
+
+              {/* top tiles section - tyres and ai */}
+              <div className="w-full flex flex-row h-2/5 gap-2">
+                {/* tyressssssss */}
+                <div className="bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
+                  <div className="flex flex-row gap-2 justify-between">
+                    <p className="text-md font-bold">Tyres</p>
+                    <button
+                      className="cursor-pointer text-sm"
+                      onClick={() => settyresettingsVis(true)}
+                    >
+                      <Settings className="h-5 w-5" />
+                    </button>
+                  </div>
+                  {TYRE_TYPES.map((tyre) => {
+                    const effectiveData = getEffectiveTyreData(
+                      tyre.id,
+                      tyreData,
+                      tyrePreferences
+                    );
+                    return (
+                      <div
+                        key={tyre.id}
+                        className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
+                      >
+                        <button
+                          onClick={() => {
+                            setSelectedTyre(tyre.id);
+                            settyremanVis(true);
+                          }}
+                        >
+                          <h3
+                            className={`${tyre.color} text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
+                          >
+                            {tyre.label}
+                          </h3>
+                        </button>
+                        <div className="flex flex-col">
+                          {effectiveData ? (
+                            <>
+                              <p className="text-neutral-400 text-xs">
+                                {effectiveData.isEstimated ? "Est. " : ""}
+                                Average wear per lap:{" "}
+                                {effectiveData.wearPerLap.toFixed(2)}%
+                              </p>
+                              <p className="text-neutral-400 text-xs">
+                                Recommended Lap Count:{" "}
+                                {calcRecommendedLapCount(
+                                  effectiveData.wearPerLap
+                                )}{" "}
+                                (
+                                {(
+                                  100 -
+                                  effectiveData.wearPerLap *
+                                    calcRecommendedLapCount(
+                                      effectiveData.wearPerLap
+                                    )
+                                ).toFixed(2)}
+                                %)
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-neutral-400 text-xs">
+                              No Data Yet (Click on the tyre to add data)
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* AI strategy overview cause i cant think of anything better */}
+                <AIStrategySuggestion />
+              </div>
+
+              {/* Notes section*/}
+              <DashNotes notes={currentNotes} onChange={setCurrentNotes} />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+      {!currentSessionId && (
+        <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
+          <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
+            <DashSidebar
+              currentSessionId={currentSessionId}
+              onSelectSession={loadSession}
+            />
+
+            {/* Main Dashboard Thingy */}
+            <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2 items-center justify-center">
+              <p className="text-white text-lg font-extralight">
+                No session selected. Please select a session from the sidebar.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

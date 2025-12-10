@@ -1,38 +1,58 @@
-import { Calendar, Clock, Tag } from "lucide-react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import DashSidebarSession from "./DashSidebarSession";
+import NewSession from "./NewSession";
 
+export default function DashSidebar({ currentSessionId, onSelectSession }: any) {
+  const [newSessionOpen, setNewSessionOpen] = useState(false);
+  const [sessions, setSessions] = useState<any[]>([]);
 
-export default function DashSidebar() {
+  useEffect(() => {
+      const storedSessions = localStorage.getItem("tyrestats_sessions"); 
+      if (storedSessions) {
+          setSessions(JSON.parse(storedSessions));
+      }
+  }, []);
+
   return (
-    <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4 overflow-y-auto" style={{
-        scrollbarGutter: 'stable', 
-        scrollbarColor: 'rgba(100, 116, 139) transparent',
-     }}>
-      <div className="w-full h-2/12 bg-neutral-900 rounded-md p-2 flex flex-row gap-4">
-        <Image
-          src="/placeholder.png"
-          alt="Track Logo"
-          className="h-full w-2/8 rounded-md"
-          width={256}
-          height={256}
-        />
-        <div className="flex flex-col">
-          <h2 className="text-white text-lg font-semibold">
-            Track Name/Session Name
-          </h2>
-          <hr className="my-2 border-neutral-700" />
-          <span className="flex flex-col justify-between">
-            <div className="flex flex-row items-center text-neutral-400 text-sm">
-              <Calendar className="inline h-4 w-4 mr-2 text-neutral-400" />
-              Date
-            </div>
-            <div className="flex flex-row items-center text-neutral-400 text-sm">
-              <Clock className="inline h-4 w-4 mr-2 text-neutral-400" />
-              Edited on 12/12/2025
-            </div>
-          </span>
-        </div>
+    <>
+      {newSessionOpen && (
+        <NewSession onClose={() => setNewSessionOpen(false)} />
+      )}
+      <div
+        className="w-1/4 h-full bg-neutral-800 rounded-lg p-4 overflow-y-auto"
+        style={{
+          scrollbarGutter: "stable",
+          scrollbarColor: "rgba(100, 116, 139) transparent",
+        }}
+      >
+        <button
+          className="w-full mb-4 px-4 py-2 bg-transparent border border-blue-800 text-white rounded hover:bg-blue-950 cursor-pointer transition-colors"
+          onClick={() => setNewSessionOpen(true)}
+        >
+          + New Session
+        </button>
+        <details open className="mb-2">
+          <summary className="cursor-pointer text-white font-semibold py-2 px-2 rounded hover:bg-neutral-700 transition">
+            Sessions (LocalStorage)
+          </summary>
+          <div className="mt-2 flex flex-col gap-2">
+            {sessions.length === 0 && (
+                <p className="text-neutral-500 text-sm p-2">No sessions found. Maybe create one?</p>
+            )}
+            {sessions.map((session) => (
+              <DashSidebarSession
+                key={session.id}
+                name={session.meta.name}
+                date={session.meta.date}
+                lastModified={session.meta.lastModified}
+                icon_url={session.meta.icon_url || ""}
+                isActive={currentSessionId}
+                onClick={() => onSelectSession(session)}
+              />
+            ))}
+          </div>
+        </details>
       </div>
-    </div>
+    </>
   );
 }
