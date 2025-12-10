@@ -33,7 +33,7 @@ export default function DashSidebarSession({
         width={256}
         height={256}
       />
-      <div className="flex flex-col justify-center overflow-hidden">
+      <div className="flex flex-col justify-center w-full overflow-hidden">
         <h2 className="text-white text-md font-semibold truncate w-full">
           {name}
         </h2>

@@ -129,6 +129,49 @@ export default function TyreWearManager({
     });
   };
 
+  // ctrl-v detector for image paste
+  useEffect(() => {
+    const listener = (e: KeyboardEvent) => {
+      if (e.key === "v" && (e.ctrlKey || e.metaKey)) {
+        navigator.clipboard.read().then((items) => {
+          items.forEach((item) => {
+            // Try common image formats
+            const imageTypes = item.types.filter((type) =>
+              type.startsWith("image/")
+            );
+            if (imageTypes.length > 0) {
+              item
+                .getType(imageTypes[0])
+                .then((blob) => {
+                  if (blob) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      if (ev.target?.result) {
+                        setImageSrc(ev.target.result as string);
+                        setCurrentPage("analysis");
+                        setPoints([]);
+                        setCalculatedWear(null);
+                        setLaps("");
+                        setZoom(1);
+                      }
+                    };
+                    reader.readAsDataURL(blob);
+                  }
+                })
+                .catch(() => {
+                  // Not an image, ignore
+                  return;
+                });
+            }
+          });
+        });
+      }
+    };
+
+    window.addEventListener("keydown", listener);
+    return () => window.removeEventListener("keydown", listener);
+  }, []);
+
   return (
     <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-10">
       {/* options page */}
@@ -181,7 +224,7 @@ export default function TyreWearManager({
             <Upload className="mb-4" />
             <p className="text-center">Click to upload a screenshot</p>
             <p className="text-center mt-2 text-neutral-500">
-              or drag and drop
+              or drag and drop, or ctrl+v to paste an image
             </p>
             <p className="text-center mt-2 text-neutral-500">
               Supported formats: PNG, JPG

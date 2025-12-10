@@ -198,12 +198,19 @@ export default function Dashboard() {
           )}
           {sessionSettingsVis && (
             <SessionSettingsPage
+              currentConfig={sessionSettings["current"]}
               onClose={() => setSessionSettingsVis(false)}
               onSave={(settings: SessionSettings) => {
                 setSessionSettings((prev) => ({
                   ...prev,
                   current: settings,
                 }));
+              }}
+              DeleteThisSession={() => {
+                setSessions((prevSessions) =>
+                  prevSessions.filter((s) => s.id !== currentSessionId)
+                );
+                setCurrentSessionId(null);
               }}
             />
           )}

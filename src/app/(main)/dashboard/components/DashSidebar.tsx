@@ -1,17 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DashSidebarSession from "./DashSidebarSession";
 import NewSession from "./NewSession";
+import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 
-export default function DashSidebar({ currentSessionId, onSelectSession }: any) {
+export default function DashSidebar({
+  currentSessionId,
+  onSelectSession,
+}: any) {
   const [newSessionOpen, setNewSessionOpen] = useState(false);
-  const [sessions, setSessions] = useState<any[]>([]);
-
-  useEffect(() => {
-      const storedSessions = localStorage.getItem("tyrestats_sessions"); 
-      if (storedSessions) {
-          setSessions(JSON.parse(storedSessions));
-      }
-  }, []);
+  const [sessions] = useLocalStorage<any[]>("tyrestats_sessions", []);
 
   return (
     <>
@@ -37,7 +34,9 @@ export default function DashSidebar({ currentSessionId, onSelectSession }: any) 
           </summary>
           <div className="mt-2 flex flex-col gap-2">
             {sessions.length === 0 && (
-                <p className="text-neutral-500 text-sm p-2">No sessions found. Maybe create one?</p>
+              <p className="text-neutral-500 text-sm p-2">
+                No sessions found. Maybe create one?
+              </p>
             )}
             {sessions.map((session) => (
               <DashSidebarSession
@@ -46,7 +45,7 @@ export default function DashSidebar({ currentSessionId, onSelectSession }: any) 
                 date={session.meta.date}
                 lastModified={session.meta.lastModified}
                 icon_url={session.meta.icon_url || ""}
-                isActive={currentSessionId}
+                isActive={currentSessionId === session.id}
                 onClick={() => onSelectSession(session)}
               />
             ))}
