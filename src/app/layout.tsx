@@ -11,7 +11,7 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "tyrestats",
   description: "PBFT Tyre Stats Viewer & Analyzer",
-  
+
   icons: {
     icon: "/favicon.ico",
   },

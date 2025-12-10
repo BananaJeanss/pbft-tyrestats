@@ -1,0 +1,115 @@
+import { Trash2, X } from "lucide-react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useState } from "react";
+
+export interface SettingsMenuProps {
+  onClose: () => void;
+}
+
+function DangerousDeletionWarningWaaazaaa({
+  onClose,
+}: {
+  onClose: () => void;
+}) {
+  const [_, setSessions] = useLocalStorage<any[]>("tyrestats_sessions", []);
+  const handleClearData = () => {
+    if (window.prompt("Type DELETE to confirm data clearance.") === "DELETE") {
+      setSessions([]);
+      window.location.reload();
+    }
+  };
+  return (
+    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-150">
+      <div className="w-full max-w-md bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold text-white">
+            Confirm Data Clearance
+          </h2>
+          <button onClick={onClose} className="text-neutral-400 cursor-pointer">
+            <X />
+          </button>
+        </div>
+        <hr className="border-neutral-800" />
+        <p className="text-red-400 font-light">
+          This action will permanently delete all your data. This cannot be
+          undone. Are you sure you want to proceed?
+        </p>
+        <div className="flex justify-end gap-4">
+          <button
+            onClick={onClose}
+            className="bg-neutral-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleClearData}
+            className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-500 transition cursor-pointer"
+          >
+            Confirm Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function SettingsPage({ onClose }: SettingsMenuProps) {
+  const [isWarningOpen, setIsWarningOpen] = useState(false);
+  
+  const [selectedTheme, setSelectedTheme] = useLocalStorage<string>(
+    "tyrestats_theme",
+    "system"
+  );
+
+  return (
+    <>
+      {isWarningOpen && (
+        <DangerousDeletionWarningWaaazaaa
+          onClose={() => setIsWarningOpen(false)}
+        />
+      )}
+      <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
+        <div className="w-full max-w-md bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-white">Settings</h2>
+            <button
+              onClick={onClose}
+              className="text-neutral-400 cursor-pointer"
+            >
+              <X />
+            </button>
+          </div>
+
+          <hr className="border-neutral-800" />
+          <div className="flex flex-col gap-6">
+            <label className="text-sm font-semibold text-neutral-300">
+              Theme (non functional rn)
+            </label>
+            <select
+              className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              value={selectedTheme}
+              onChange={(e) => setSelectedTheme(e.target.value)}
+            >
+              <option value="system">System Default</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+          <hr className="border-neutral-800" />
+          <button
+            className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-500 transition cursor-pointer w-fit"
+            onClick={() => {
+              setIsWarningOpen(true);
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <Trash2 className="w-4 h-4" />
+              <span>Clear All Data</span>
+            </div>
+          </button>
+          <hr className="border-neutral-800" />
+        </div>
+      </div>
+    </>
+  );
+}

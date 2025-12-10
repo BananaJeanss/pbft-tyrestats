@@ -1,22 +1,38 @@
+"use client";
+
 import { Settings } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import SettingsPage from "./SettingsMenu";
 
 export default function Navbar() {
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+
   return (
-    <nav className="w-full max-h-20 p-8 bg-neutral-900 text-white flex flex-row items-center">
-      <div className="min-w-1/2 flex items-center font-bold text-2xl">
-        <Image
-          src="/tslogow.png"
-          alt="TyreStats Logo"
-          width={64}
-          height={64}
-          className="mr-4"
-        />
-        | TyreStats
-      </div>
-      <div className="min-w-1/2 flex flex-row-reverse items-center font-bold text-2xl">
-      <Settings />
-      </div>
-    </nav>
+    <>
+      {settingsMenuOpen && (
+        <SettingsPage onClose={() => setSettingsMenuOpen(false)} />
+      )}
+      <nav className="w-full max-h-20 p-8 bg-neutral-900 text-white flex flex-row items-center">
+        <div className="min-w-1/2 flex items-center font-bold text-2xl">
+          <Image
+            src="/tslogow.png"
+            alt="TyreStats Logo"
+            width={64}
+            height={64}
+            className="mr-4"
+          />
+          | TyreStats
+        </div>
+        <div className="min-w-1/2 flex flex-row-reverse items-center font-bold text-2xl">
+          <button
+            className="mr-4 hover:text-neutral-400 transition cursor-pointer"
+            onClick={() => setSettingsMenuOpen(true)}
+          >
+            <Settings />
+          </button>
+        </div>
+      </nav>
+    </>
   );
 }

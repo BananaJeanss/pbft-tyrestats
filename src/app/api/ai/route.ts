@@ -133,7 +133,8 @@ export async function POST(request: Request) {
            body.raceConfig.RaceLaps
          } laps with the minimum total time.
          - Assume a pit stop takes significant time, so fewer stops are generally preferred unless tyre degradation is extreme.
-         - Per the FIT regulations, one stop is mandatory, and two different compounds must be used by the driver, unless it's a wet race.
+         - Per the FIT regulations, one stop is mandatory, and two different compounds must be used by the driver, unless it's a wet race or a sprint.
+         - There is no fuel load to consider.
          - Do NOT use Wet tyres for the main strategy unless the user explicitly mentions rain (but provide a backup wet strategy if wet data is present).
       
       ${
@@ -163,6 +164,7 @@ export async function POST(request: Request) {
       - **Primary Strategy**: [e.g., Soft (x laps) -> Medium (y laps)]
       - **Reasoning**: Brief explanation of why this is fastest/safest.
       - **Alternative**: A risky or conservative alternative.
+      - **Additional Notes**: Any assumptions, considerations or comments, or anything noteworthy.
       - **Wet Strategy**: (Only if wet tyre data exists)
 
       Keep the response concise and actionable.
