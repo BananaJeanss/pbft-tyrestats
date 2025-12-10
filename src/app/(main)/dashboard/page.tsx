@@ -103,6 +103,7 @@ export default function Dashboard() {
     tyrePreferences,
     currentNotes,
     sessionSettings,
+    currentSuggestion,
     currentSessionId,
   ]);
 
@@ -323,6 +324,7 @@ export default function Dashboard() {
                   tyreData={tyreData}
                   raceConfig={raceConfig}
                   tyrePreferences={tyrePreferences}
+                  notes={currentNotes}
                   existingSuggestion={currentSuggestion}
                   onSave={(suggestion: string) =>
                     setCurrentSuggestion(suggestion)

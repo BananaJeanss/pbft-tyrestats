@@ -1,9 +1,11 @@
 import { ExpectedRequest } from "@/app/api/ai/route";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 export interface AIStrategySuggestionProps {
   onSave: (suggestion: string) => void;
   existingSuggestion: string | null;
+  notes?: string;
 }
 
 export default function AIStrategySuggestion({
@@ -12,6 +14,7 @@ export default function AIStrategySuggestion({
   tyrePreferences,
   onSave,
   existingSuggestion,
+  notes,
 }: ExpectedRequest & AIStrategySuggestionProps) {
   const [ratelimitCount, setRatelimitCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +32,7 @@ export default function AIStrategySuggestion({
           tyreData,
           raceConfig,
           tyrePreferences,
+          notes,
         }),
       });
 
@@ -42,8 +46,17 @@ export default function AIStrategySuggestion({
 
       const data = await response.json();
       setRatelimitCount(data.ratelimitCount);
-      setGeneratedSuggestion(data.suggestion);
-      onSave(data.suggestion);
+
+      const cleanSuggestion = data.suggestion
+        .replace(/\$\\to\$/g, "→")
+        .replace(/\$\\times\$/g, "×")
+        .replace(/\$\\rightarrow\$/g, "→")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<\/?strong>/gi, "**")
+        .replace(/•/g, "-");
+
+      setGeneratedSuggestion(cleanSuggestion);
+      onSave(cleanSuggestion);
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
@@ -57,6 +70,10 @@ export default function AIStrategySuggestion({
   const [isLoading, setIsLoading] = useState(false);
   const [generatedSuggestion, setGeneratedSuggestion] =
     useState(existingSuggestion);
+
+  useEffect(() => {
+    setGeneratedSuggestion(existingSuggestion);
+  }, [existingSuggestion]);
 
   return (
     <div className="bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">
@@ -82,6 +99,7 @@ export default function AIStrategySuggestion({
           </button>
         )}
       </div>
+      <hr className="border-neutral-700" />
 
       {isLoading && (
         <p className="text-neutral-500 font-extralight ">
@@ -97,9 +115,46 @@ export default function AIStrategySuggestion({
         </p>
       )}
       {generatedSuggestion && !isLoading && (
-        <p className="text-neutral-300 font-light whitespace-pre-wrap">
-          {generatedSuggestion}
-        </p>
+        <div className="text-neutral-300 leading-relaxed overflow-y-auto flex-1 text-sm wrap-break-words pr-2">
+          <ReactMarkdown
+            components={{
+              h1: ({ ...props }) => (
+                <h1
+                  className="text-xl font-bold text-white mt-4 mb-2"
+                  {...props}
+                />
+              ),
+              h2: ({ ...props }) => (
+                <h2
+                  className="text-lg font-bold text-white mt-4 mb-2"
+                  {...props}
+                />
+              ),
+              h3: ({ ...props }) => (
+                <h3
+                  className="text-base font-bold text-white mt-3 mb-1"
+                  {...props}
+                />
+              ),
+              p: ({ ...props }) => <p className="mb-2" {...props} />,
+              ul: ({ ...props }) => (
+                <ul
+                  className="list-disc list-inside mb-2 ml-2 space-y-1"
+                  {...props}
+                />
+              ),
+              li: ({ ...props }) => <li className="pl-1" {...props} />,
+              hr: ({ ...props }) => (
+                <hr className="border-neutral-700 my-4" {...props} />
+              ),
+              strong: ({ ...props }) => (
+                <strong className="font-semibold text-white" {...props} />
+              ),
+            }}
+          >
+            {generatedSuggestion}
+          </ReactMarkdown>
+        </div>
       )}
     </div>
   );
