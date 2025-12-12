@@ -3,7 +3,7 @@
 import { Settings } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import SettingsPage from "./SettingsMenu";
+import SettingsPage from "./Settings/SettingsMenu";
 
 export default function Navbar() {
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);

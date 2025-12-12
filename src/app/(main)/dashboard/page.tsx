@@ -2,7 +2,7 @@
 
 import { Pencil, Settings } from "lucide-react";
 import TyreWearManager, { TyreWearData } from "./components/TyreWearManager";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import TyreSettings, {
   TyrePreferences,
   DEFAULT_PREFERENCES,
@@ -20,6 +20,7 @@ import SessionSettingsPage, {
   SessionSettings,
 } from "./components/SessionSettings";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -69,6 +70,9 @@ export default function Dashboard() {
   // 1. Add state to track which ID is open
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
+  // ref to prevent autosave on session load
+  const isLoadingSession = useRef(false);
+
   // 2. Get access to the global sessions list
   const [sessions, setSessions] = useLocalStorage<any[]>(
     "tyrestats_sessions",
@@ -79,24 +83,36 @@ export default function Dashboard() {
   useEffect(() => {
     if (!currentSessionId) return;
 
-    setSessions((prevSessions) =>
-      prevSessions.map((s) =>
-        s.id === currentSessionId
-          ? {
-              ...s,
-              tyreData,
-              raceConfig,
-              tyrePreferences,
-              currentNotes,
-              currentSuggestion,
-              meta: {
-                ...(sessionSettings["current"] || s.meta),
-                lastModified: new Date().toISOString(),
-              },
-            }
-          : s
-      )
-    );
+    // skip save if this effect run is caused by loading a session
+    if (isLoadingSession.current) {
+      isLoadingSession.current = false;
+      return;
+    }
+
+    try {
+      setSessions((prevSessions) =>
+        prevSessions.map((s) =>
+          s.id === currentSessionId
+            ? {
+                ...s,
+                tyreData,
+                raceConfig,
+                tyrePreferences,
+                currentNotes,
+                currentSuggestion,
+                meta: {
+                  ...(sessionSettings["current"] || s.meta),
+                  lastModified: new Date().toISOString(),
+                },
+              }
+            : s
+        )
+      );
+      toast.success("Session data saved successfully!");
+    } catch (err) {
+      console.error("Error saving session data:", err);
+      toast.error("Failed to save session data. Check console for details.");
+    }
   }, [
     tyreData,
     raceConfig,
@@ -125,6 +141,7 @@ export default function Dashboard() {
     );
   };
 
+  // timeline auto regenerator
   useEffect(() => {
     const hasRaceConfig = raceConfig && raceConfig.RaceLaps > 0;
     const hasTyreData = Object.keys(tyreData).length > 0;
@@ -157,6 +174,7 @@ export default function Dashboard() {
   }, [tyreData, raceConfig, tyrePreferences]);
 
   const loadSession = (session: any) => {
+    isLoadingSession.current = true;
     setCurrentSessionId(session.id);
 
     setTyreData(session.tyreData || {});
@@ -170,6 +188,20 @@ export default function Dashboard() {
 
   return (
     <>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+        className={"z-1000000"} // css is my passion
+      />
       {currentSessionId && (
         <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
           {raceSettingsVis && (

@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const loginButtonStyles =
-  "border cursor-pointer p-2 m-2 rounded-4xl transition hover:bg-gray-900 flex flex-row gap-2";
+  "border p-2 m-2 rounded-4xl transition hover:bg-gray-900 flex flex-row gap-2";
 
 export default function Home() {
   return (
@@ -17,13 +17,18 @@ export default function Home() {
       <h1 className="text-4xl font-bold underline mb-2">tyrestats</h1>
       <p>PB Formula Truck raceday statistics dashboard & analyzer</p>
       <hr className="my-4 w-1/2 border-zinc-300" />
-      <div className="flex flex-row">
-        <button className={loginButtonStyles}>
+      <div className="flex flex-row items-center w-full justify-center">
+        <button
+          className={`cursor-not-allowed ${loginButtonStyles} relative`}
+          disabled
+          style={{ opacity: 0.5 }}
+        >
           <Github />
-          Login with GitHub
+          Login with GitHub (not implemented yet)
         </button>
+        <div className="h-8 w-px bg-zinc-300 mx-2" />
         <Link href="/dashboard" passHref>
-          <button className={loginButtonStyles}>
+          <button className={`cursor-pointer ${loginButtonStyles}`}>
             <Database />
             LocalStorage (No Login)
           </button>
