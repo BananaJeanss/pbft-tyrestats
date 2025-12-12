@@ -89,30 +89,34 @@ export default function Dashboard() {
       return;
     }
 
-    try {
-      setSessions((prevSessions) =>
-        prevSessions.map((s) =>
-          s.id === currentSessionId
-            ? {
-                ...s,
-                tyreData,
-                raceConfig,
-                tyrePreferences,
-                currentNotes,
-                currentSuggestion,
-                meta: {
-                  ...(sessionSettings["current"] || s.meta),
-                  lastModified: new Date().toISOString(),
-                },
-              }
-            : s
-        )
-      );
-      toast.success("Session data saved successfully!");
-    } catch (err) {
-      console.error("Error saving session data:", err);
-      toast.error("Failed to save session data. Check console for details.");
-    }
+    const timeoutId = setTimeout(() => {
+      try {
+        setSessions((prevSessions) =>
+          prevSessions.map((s) =>
+            s.id === currentSessionId
+              ? {
+                  ...s,
+                  tyreData,
+                  raceConfig,
+                  tyrePreferences,
+                  currentNotes,
+                  currentSuggestion,
+                  meta: {
+                    ...(sessionSettings["current"] || s.meta),
+                    lastModified: new Date().toISOString(),
+                  },
+                }
+              : s
+          )
+        );
+        toast.success("Session data saved successfully!");
+      } catch (err) {
+        console.error("Error saving session data:", err);
+        toast.error("Failed to save session data. Check console for details.");
+      }
+    }, 2500);
+
+    return () => clearTimeout(timeoutId);
   }, [
     tyreData,
     raceConfig,
