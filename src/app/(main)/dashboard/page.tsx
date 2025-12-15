@@ -67,6 +67,15 @@ export default function Dashboard() {
 
   const [currentSuggestion, setCurrentSuggestion] = useState("");
 
+  const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
+    "tyrestats_autosave_enabled",
+    true
+  );
+  const [autoSaveInterval, setAutoSaveInterval] = useLocalStorage<number>(
+    "tyrestats_autosave_interval",
+    2.5
+  );
+
   // 1. Add state to track which ID is open
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
@@ -79,45 +88,47 @@ export default function Dashboard() {
     []
   );
 
-  // auto-Save Effect
-  useEffect(() => {
+  const saveSession = () => {
     if (!currentSessionId) return;
 
-    // skip save if this effect run is caused by loading a session
+    setSessions((prevSessions) =>
+      prevSessions.map((s) =>
+        s.id === currentSessionId
+          ? {
+              ...s,
+              tyreData,
+              raceConfig,
+              tyrePreferences,
+              currentNotes,
+              currentSuggestion,
+              meta: {
+                ...(sessionSettings["current"] || s.meta),
+                lastModified: new Date().toISOString(),
+              },
+            }
+          : s
+      )
+    );
+
+    toast.success("Session saved");
+  };
+
+  // auto-Save Effect
+  useEffect(() => {
+    if (!isAutosaveEnabled) return;
+    if (!currentSessionId) return;
+
     if (isLoadingSession.current) {
       isLoadingSession.current = false;
       return;
     }
 
-    const timeoutId = setTimeout(() => {
-      try {
-        setSessions((prevSessions) =>
-          prevSessions.map((s) =>
-            s.id === currentSessionId
-              ? {
-                  ...s,
-                  tyreData,
-                  raceConfig,
-                  tyrePreferences,
-                  currentNotes,
-                  currentSuggestion,
-                  meta: {
-                    ...(sessionSettings["current"] || s.meta),
-                    lastModified: new Date().toISOString(),
-                  },
-                }
-              : s
-          )
-        );
-        toast.success("Session data saved successfully!");
-      } catch (err) {
-        console.error("Error saving session data:", err);
-        toast.error("Failed to save session data. Check console for details.");
-      }
-    }, 2500);
+    const timeoutId = setTimeout(saveSession, autoSaveInterval * 1000);
 
     return () => clearTimeout(timeoutId);
   }, [
+    isAutosaveEnabled,
+    autoSaveInterval,
     tyreData,
     raceConfig,
     tyrePreferences,
@@ -126,6 +137,19 @@ export default function Dashboard() {
     currentSuggestion,
     currentSessionId,
   ]);
+
+  // ctrl+s
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        saveSession();
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [saveSession]);
 
   const handleSaveTyreData = (data: TyreWearData) => {
     if (selectedTyre) {

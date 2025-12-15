@@ -14,7 +14,7 @@ export default function Home() {
         width={256}
         height={256}
       />
-      <h1 className="text-4xl font-bold underline mb-2">tyrestats</h1>
+      <h1 className="text-4xl font-bold underline mb-2">TyreStats</h1>
       <p>PB Formula Truck raceday statistics dashboard & analyzer</p>
       <hr className="my-4 w-1/2 border-zinc-300" />
       <div className="flex flex-row items-center w-full justify-center">
@@ -26,7 +26,7 @@ export default function Home() {
           <Github />
           Login with GitHub (not implemented yet)
         </button>
-        <div className="h-8 w-px bg-zinc-300 mx-2" />
+        <div className="h-12 w-px bg-zinc-300 mx-2" />
         <Link href="/dashboard" passHref>
           <button className={`cursor-pointer ${loginButtonStyles}`}>
             <Database />

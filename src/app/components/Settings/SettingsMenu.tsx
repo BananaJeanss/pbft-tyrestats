@@ -1,4 +1,4 @@
-import { Trash2, X } from "lucide-react";
+import { Trash2, TriangleAlert, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import DangerousDeletionWarningWaaazaaa from "./DangerousDeletionWarningWaaazaaa";
@@ -10,6 +10,16 @@ export interface SettingsMenuProps {
 export default function SettingsPage({ onClose }: SettingsMenuProps) {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+
+  // atuo save
+  const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
+    "tyrestats_autosave_enabled",
+    true
+  );
+  const [autoSaveInterval, setAutoSaveInterval] = useLocalStorage<number>(
+    "tyrestats_autosave_interval",
+    2.5
+  );
 
   const [selectedTheme, setSelectedTheme] = useLocalStorage<string>(
     "tyrestats_theme",
@@ -36,7 +46,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           </div>
 
           <hr className="border-neutral-800" />
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4">
             <label className="text-sm font-semibold text-neutral-300">
               Theme (non functional rn)
             </label>
@@ -49,6 +59,38 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </select>
+          </div>
+          <hr className="border-neutral-800" />
+          <div className="flex flex-col gap-4">
+            <label className="text-sm font-semibold text-neutral-300">
+              Auto-Save
+            </label>
+            <div className="flex flex-row">
+              <input
+                type="checkbox"
+                checked={isAutosaveEnabled}
+                onChange={(e) => setIsAutosaveEnabled(e.target.checked)}
+              />
+              <span className="ml-2 text-white">Enable Auto-Save</span>
+            </div>
+            <div className="flex flex-row items-center">
+              <input
+                type="number"
+                className="w-1/4 bg-neutral-800 border border-neutral-700 rounded p-2 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                placeholder="2.5"
+                value={autoSaveInterval}
+                onChange={(e) => setAutoSaveInterval(Number(e.target.value))}
+              />
+              <span className="ml-2 text-white text-sm">
+                Auto-save Interval (in seconds)
+              </span>
+            </div>
+            {!isAutosaveEnabled && (
+              <span className="text-xs text-yellow-500">
+                <TriangleAlert className="inline w-4 h-4 mr-1" />
+                Auto-Save is disabled. Press CTRL+S to manually save your data.
+              </span>
+            )}
           </div>
           <hr className="border-neutral-800" />
           <label className="text-md font-semibold text-neutral-300">
