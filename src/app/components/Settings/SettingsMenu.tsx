@@ -2,6 +2,8 @@ import { Trash2, TriangleAlert, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState } from "react";
 import DangerousDeletionWarningWaaazaaa from "./DangerousDeletionWarningWaaazaaa";
+import ExportMyData from "./ExportMyData";
+import ImportMyData from "./ImportMyData";
 
 export interface SettingsMenuProps {
   onClose: () => void;
@@ -10,6 +12,7 @@ export interface SettingsMenuProps {
 export default function SettingsPage({ onClose }: SettingsMenuProps) {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
 
   // atuo save
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
@@ -33,6 +36,8 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           onClose={() => setIsWarningOpen(false)}
         />
       )}
+      {isExportOpen && <ExportMyData onClose={() => setIsExportOpen(false)} />}
+      {isImportOpen && <ImportMyData onClose={() => setIsImportOpen(false)} />}
       <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
         <div className="w-full max-w-md bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
           <div className="flex justify-between items-center">
@@ -98,15 +103,19 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           </label>
           <div className="flex flex-row items-center gap-2">
             <button
-              className="bg-neutral-700 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-not-allowed w-fit"
-              disabled
+              className="bg-neutral-700 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-pointer w-fit"
+              onClick={() => {
+                setIsExportOpen(true);
+              }}
             >
               Export Data
             </button>
             <div className="h-8 w-px bg-neutral-800 mx-2" />
             <button
-              className="bg-neutral-700 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-not-allowed w-fit"
-              disabled
+              className="bg-neutral-700 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-pointer w-fit"
+              onClick={() => {
+                setIsImportOpen(true);
+              }}
             >
               Import & Overwrite Data
             </button>
