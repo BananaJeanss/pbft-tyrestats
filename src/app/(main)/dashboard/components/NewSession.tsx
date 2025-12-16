@@ -13,6 +13,8 @@ export default function NewSession({ onClose }: NewSessionProps) {
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [laps, setLaps] = useState("");
+  const [icon, setIcon] = useState("default");
+  const [iconUrl, setIconUrl] = useState("");
 
   // 2. Access the global sessions list from LocalStorage
   const [sessions, setSessions] = useLocalStorage<any[]>(
@@ -28,6 +30,8 @@ export default function NewSession({ onClose }: NewSessionProps) {
       meta: {
         name,
         date,
+        selectedIcon: icon,
+        icon_url: iconUrl,
         lastModified: new Date().toISOString(),
       },
       raceConfig: {
@@ -96,6 +100,37 @@ export default function NewSession({ onClose }: NewSessionProps) {
               />
               <span className="text-neutral-500 text-sm">laps</span>
             </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-semibold text-neutral-300">
+              Thumbnail Icon
+            </label>
+            <div className="flex items-center gap-2">
+              <select
+                name="Thumbnail Icon"
+                className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+              >
+                <option value="default">Default (Placeholder)</option>
+                <option value="kubica">Kubica Island Autodrome</option>
+                <option value="petgear">PET Gear Autodrome</option>
+                <option value="harju">Harju Superovaal</option>
+                <option value="panther">Panther Hügel Rennstrecke</option>
+                <option value="custom">Custom (Image URL)</option>
+              </select>
+            </div>
+            {icon === "custom" && (
+              <input
+                type="text"
+                placeholder="Image URL"
+                value={iconUrl ?? ""}
+                onChange={(e) => {
+                  setIconUrl(e.target.value);
+                }}
+                className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full"
+              />
+            )}
           </div>
         </div>
 

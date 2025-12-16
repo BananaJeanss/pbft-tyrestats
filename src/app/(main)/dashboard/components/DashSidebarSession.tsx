@@ -5,34 +5,54 @@ export interface DashSidebarSessionThings {
   name: string;
   date: string;
   lastModified: string;
-  icon_url: string;
+  icon: string;
+  iconUrl?: string;
   isActive: boolean;
   onClick: () => void;
 }
+
+const IconsMap: { [key: string]: string } = {
+  default: "/placeholder.png",
+  kubica: "/icons/kubica.webp",
+  petgear: "/icons/petgear.webp",
+  harju: "/icons/harju.webp",
+  panther: "/icons/panther.webp",
+};
 
 export default function DashSidebarSession({
   name,
   date,
   lastModified,
   isActive,
+  icon,
+  iconUrl,
   onClick,
 }: DashSidebarSessionThings) {
   return (
-        <button
+    <button
       onClick={onClick}
       className={`w-full h-24 rounded-md p-2 flex flex-row gap-4 cursor-pointer transition-colors text-left ${
         isActive
-          ? "bg-blue-950/50 border border-blue-800"
-          : "bg-neutral-900 hover:bg-neutral-800"
+          ? "bg-blue-950/30 border border-blue-700/80"
+          : "bg-neutral-900 hover:bg-neutral-950"
       }`}
     >
-      <Image
-        src="/placeholder.png"
-        alt="Track Logo"
-        className="h-full w-24 rounded-md object-cover bg-neutral-800"
-        width={256}
-        height={256}
-      />
+      {iconUrl ? (
+        <img
+          src={iconUrl}
+          alt="Track Logo"
+          className="w-20 aspect-square min-w-20 shrink-0 rounded-md object-cover bg-neutral-800"
+        />
+      ) : (
+        <Image
+          src={IconsMap[icon] || IconsMap["default"]}
+          alt="Track Logo"
+          width={256}
+          height={256}
+          className="w-20 aspect-square min-w-20 shrink-0 rounded-md object-cover bg-neutral-800"
+        />
+      )}
+
       <div className="flex flex-col justify-center w-full overflow-hidden">
         <h2 className="text-white text-md font-semibold truncate w-full">
           {name}

@@ -1,5 +1,12 @@
 import { CheckCircle2, Settings, XCircle } from "lucide-react";
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { RaceConfiguration } from "./RaceSettings";
 
 const validateTimelineData = (
@@ -47,27 +54,35 @@ export default function DashTimeline({
   return (
     <div className="w-full bg-neutral-900 p-4 rounded-lg flex flex-col gap-2">
       <div className="w-full flex flex-row justify-between">
-        <h3 className="text-lg font-bold flex items-center gap-2">
-          Timeline (
-          {validateTimelineData(timelineData, timelineStints) ? (
+        <h3 className="text-lg font-bold flex items-center gap-1.5">
+          Timeline{" "}
+          {timelineGenerated && (
             <>
-              <CheckCircle2 className="inline h-5 w-5 text-green-500 mr-1" />
-              <p title="2 or more tyre compounds used" className="cursor-help">
-                FIT Valid
-              </p>
-            </>
-          ) : (
-            <>
-              <XCircle className="inline h-5 w-5 text-red-500" />
-              <p
-                title="Less than 2 different compounds used"
-                className="cursor-help"
-              >
-                FIT Invalid - At least 2 tyre compounds must be used
-              </p>
+              (
+              {validateTimelineData(timelineData, timelineStints) ? (
+                <>
+                  <CheckCircle2 className="inline h-5 w-5 text-green-500" />
+                  <p
+                    title="2 or more tyre compounds used"
+                    className="cursor-help"
+                  >
+                    FIT Valid
+                  </p>
+                </>
+              ) : (
+                <>
+                  <XCircle className="inline h-5 w-5 text-red-500" />
+                  <p
+                    title="Less than 2 different compounds used"
+                    className="cursor-help"
+                  >
+                    FIT Invalid - At least 2 tyre compounds must be used
+                  </p>
+                </>
+              )}
+              )
             </>
           )}
-          )
         </h3>
         <button
           className="cursor-pointer"
@@ -126,8 +141,7 @@ export default function DashTimeline({
         <div className="h-16 w-full">
           <p className="text-neutral-400 text-sm">
             Timeline will be auto-generated once{" "}
-            {!raceConfig?.RaceLaps &&
-            Object.keys(tyreData).length === 0
+            {!raceConfig?.RaceLaps && Object.keys(tyreData).length === 0
               ? "the race settings and at least one tyre compound data has"
               : !raceConfig?.RaceLaps
               ? "the race settings have"
@@ -139,9 +153,7 @@ export default function DashTimeline({
 
       <div className="flex justify-between text-xs text-neutral-500 px-1">
         <span>Start</span>
-        <span>
-          Finish (Lap {raceConfig?.RaceLaps || "Not Set"})
-        </span>
+        <span>Finish (Lap {raceConfig?.RaceLaps || "Not Set"})</span>
       </div>
     </div>
   );

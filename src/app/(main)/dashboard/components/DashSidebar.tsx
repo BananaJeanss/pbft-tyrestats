@@ -44,7 +44,8 @@ export default function DashSidebar({
                 name={session.meta.name}
                 date={session.meta.date}
                 lastModified={session.meta.lastModified}
-                icon_url={session.meta.icon_url || ""}
+                icon={session.meta.selectedIcon}
+                iconUrl={session.meta.icon_url || ""}
                 isActive={currentSessionId === session.id}
                 onClick={() => onSelectSession(session)}
               />

@@ -6,7 +6,8 @@ export interface SessionSettings {
   date: string;
   tags: string[];
   lastModified: string;
-  icon_url: string;
+  selectedIcon: string;
+  icon_url?: string;
 }
 
 interface SessionSettingsProps {
@@ -64,6 +65,7 @@ export default function SessionSettingsPage({
       date: new Date().toISOString().split("T")[0],
       tags: [],
       lastModified: new Date().toISOString(),
+      selectedIcon: "default",
       icon_url: "",
     }
   );
@@ -139,6 +141,43 @@ export default function SessionSettingsPage({
                   className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
                 />
               </div>
+            </div>
+            {/* icon selector */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-neutral-300">
+                Thumbnail Icon
+              </label>
+              <div className="flex items-center gap-2">
+                <select
+                  name="Thumbnail Icon"
+                  className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                  value={config.selectedIcon}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      selectedIcon: e.target.value,
+                    })
+                  }
+                >
+                  <option value="default">Default (Placeholder)</option>
+                  <option value="kubica">Kubica Island Autodrome</option>
+                  <option value="petgear">PET Gear Autodrome</option>
+                  <option value="harju">Harju Superovaal</option>
+                  <option value="panther">Panther Hügel Rennstrecke</option>
+                  <option value="custom">Custom (Image URL)</option>
+                </select>
+              </div>
+              {config.selectedIcon === "custom" && (
+                <input
+                  type="text"
+                  placeholder="Image URL"
+                  value={config.icon_url ?? ""}
+                  onChange={(e) =>
+                    setConfig({ ...config, icon_url: e.target.value })
+                  }
+                  className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full"
+                />
+              )}
             </div>
           </div>
           <hr className="border-neutral-800" />

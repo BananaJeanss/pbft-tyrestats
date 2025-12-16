@@ -20,7 +20,7 @@ import SessionSettingsPage, {
   SessionSettings,
 } from "./components/SessionSettings";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
-import { Bounce, toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -214,22 +214,44 @@ export default function Dashboard() {
     setSessionSettings({ current: session.meta });
   };
 
+  function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth < 1024);
+      check();
+      window.addEventListener("resize", check);
+      return () => window.removeEventListener("resize", check);
+    }, []);
+
+    useEffect(() => {
+      const ua = navigator.userAgent;
+      const mobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          ua
+        );
+      if (mobile) setIsMobile(true);
+    }, []);
+
+    return isMobile;
+  }
+
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-5rem)] p-8 bg-neutral-800">
+        <p className="text-white text-lg font-extralight text-center">
+          TyreStats is desktop-only for now.
+          <br />
+          Please use a PC or laptop.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="dark"
-        transition={Bounce}
-        className={"z-1000000"} // css is my passion
-      />
       {currentSessionId && (
         <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
           {raceSettingsVis && (
