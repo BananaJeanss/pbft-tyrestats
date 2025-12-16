@@ -263,6 +263,9 @@ export default function Dashboard() {
               onSave={function (config: RaceConfiguration): void {
                 setRaceConfig(config);
               }}
+              timelineData={timelineData}
+              timelineStints={timelineStints}
+              timelineGenerated={timelineGenerated}
             />
           )}
           {tyresettingsVis && (

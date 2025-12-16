@@ -4,7 +4,6 @@ import { useState } from "react";
 export interface SessionSettings {
   name: string;
   date: string;
-  tags: string[];
   lastModified: string;
   selectedIcon: string;
   icon_url?: string;
@@ -63,7 +62,7 @@ export default function SessionSettingsPage({
     currentConfig || {
       name: "New Session",
       date: new Date().toISOString().split("T")[0],
-      tags: [],
+
       lastModified: new Date().toISOString(),
       selectedIcon: "default",
       icon_url: "",

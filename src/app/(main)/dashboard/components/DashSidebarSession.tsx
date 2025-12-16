@@ -37,7 +37,7 @@ export default function DashSidebarSession({
           : "bg-neutral-900 hover:bg-neutral-950"
       }`}
     >
-      {iconUrl ? (
+      {iconUrl && icon === "custom" ? (
         <img
           src={iconUrl}
           alt="Track Logo"
