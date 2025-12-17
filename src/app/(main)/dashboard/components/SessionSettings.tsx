@@ -66,7 +66,7 @@ export default function SessionSettingsPage({
       lastModified: new Date().toISOString(),
       selectedIcon: "default",
       icon_url: "",
-    }
+    },
   );
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

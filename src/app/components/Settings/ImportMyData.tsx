@@ -1,5 +1,5 @@
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { ClipboardCopyIcon, ImportIcon, TriangleAlert, X } from "lucide-react";
+import { TySession } from "@/app/types/TyTypes";
+import { ImportIcon, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
@@ -9,9 +9,8 @@ export interface ImportMyDataProps {
 
 export default function ImportMyData({ onClose }: ImportMyDataProps) {
   const [importData, setImportData] = useState<string>("");
-  const [_, setSessions] = useLocalStorage<any[]>("tyrestats_sessions", []);
 
-  function isValidSession(session: any): boolean {
+  function isValidSession(session: TySession): boolean {
     return (
       typeof session === "object" &&
       typeof session.id === "string" &&
@@ -58,7 +57,7 @@ export default function ImportMyData({ onClose }: ImportMyDataProps) {
       onClose();
     } catch (err) {
       toast.error(
-        "Failed to import data. Please ensure the format is correct."
+        "Failed to import data. Please ensure the format is correct.",
       );
       console.error(err);
     }

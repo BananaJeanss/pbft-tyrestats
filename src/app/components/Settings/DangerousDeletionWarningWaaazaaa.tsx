@@ -1,3 +1,4 @@
+import { TySession } from "@/app/types/TyTypes";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { X } from "lucide-react";
 
@@ -6,7 +7,10 @@ export default function DangerousDeletionWarningWaaazaaa({
 }: {
   onClose: () => void;
 }) {
-  const [_, setSessions] = useLocalStorage<any[]>("tyrestats_sessions", []);
+  const [, setSessions] = useLocalStorage<TySession[]>(
+    "tyrestats_sessions",
+    [],
+  );
   const handleClearData = () => {
     if (window.prompt("Type DELETE to confirm data clearance.") === "DELETE") {
       setSessions([]);

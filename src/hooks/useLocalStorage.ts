@@ -1,33 +1,31 @@
 import { useState, useEffect } from "react";
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  // start with initialValue to match the Server (avoids Hydration Error)
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") return initialValue;
 
-  useEffect(() => {
     try {
       const item = window.localStorage.getItem(key);
-      if (item) {
-        setStoredValue(JSON.parse(item));
-      }
+      return item ? (JSON.parse(item) as T) : initialValue;
     } catch (error) {
       console.warn(error);
+      return initialValue;
     }
-  }, [key]);
+  });
 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
+
       setStoredValue(valueToStore);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        window.dispatchEvent(new Event("local-storage"));
-      }
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+      window.dispatchEvent(new Event("local-storage"));
     } catch (error) {
       console.warn(error);
     }
   };
-  
+
   useEffect(() => {
     const handleStorageChange = () => {
       try {
@@ -42,6 +40,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 
     window.addEventListener("storage", handleStorageChange);
     window.addEventListener("local-storage", handleStorageChange);
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("local-storage", handleStorageChange);

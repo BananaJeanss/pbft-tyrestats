@@ -1,6 +1,12 @@
-import { RaceConfiguration } from "./components/RaceSettings";
+import { RaceConfiguration, Stint, TimelineData } from "@/app/types/TyTypes";
 import { TyrePreferences } from "./components/TyreSettings";
-import { TyreWearData } from "./components/TyreWearManager";
+import { TyreWearData } from "@/app/types/TyTypes";
+
+interface StrategyStint {
+  tyreId: string;
+  laps: number;
+  color: string;
+}
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -12,7 +18,7 @@ const TYRE_TYPES = [
 export const getEffectiveTyreData = (
   tyreId: string,
   tyreData: Record<string, TyreWearData>,
-  tyrePreferences: TyrePreferences
+  tyrePreferences: TyrePreferences,
 ) => {
   // 1. Real data
   if (tyreData[tyreId]) {
@@ -57,7 +63,7 @@ export const getEffectiveTyreData = (
 export const generateOptimalTimeline = (
   raceConfig: RaceConfiguration,
   tyrePreferences: TyrePreferences,
-  tyreData: Record<string, TyreWearData>
+  tyreData: Record<string, TyreWearData>,
 ) => {
   // 1. Get Race Laps
   const totalLaps = raceConfig?.RaceLaps ? raceConfig.RaceLaps : 50;
@@ -82,8 +88,8 @@ export const generateOptimalTimeline = (
           t.id === "soft"
             ? "#dc2626"
             : t.id === "medium"
-            ? "#eab308"
-            : "#ffffff",
+              ? "#eab308"
+              : "#ffffff",
       });
     }
   });
@@ -91,11 +97,10 @@ export const generateOptimalTimeline = (
   if (availableTyres.length === 0) return null;
 
   // 3. Find Strategy
-  let bestStrategy: { tyreId: string; laps: number; color: string }[] | null =
-    null;
+  let bestStrategy: StrategyStint[] | null = null;
 
   // Helper to check if a strategy is valid (uses 2+ compounds)
-  const isValidComposition = (stints: typeof bestStrategy) => {
+  const isValidComposition = (stints: StrategyStint[]) => {
     if (!stints) return false;
     const compounds = new Set(stints.map((s) => s.tyreId));
     return compounds.size >= 2;
@@ -108,7 +113,7 @@ export const generateOptimalTimeline = (
     hard: 1,
   };
 
-  const calculateScore = (stints: any[]) => {
+  const calculateScore = (stints: StrategyStint[]) => {
     // Heavy penalty for pit stops to prioritize fewer stops
     // 500 points is more than max possible points from laps (e.g. 100 laps * 3 pts = 300)
     const stopPenalty = (stints.length - 1) * 500;
@@ -120,9 +125,12 @@ export const generateOptimalTimeline = (
     return performanceScore - stopPenalty;
   };
 
-  const validStrategies: { stints: any[]; score: number }[] = [];
+  const validStrategies: { stints: StrategyStint[]; score: number }[] = [];
 
-  const findAllCombinations = (currentLaps: number, currentStints: any[]) => {
+  const findAllCombinations = (
+    currentLaps: number,
+    currentStints: StrategyStint[],
+  ) => {
     // Base case: Race finished
     if (currentLaps >= totalLaps) {
       if (isValidComposition(currentStints)) {
@@ -173,8 +181,8 @@ export const generateOptimalTimeline = (
 
   // 4. Map to Timeline Data
   if (bestStrategy) {
-    const newTimelineData: any = { name: "Strategy" };
-    const newStints: any[] = [];
+    const newTimelineData: TimelineData = { name: "Strategy" };
+    const newStints: Stint[] = [];
     let cumulativeLaps = 0;
 
     bestStrategy.forEach((stint, index) => {

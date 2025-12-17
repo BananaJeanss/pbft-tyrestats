@@ -36,10 +36,7 @@ export default function TyreSettings({
       <div className="w-full max-w-md bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold text-white">Tyre Settings</h2>
-          <button
-            onClick={onClose}
-            className="text-neutral-400 cursor-pointer"
-          >
+          <button onClick={onClose} className="text-neutral-400 cursor-pointer">
             <X />
           </button>
         </div>
@@ -77,7 +74,9 @@ export default function TyreSettings({
 
           {/* Estimation Ratios */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-md font-bold text-white">Life Estimation Ratios</h3>
+            <h3 className="text-md font-bold text-white">
+              Life Estimation Ratios
+            </h3>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-neutral-300">

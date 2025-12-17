@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { DEFAULT_RACECONFIGURATION } from "./RaceSettings";
 import { DEFAULT_PREFERENCES } from "./TyreSettings";
+import { TySession } from "@/app/types/TyTypes";
 
 interface NewSessionProps {
   onClose: () => void;
@@ -17,9 +18,9 @@ export default function NewSession({ onClose }: NewSessionProps) {
   const [iconUrl, setIconUrl] = useState("");
 
   // 2. Access the global sessions list from LocalStorage
-  const [sessions, setSessions] = useLocalStorage<any[]>(
+  const [sessions, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    []
+    [],
   );
 
   const handleCreate = () => {
@@ -40,6 +41,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
       },
       tyrePreferences: DEFAULT_PREFERENCES,
       tyreData: {},
+      manualStints: [],
     };
 
     // 3. Save to LocalStorage

@@ -21,7 +21,7 @@ export default function Navbar() {
             width={64}
             height={64}
           />
-          <div className="h-12 w-0.5 bg-white" /> 
+          <div className="h-12 w-0.5 bg-white" />
           <p className="underline">TyreStats</p>
         </div>
         <div className="min-w-1/2 flex flex-row-reverse items-center font-bold text-2xl">

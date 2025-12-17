@@ -1,12 +1,6 @@
-import {
-  CheckCircle2,
-  Settings,
-  ToggleLeft,
-  ToggleRight,
-  User,
-  XCircle,
-  Zap,
-} from "lucide-react";
+"use client";
+
+import { CheckCircle2, Settings, XCircle } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -15,12 +9,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { RaceConfiguration } from "./RaceSettings";
-import { useState } from "react";
+import {
+  RaceConfiguration,
+  TimelineData,
+  TyreWearData,
+} from "@/app/types/TyTypes";
 
 const validateTimelineData = (
-  timelineData: any[],
-  timelineStints: { tyreId: string }[]
+  timelineData: TimelineData[],
+  timelineStints: { tyreId: string }[],
 ) => {
   // per FIT regulations 2 or more compounds must be used
   if (timelineStints.length > 0) {
@@ -29,7 +26,7 @@ const validateTimelineData = (
   }
 
   const usedTyres = Object.values(timelineData[0]).filter(
-    (val) => typeof val === "number" && val > 0
+    (val) => typeof val === "number" && val > 0,
   ).length;
   if (usedTyres < 2) {
     return false;
@@ -40,14 +37,14 @@ const validateTimelineData = (
 
 interface DashTimelineProps {
   timelineGenerated: boolean;
-  timelineData: any[];
+  timelineData: TimelineData[];
   timelineStints: {
     tyreId: string;
     key: string;
     color: string;
     label: string;
   }[];
-  tyreData: Record<string, any>;
+  tyreData: Record<string, TyreWearData>;
   setRaceSettingsVis: (vis: boolean) => void;
   raceConfig: RaceConfiguration;
   isManualMode?: boolean;
@@ -58,7 +55,6 @@ export default function DashTimeline({
   timelineGenerated,
   timelineData,
   timelineStints,
-  tyreData,
   setRaceSettingsVis,
   raceConfig,
   isManualMode = false,
@@ -80,7 +76,7 @@ export default function DashTimeline({
             >
               Auto
             </span>
-              |
+            |
             <span
               className={`text-xs font-bold px-2 cursor-pointer transition ${
                 isManualMode ? "text-white" : "text-neutral-500"
@@ -154,7 +150,7 @@ export default function DashTimeline({
                 }}
                 itemStyle={{ color: "#fff" }}
               />
-              {timelineStints.map((stint, index) => (
+              {timelineStints.map((stint) => (
                 <Bar
                   key={stint.key}
                   dataKey={stint.key}

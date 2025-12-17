@@ -38,6 +38,7 @@ export default function DashSidebarSession({
       }`}
     >
       {iconUrl && icon === "custom" ? (
+        /* eslint-disable-next-line @next/next/no-img-element*/
         <img
           src={iconUrl}
           alt="Track Logo"

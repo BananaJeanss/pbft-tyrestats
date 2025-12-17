@@ -2,13 +2,29 @@ import { useState } from "react";
 import DashSidebarSession from "./DashSidebarSession";
 import NewSession from "./NewSession";
 import { useLocalStorage } from "../../../../hooks/useLocalStorage";
+import { useMounted } from "@/hooks/useMounted";
+import { TySession } from "@/app/types/TyTypes";
+
+interface DashSidebarProps {
+  currentSessionId: string;
+  onSelectSession: (session: TySession) => void;
+}
 
 export default function DashSidebar({
   currentSessionId,
   onSelectSession,
-}: any) {
+}: DashSidebarProps) {
   const [newSessionOpen, setNewSessionOpen] = useState(false);
-  const [sessions] = useLocalStorage<any[]>("tyrestats_sessions", []);
+  const [sessions] = useLocalStorage<TySession[]>("tyrestats_sessions", []);
+  const mounted = useMounted();
+
+  if (!mounted) {
+    return (
+      <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4 overflow-y-auto">
+        <p className="text-neutral-500 text-sm p-2">Loading sessions…</p>
+      </div>
+    );
+  }
 
   return (
     <>

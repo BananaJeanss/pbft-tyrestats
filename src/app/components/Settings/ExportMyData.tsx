@@ -9,7 +9,7 @@ export default function ExportMyData({ onClose }: ExportMyDataProps) {
   const exportData = JSON.stringify(
     Object.fromEntries(Object.entries(localStorage)),
     null,
-    2
+    2,
   );
 
   const handleCopy = async () => {

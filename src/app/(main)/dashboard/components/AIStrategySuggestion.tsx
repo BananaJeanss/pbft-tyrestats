@@ -40,7 +40,7 @@ export default function AIStrategySuggestion({
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`
+            : `Server responded with status: ${response.status}`,
         );
       }
 
@@ -60,7 +60,7 @@ export default function AIStrategySuggestion({
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
+        error instanceof Error ? error.message : "An unknown error occurred",
       );
     } finally {
       setIsLoading(false);

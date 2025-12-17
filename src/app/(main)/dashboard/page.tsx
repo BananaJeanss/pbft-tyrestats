@@ -1,17 +1,18 @@
 "use client";
 
 import { Pencil, Settings } from "lucide-react";
-import TyreWearManager, { TyreWearData } from "./components/TyreWearManager";
-import { useEffect, useState, useRef, useMemo } from "react";
+import TyreWearManager from "./components/TyreWearManager";
+import { Stint, TimelineData, TyreWearData } from "@/app/types/TyTypes";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import TyreSettings, {
   TyrePreferences,
   DEFAULT_PREFERENCES,
 } from "./components/TyreSettings";
 import RaceSettings, {
-  RaceConfiguration,
   DEFAULT_RACECONFIGURATION,
-  ManualStint,
 } from "./components/RaceSettings";
+import { RaceConfiguration } from "@/app/types/TyTypes";
+import { ManualStint } from "@/app/types/TyTypes";
 import DashSidebar from "./components/DashSidebar";
 import AIStrategySuggestion from "./components/AIStrategySuggestion";
 import DashNotes from "./components/DashNotes";
@@ -22,6 +23,7 @@ import SessionSettingsPage, {
 } from "./components/SessionSettings";
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { toast } from "react-toastify";
+import { TySession } from "@/app/types/TyTypes";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -42,8 +44,8 @@ export default function Dashboard() {
     useState<TyrePreferences>(DEFAULT_PREFERENCES);
 
   // auto timeline states
-  const [autoTimelineData, setAutoTimelineData] = useState<any[]>([]);
-  const [autoTimelineStints, setAutoTimelineStints] = useState<any[]>([]);
+  const [autoTimelineData, setAutoTimelineData] = useState<TimelineData[]>([]);
+  const [autoTimelineStints, setAutoTimelineStints] = useState<Stint[]>([]);
   const [timelineGenerated, setTimelineGenerates] = useState(false);
 
   // manual timeline states
@@ -52,7 +54,7 @@ export default function Dashboard() {
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
   const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(
-    DEFAULT_RACECONFIGURATION
+    DEFAULT_RACECONFIGURATION,
   );
 
   const [sessionSettingsVis, setSessionSettingsVis] = useState(false);
@@ -64,20 +66,20 @@ export default function Dashboard() {
   const [currentNotes, setCurrentNotes] = useState("");
   const [currentSuggestion, setCurrentSuggestion] = useState("");
 
-  const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
+  const [isAutosaveEnabled] = useLocalStorage<boolean>(
     "tyrestats_autosave_enabled",
-    true
+    true,
   );
-  const [autoSaveInterval, setAutoSaveInterval] = useLocalStorage<number>(
+  const [autoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5
+    2.5,
   );
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const isLoadingSession = useRef(false);
-  const [sessions, setSessions] = useLocalStorage<any[]>(
+  const [, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    []
+    [],
   );
 
   // Helper to convert Manual Stints (Array) to Recharts Data Format
@@ -88,7 +90,7 @@ export default function Dashboard() {
     // Recharts needs a single object for the bar to stack properly in one row
     // Or we map unique keys per stint.
     // The previous structure likely used: { name: 'Strategy', 'stint_0_soft': 10, 'stint_1_medium': 20 }
-    const dataRow: any = { name: "Strategy" };
+    const dataRow: TimelineData = { name: "Strategy" };
     manualStints.forEach((stint, index) => {
       // Create a unique key for Recharts stacking: "manual_index_tyreID"
       dataRow[`manual_${index}_${stint.tyre}`] = stint.laps;
@@ -119,7 +121,7 @@ export default function Dashboard() {
     }));
   }, [manualStints]);
 
-  const saveSession = () => {
+  const saveSession = useCallback(() => {
     if (!currentSessionId) return;
 
     setSessions((prevSessions) =>
@@ -138,12 +140,22 @@ export default function Dashboard() {
                 lastModified: new Date().toISOString(),
               },
             }
-          : s
-      )
+          : s,
+      ),
     );
 
     toast.success("Session saved");
-  };
+  }, [
+    currentSessionId,
+    setSessions,
+    tyreData,
+    raceConfig,
+    tyrePreferences,
+    currentNotes,
+    currentSuggestion,
+    manualStints,
+    sessionSettings,
+  ]);
 
   // Auto-save logic
   useEffect(() => {
@@ -152,6 +164,7 @@ export default function Dashboard() {
     const timeoutId = setTimeout(saveSession, autoSaveInterval * 1000);
     return () => clearTimeout(timeoutId);
   }, [
+    saveSession,
     isAutosaveEnabled,
     autoSaveInterval,
     tyreData,
@@ -191,7 +204,7 @@ export default function Dashboard() {
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
     return Math.floor(
-      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
+      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap,
     );
   };
 
@@ -204,7 +217,7 @@ export default function Dashboard() {
       const result = generateOptimalTimeline(
         raceConfig,
         tyrePreferences,
-        tyreData
+        tyreData,
       );
       if (result) {
         setAutoTimelineData(result.timelineData);
@@ -220,7 +233,7 @@ export default function Dashboard() {
     }
   }, [tyreData, raceConfig, tyrePreferences]);
 
-  const loadSession = (session: any) => {
+  const loadSession = (session: TySession) => {
     isLoadingSession.current = true;
     setCurrentSessionId(session.id);
 
@@ -231,7 +244,6 @@ export default function Dashboard() {
     setCurrentSuggestion(session.currentSuggestion || "");
 
     setManualStints(session.manualStints || []);
-    setIsManualMode(session.isManualMode || false);
 
     setSessionSettings({ current: session.meta });
     setTimeout(() => {
@@ -253,7 +265,7 @@ export default function Dashboard() {
       const ua = navigator.userAgent;
       const mobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          ua
+          ua,
         );
       if (mobile) setIsMobile(true);
     }, []);
@@ -318,7 +330,7 @@ export default function Dashboard() {
               }
               DeleteThisSession={() => {
                 setSessions((prev) =>
-                  prev.filter((s) => s.id !== currentSessionId)
+                  prev.filter((s) => s.id !== currentSessionId),
                 );
                 setCurrentSessionId(null);
               }}
@@ -327,7 +339,7 @@ export default function Dashboard() {
 
           <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
             <DashSidebar
-              currentSessionId={currentSessionId}
+              currentSessionId={currentSessionId ?? ""}
               onSelectSession={loadSession}
             />
 
@@ -380,7 +392,7 @@ export default function Dashboard() {
                     const effectiveData = getEffectiveTyreData(
                       tyre.id,
                       tyreData,
-                      tyrePreferences
+                      tyrePreferences,
                     );
                     return (
                       <div
@@ -410,14 +422,14 @@ export default function Dashboard() {
                               <p className="text-neutral-400 text-xs">
                                 Recommended Lap Count:{" "}
                                 {calcRecommendedLapCount(
-                                  effectiveData.wearPerLap
+                                  effectiveData.wearPerLap,
                                 )}{" "}
                                 (
                                 {(
                                   100 -
                                   effectiveData.wearPerLap *
                                     calcRecommendedLapCount(
-                                      effectiveData.wearPerLap
+                                      effectiveData.wearPerLap,
                                     )
                                 ).toFixed(2)}
                                 %)
@@ -456,7 +468,7 @@ export default function Dashboard() {
         <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
           <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
             <DashSidebar
-              currentSessionId={currentSessionId}
+              currentSessionId={currentSessionId || ""}
               onSelectSession={loadSession}
             />
 

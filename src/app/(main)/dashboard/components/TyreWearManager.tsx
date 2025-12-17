@@ -1,11 +1,6 @@
+import { TyreWearData } from "@/app/types/TyTypes";
 import { Upload, X, ZoomIn, ZoomOut } from "lucide-react";
 import { useState, useEffect } from "react";
-
-export interface TyreWearData {
-  remainingLife: number;
-  lapsDriven: number;
-  wearPerLap: number;
-}
 
 interface TyreWearManagerProps {
   tyreType: "soft" | "medium" | "hard" | "wet";
@@ -36,20 +31,6 @@ export default function TyreWearManager({
     hard: "Hard",
     wet: "Wet",
   };
-
-  useEffect(() => {
-    if (currentPage === "manual") {
-      const wear = parseFloat(manualWear);
-      const lapsCount = parseFloat(manualLaps);
-
-      if (!isNaN(wear) && !isNaN(lapsCount) && lapsCount > 0) {
-        // manualWear is "Remaining %", calculatedWear is "Remaining %"
-        setCalculatedWear(wear);
-      } else {
-        setCalculatedWear(null);
-      }
-    }
-  }, [manualWear, manualLaps, currentPage]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -119,7 +100,7 @@ export default function TyreWearManager({
     const validLaps = isNaN(lapsValue) ? 0 : lapsValue;
     const wearPerLap = CalculateAverageWearPerLap(
       100 - calculatedWear,
-      validLaps
+      validLaps,
     );
 
     onSave({
@@ -137,7 +118,7 @@ export default function TyreWearManager({
           items.forEach((item) => {
             // Try common image formats
             const imageTypes = item.types.filter((type) =>
-              type.startsWith("image/")
+              type.startsWith("image/"),
             );
             if (imageTypes.length > 0) {
               item
@@ -258,6 +239,7 @@ export default function TyreWearManager({
                 className="relative inline-block cursor-crosshair"
                 onClick={handleImageClick}
               >
+                {/* eslint-disable-next-line @next/next/no-img-element*/}
                 <img
                   src={imageSrc}
                   alt="Analysis"
@@ -380,7 +362,7 @@ export default function TyreWearManager({
                         <p className="text-3xl font-bold text-white">
                           {CalculateAverageWearPerLap(
                             100 - calculatedWear,
-                            parseFloat(laps) || 0
+                            parseFloat(laps) || 0,
                           ).toFixed(2)}
                           %
                         </p>
@@ -420,29 +402,31 @@ export default function TyreWearManager({
               max="100"
               value={manualWear}
               onKeyDown={(e) => {
-                // Prevent scientific notation and signs
                 if (["e", "E", "+", "-"].includes(e.key)) {
                   e.preventDefault();
                 }
               }}
               onChange={(e) => {
                 const val = e.target.value;
-                // Allow empty string to clear input
+
                 if (val === "") {
                   setManualWear("");
+                  setCalculatedWear(null);
                   return;
                 }
 
                 const num = parseFloat(val);
+                let finalVal = val;
 
-                // Strict clamping
                 if (num > 100) {
-                  setManualWear("100");
+                  finalVal = "100";
                 } else if (num < 0) {
-                  setManualWear("0");
-                } else {
-                  setManualWear(val);
+                  finalVal = "0";
                 }
+
+                setManualWear(finalVal);
+
+                setCalculatedWear(parseFloat(finalVal));
               }}
               className="w-48 bg-neutral-800 rounded-md p-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
             />
@@ -492,7 +476,7 @@ export default function TyreWearManager({
                 <p className="text-3xl font-bold text-white">
                   {CalculateAverageWearPerLap(
                     100 - calculatedWear,
-                    parseFloat(manualLaps) || 0
+                    parseFloat(manualLaps) || 0,
                   ).toFixed(2)}
                   %
                 </p>
