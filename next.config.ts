@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
-import nextBuildId from "next-build-id";
+
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  generateBuildId: async () => nextBuildId({ dir: __dirname }),
+  generateBuildId: async () => {
+    return process.env.VERCEL_GIT_COMMIT_SHA || null;
+  },
   async headers() {
     return [
       {
