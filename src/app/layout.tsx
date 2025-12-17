@@ -3,6 +3,7 @@ import { Space_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Bounce, ToastContainer } from "react-toastify";
+import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
 
 const spaceMono = Space_Mono({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${spaceMono.variable} antialiased`}>
         <Analytics />
+        <ServiceWorkerRegister />
         <ToastContainer
           position="bottom-right"
           autoClose={2000}
