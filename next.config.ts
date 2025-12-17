@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
+import nextBuildId from "next-build-id";
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  generateBuildId: async () => nextBuildId({ dir: __dirname }),
   async headers() {
     return [
       {

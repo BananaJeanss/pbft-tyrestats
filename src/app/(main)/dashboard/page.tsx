@@ -186,10 +186,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
       return;
-
     const timeoutId = setTimeout(() => saveSession(), autoSaveInterval * 1000);
-
     return () => clearTimeout(timeoutId);
+    // not dealing with this fuckass warning
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAutosaveEnabled,
     autoSaveInterval,

@@ -17,17 +17,19 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
   // atuo save
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
     "tyrestats_autosave_enabled",
-    true,
+    true
   );
   const [autoSaveInterval, setAutoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5,
+    2.5
   );
 
   const [selectedTheme, setSelectedTheme] = useLocalStorage<string>(
     "tyrestats_theme",
-    "system",
+    "system"
   );
+
+  const nextBuildId = process.env.NEXT_PUBLIC_BUILD_ID || "dev";
 
   return (
     <>
@@ -131,6 +133,23 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
               <span>Clear All Data</span>
             </div>
           </button>
+          <hr className="border-neutral-800" />
+          <span className="text-xs text-neutral-500 text-center">
+            TyreStats |{" "}
+            <a
+              href="https://github.com/BananaJeanss/pbft-tyrestats"
+              className="underline"
+            >
+              {"View Source"}
+            </a>
+            {" "}| Build{" "}
+            <a
+              href={`https://github.com/BananaJeanss/pbft-tyrestats/commit/${nextBuildId}`}
+              className="underline"
+            >
+              {nextBuildId}
+            </a>
+          </span>
         </div>
       </div>
     </>
