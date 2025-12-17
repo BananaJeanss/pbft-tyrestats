@@ -1,16 +1,37 @@
-import { defineConfig, globalIgnores } from "eslint/config";
+import { defineConfig } from "eslint/config";
+import { globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import prettierConfig from "eslint-config-prettier";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
+  prettierConfig,
+
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
+
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+
+      "react/react-in-jsx-scope": "off",
+      "react/prop-types": "off",
+    },
+  },
+
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",
+    "node_modules/**",
     "next-env.d.ts",
   ]),
 ]);

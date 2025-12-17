@@ -170,7 +170,6 @@ export async function POST(request: Request) {
 
       Keep the response concise and actionable.
     `;
-    console.log(prompt);
 
     const aiResponse = await CallHCAI(prompt);
 
