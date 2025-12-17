@@ -1,4 +1,12 @@
-import { CheckCircle2, Settings, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  Settings,
+  ToggleLeft,
+  ToggleRight,
+  User,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -8,6 +16,7 @@ import {
   YAxis,
 } from "recharts";
 import { RaceConfiguration } from "./RaceSettings";
+import { useState } from "react";
 
 const validateTimelineData = (
   timelineData: any[],
@@ -41,6 +50,8 @@ interface DashTimelineProps {
   tyreData: Record<string, any>;
   setRaceSettingsVis: (vis: boolean) => void;
   raceConfig: RaceConfiguration;
+  isManualMode?: boolean;
+  setIsManualMode: (mode: boolean) => void;
 }
 
 export default function DashTimeline({
@@ -50,61 +61,89 @@ export default function DashTimeline({
   tyreData,
   setRaceSettingsVis,
   raceConfig,
+  isManualMode = false,
+  setIsManualMode,
 }: DashTimelineProps) {
   return (
-    <div className="w-full bg-neutral-900 p-4 rounded-lg flex flex-col gap-2">
-      <div className="w-full flex flex-row justify-between">
-        <h3 className="text-lg font-bold flex items-center gap-1.5">
-          Timeline{" "}
+    <div className="w-full bg-neutral-900 p-4 rounded-lg flex flex-col relative gap-2">
+      <div className="w-full flex flex-row justify-between items-center">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-bold flex items-center gap-1.5 text-white">
+            Timeline
+          </h3>
+          <div className="flex items-center gap-1 bg-neutral-900 p-1 rounded-lg border border-neutral-700">
+            <span
+              className={`text-xs font-bold px-2 cursor-pointer transition ${
+                !isManualMode ? "text-white" : "text-neutral-500"
+              }`}
+              onClick={() => setIsManualMode(false)}
+            >
+              Auto
+            </span>
+              |
+            <span
+              className={`text-xs font-bold px-2 cursor-pointer transition ${
+                isManualMode ? "text-white" : "text-neutral-500"
+              }`}
+              onClick={() => setIsManualMode(true)}
+            >
+              Manual
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
           {timelineGenerated && (
-            <>
-              (
+            <div className="flex items-center gap-1 text-sm">
               {validateTimelineData(timelineData, timelineStints) ? (
                 <>
-                  <CheckCircle2 className="inline h-5 w-5 text-green-500" />
-                  <p
-                    title="2 or more tyre compounds used"
-                    className="cursor-help"
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  <span
+                    className="text-neutral-400 cursor-help"
+                    title="Timeline uses two or more different tyre compounds."
                   >
                     FIT Valid
-                  </p>
+                  </span>
                 </>
               ) : (
                 <>
-                  <XCircle className="inline h-5 w-5 text-red-500" />
-                  <p
-                    title="Less than 2 different compounds used"
-                    className="cursor-help"
+                  <XCircle className="h-4 w-4 text-red-500" />
+                  <span
+                    className="text-neutral-400 cursor-help"
+                    title="Timeline must have two or more different tyre compounds."
                   >
-                    FIT Invalid - At least 2 tyre compounds must be used
-                  </p>
+                    FIT Invalid
+                  </span>
                 </>
               )}
-              )
-            </>
+            </div>
           )}
-        </h3>
-        <button
-          className="cursor-pointer"
-          onClick={() => {
-            setRaceSettingsVis(true);
-          }}
-        >
-          <Settings />
-        </button>
+
+          <button
+            className="cursor-pointer text-neutral-400 hover:text-white transition"
+            onClick={() => {
+              setRaceSettingsVis(true);
+            }}
+          >
+            <Settings />
+          </button>
+        </div>
       </div>
 
       {timelineGenerated ? (
-        <div className="h-16 w-full">
+        <div className="h-20 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               layout="vertical"
               data={timelineData}
               margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
             >
-              <XAxis type="number" domain={[0, "dataMax"]} hide />
+              <XAxis
+                type="number"
+                domain={[0, raceConfig?.RaceLaps || "auto"]}
+                hide
+              />
               <YAxis type="category" dataKey="name" hide />
-
               <Tooltip
                 cursor={{ fill: "transparent" }}
                 contentStyle={{
@@ -114,10 +153,6 @@ export default function DashTimeline({
                   color: "#fff",
                 }}
                 itemStyle={{ color: "#fff" }}
-                itemSorter={(item: any) => {
-                  const match = item.name.match(/Laps (\d+)-/);
-                  return match ? parseInt(match[1]) : 0;
-                }}
               />
               {timelineStints.map((stint, index) => (
                 <Bar
@@ -125,35 +160,26 @@ export default function DashTimeline({
                   dataKey={stint.key}
                   stackId="a"
                   fill={stint.color}
-                  radius={[
-                    index === 0 ? 4 : 0,
-                    index === timelineStints.length - 1 ? 4 : 0,
-                    index === timelineStints.length - 1 ? 4 : 0,
-                    index === 0 ? 4 : 0,
-                  ]}
                   name={stint.label}
+                  isAnimationActive={false} // smoother switching
                 />
               ))}
             </BarChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="h-16 w-full">
-          <p className="text-neutral-400 text-sm">
-            Timeline will be auto-generated once{" "}
-            {!raceConfig?.RaceLaps && Object.keys(tyreData).length === 0
-              ? "the race settings and at least one tyre compound data has"
-              : !raceConfig?.RaceLaps
-              ? "the race settings have"
-              : "at least one tyre compound data has"}{" "}
-            been added.
+        <div className="h-20 w-full flex items-center justify-center border border-dashed border-neutral-800 rounded">
+          <p className="text-neutral-500 text-sm">
+            {isManualMode
+              ? "No manual stints configured. Click Settings to add stints."
+              : "Timeline not generated. Check race settings and tyre data."}
           </p>
         </div>
       )}
 
       <div className="flex justify-between text-xs text-neutral-500 px-1">
         <span>Start</span>
-        <span>Finish (Lap {raceConfig?.RaceLaps || "Not Set"})</span>
+        <span>Finish ({raceConfig?.RaceLaps || 0} Laps)</span>
       </div>
     </div>
   );

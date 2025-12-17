@@ -2,7 +2,7 @@
 
 import { Pencil, Settings } from "lucide-react";
 import TyreWearManager, { TyreWearData } from "./components/TyreWearManager";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import TyreSettings, {
   TyrePreferences,
   DEFAULT_PREFERENCES,
@@ -10,6 +10,7 @@ import TyreSettings, {
 import RaceSettings, {
   RaceConfiguration,
   DEFAULT_RACECONFIGURATION,
+  ManualStint,
 } from "./components/RaceSettings";
 import DashSidebar from "./components/DashSidebar";
 import AIStrategySuggestion from "./components/AIStrategySuggestion";
@@ -40,18 +41,14 @@ export default function Dashboard() {
   const [tyrePreferences, setTyrePreferences] =
     useState<TyrePreferences>(DEFAULT_PREFERENCES);
 
-  const [timelineData, setTimelineData] = useState<any[]>([
-    {
-      name: "Strategy",
-      soft: 0,
-      medium: 0,
-      hard: 0,
-      wet: 0,
-    },
-  ]);
-
-  const [timelineStints, setTimelineStints] = useState<any[]>([]);
+  // auto timeline states
+  const [autoTimelineData, setAutoTimelineData] = useState<any[]>([]);
+  const [autoTimelineStints, setAutoTimelineStints] = useState<any[]>([]);
   const [timelineGenerated, setTimelineGenerates] = useState(false);
+
+  // manual timeline states
+  const [manualStints, setManualStints] = useState<ManualStint[]>([]);
+  const [isManualMode, setIsManualMode] = useState(false);
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
   const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(
@@ -63,8 +60,8 @@ export default function Dashboard() {
     Record<string, SessionSettings>
   >({});
 
+  // notes & AI
   const [currentNotes, setCurrentNotes] = useState("");
-
   const [currentSuggestion, setCurrentSuggestion] = useState("");
 
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
@@ -76,17 +73,51 @@ export default function Dashboard() {
     2.5
   );
 
-  // 1. Add state to track which ID is open
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-
-  // ref to prevent autosave on session load
   const isLoadingSession = useRef(false);
-
-  // 2. Get access to the global sessions list
   const [sessions, setSessions] = useLocalStorage<any[]>(
     "tyrestats_sessions",
     []
   );
+
+  // Helper to convert Manual Stints (Array) to Recharts Data Format
+  const manualTimelineData = useMemo(() => {
+    if (manualStints.length === 0)
+      return [{ name: "Strategy", soft: 0, medium: 0, hard: 0, wet: 0 }];
+
+    // Recharts needs a single object for the bar to stack properly in one row
+    // Or we map unique keys per stint.
+    // The previous structure likely used: { name: 'Strategy', 'stint_0_soft': 10, 'stint_1_medium': 20 }
+    const dataRow: any = { name: "Strategy" };
+    manualStints.forEach((stint, index) => {
+      // Create a unique key for Recharts stacking: "manual_index_tyreID"
+      dataRow[`manual_${index}_${stint.tyre}`] = stint.laps;
+    });
+    return [dataRow];
+  }, [manualStints]);
+
+  // Helper to create the Stint Definitions for DashTimeline colors
+  const manualTimelineStintsDef = useMemo(() => {
+    const colors: Record<string, string> = {
+      soft: "#dc2626",
+      medium: "#eab308",
+      hard: "#ffffff",
+      wet: "#1d4ed8",
+    };
+    const labels: Record<string, string> = {
+      soft: "S",
+      medium: "M",
+      hard: "H",
+      wet: "W",
+    };
+
+    return manualStints.map((stint, index) => ({
+      tyreId: stint.tyre,
+      key: `manual_${index}_${stint.tyre}`, // Must match the data key above
+      color: colors[stint.tyre],
+      label: `${labels[stint.tyre]} (${stint.laps}L)`,
+    }));
+  }, [manualStints]);
 
   const saveSession = () => {
     if (!currentSessionId) return;
@@ -101,6 +132,7 @@ export default function Dashboard() {
               tyrePreferences,
               currentNotes,
               currentSuggestion,
+              manualStints,
               meta: {
                 ...(sessionSettings["current"] || s.meta),
                 lastModified: new Date().toISOString(),
@@ -113,18 +145,11 @@ export default function Dashboard() {
     toast.success("Session saved");
   };
 
-  // auto-Save Effect
+  // Auto-save logic
   useEffect(() => {
-    if (!isAutosaveEnabled) return;
-    if (!currentSessionId) return;
-
-    if (isLoadingSession.current) {
-      isLoadingSession.current = false;
+    if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
       return;
-    }
-
     const timeoutId = setTimeout(saveSession, autoSaveInterval * 1000);
-
     return () => clearTimeout(timeoutId);
   }, [
     isAutosaveEnabled,
@@ -136,6 +161,7 @@ export default function Dashboard() {
     sessionSettings,
     currentSuggestion,
     currentSessionId,
+    manualStints,
   ]);
 
   // ctrl+s
@@ -181,23 +207,16 @@ export default function Dashboard() {
         tyreData
       );
       if (result) {
-        setTimelineData(result.timelineData);
-        setTimelineStints(result.timelineStints);
+        setAutoTimelineData(result.timelineData);
+        setAutoTimelineStints(result.timelineStints);
         setTimelineGenerates(true);
       }
     } else {
-      // Reset timeline if requirements are not met
       setTimelineGenerates(false);
-      setTimelineData([
-        {
-          name: "Strategy",
-          soft: 0,
-          medium: 0,
-          hard: 0,
-          wet: 0,
-        },
+      setAutoTimelineData([
+        { name: "Strategy", soft: 0, medium: 0, hard: 0, wet: 0 },
       ]);
-      setTimelineStints([]);
+      setAutoTimelineStints([]);
     }
   }, [tyreData, raceConfig, tyrePreferences]);
 
@@ -211,7 +230,13 @@ export default function Dashboard() {
     setTyrePreferences(session.tyrePreferences || DEFAULT_PREFERENCES);
     setCurrentSuggestion(session.currentSuggestion || "");
 
+    setManualStints(session.manualStints || []);
+    setIsManualMode(session.isManualMode || false);
+
     setSessionSettings({ current: session.meta });
+    setTimeout(() => {
+      isLoadingSession.current = false;
+    }, 1000);
   };
 
   function useIsMobile() {
@@ -235,7 +260,6 @@ export default function Dashboard() {
 
     return isMobile;
   }
-
   const isMobile = useIsMobile();
 
   if (isMobile) {
@@ -257,26 +281,25 @@ export default function Dashboard() {
           {raceSettingsVis && (
             <RaceSettings
               currentConfig={raceConfig}
-              onClose={function (): void {
-                setRaceSettingsVis(false);
-              }}
-              onSave={function (config: RaceConfiguration): void {
+              currentManualStints={manualStints}
+              tyreData={tyreData}
+              tyrePreferences={tyrePreferences}
+              autoTimelineData={autoTimelineData}
+              autoTimelineStints={autoTimelineStints}
+              isAutoGenerated={timelineGenerated}
+              onClose={() => setRaceSettingsVis(false)}
+              onSave={(config, newStints) => {
                 setRaceConfig(config);
+                setManualStints(newStints);
+                if (newStints.length > 0) setIsManualMode(true);
               }}
-              timelineData={timelineData}
-              timelineStints={timelineStints}
-              timelineGenerated={timelineGenerated}
             />
           )}
           {tyresettingsVis && (
             <TyreSettings
               currentPreferences={tyrePreferences}
-              onClose={function (): void {
-                settyresettingsVis(false);
-              }}
-              onSave={function (prefs: TyrePreferences): void {
-                setTyrePreferences(prefs);
-              }}
+              onClose={() => settyresettingsVis(false)}
+              onSave={setTyrePreferences}
             />
           )}
           {tyremanVis && selectedTyre && (
@@ -290,15 +313,12 @@ export default function Dashboard() {
             <SessionSettingsPage
               currentConfig={sessionSettings["current"]}
               onClose={() => setSessionSettingsVis(false)}
-              onSave={(settings: SessionSettings) => {
-                setSessionSettings((prev) => ({
-                  ...prev,
-                  current: settings,
-                }));
-              }}
+              onSave={(settings) =>
+                setSessionSettings((prev) => ({ ...prev, current: settings }))
+              }
               DeleteThisSession={() => {
-                setSessions((prevSessions) =>
-                  prevSessions.filter((s) => s.id !== currentSessionId)
+                setSessions((prev) =>
+                  prev.filter((s) => s.id !== currentSessionId)
                 );
                 setCurrentSessionId(null);
               }}
@@ -311,27 +331,36 @@ export default function Dashboard() {
               onSelectSession={loadSession}
             />
 
-            {/* Main Dashboard Thingy */}
             <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
-              <h2 className="text-white font-semibold text-2xl flex flex-row gap-2 items-center">
-                {sessionSettings["current"]?.name || "Session/Race Name"}
-                <button
-                  className="cursor-pointer text-neutral-500 hover:text-neutral-300"
-                  onClick={() => setSessionSettingsVis(true)}
-                >
-                  <Pencil />
-                </button>
-              </h2>
+              <div className="flex flex-row justify-between items-center">
+                <h2 className="text-white font-semibold text-2xl flex flex-row gap-2 items-center">
+                  {sessionSettings["current"]?.name || "Session/Race Name"}
+                  <button
+                    className="cursor-pointer text-neutral-500 hover:text-neutral-300"
+                    onClick={() => setSessionSettingsVis(true)}
+                  >
+                    <Pencil />
+                  </button>
+                </h2>
+              </div>
               <hr className="border-neutral-700" />
 
               {/* Timeline Section */}
               <DashTimeline
-                timelineGenerated={timelineGenerated}
-                timelineData={timelineData}
-                timelineStints={timelineStints}
+                timelineGenerated={
+                  isManualMode ? manualStints.length > 0 : timelineGenerated
+                }
+                timelineData={
+                  isManualMode ? manualTimelineData : autoTimelineData
+                }
+                timelineStints={
+                  isManualMode ? manualTimelineStintsDef : autoTimelineStints
+                }
                 tyreData={tyreData}
                 setRaceSettingsVis={setRaceSettingsVis}
                 raceConfig={raceConfig}
+                isManualMode={isManualMode}
+                setIsManualMode={setIsManualMode}
               />
 
               {/* top tiles section - tyres and ai */}
