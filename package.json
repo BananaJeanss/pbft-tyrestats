@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --experimental-https",
-    "dev-nohttps": "bun --bun next dev",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start",
+    "dev-nohttps": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prettier": "prettier --check .",
