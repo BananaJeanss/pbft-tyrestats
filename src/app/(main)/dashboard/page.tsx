@@ -54,7 +54,7 @@ export default function Dashboard() {
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
   const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(
-    DEFAULT_RACECONFIGURATION,
+    DEFAULT_RACECONFIGURATION
   );
 
   const [sessionSettingsVis, setSessionSettingsVis] = useState(false);
@@ -68,18 +68,18 @@ export default function Dashboard() {
 
   const [isAutosaveEnabled] = useLocalStorage<boolean>(
     "tyrestats_autosave_enabled",
-    true,
+    true
   );
   const [autoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5,
+    2.5
   );
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const isLoadingSession = useRef(false);
   const [, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    [],
+    []
   );
 
   // Helper to convert Manual Stints (Array) to Recharts Data Format
@@ -121,33 +121,28 @@ export default function Dashboard() {
     }));
   }, [manualStints]);
 
-  const saveSession = useCallback(() => {
-    if (!currentSessionId) return;
+  const stateRef = useRef({
+    tyreData,
+    raceConfig,
+    tyrePreferences,
+    currentNotes,
+    currentSuggestion,
+    manualStints,
+    sessionSettings,
+  });
 
-    setSessions((prevSessions) =>
-      prevSessions.map((s) =>
-        s.id === currentSessionId
-          ? {
-              ...s,
-              tyreData,
-              raceConfig,
-              tyrePreferences,
-              currentNotes,
-              currentSuggestion,
-              manualStints,
-              meta: {
-                ...(sessionSettings["current"] || s.meta),
-                lastModified: new Date().toISOString(),
-              },
-            }
-          : s,
-      ),
-    );
-
-    toast.success("Session saved");
+  // keep ref updated
+  useEffect(() => {
+    stateRef.current = {
+      tyreData,
+      raceConfig,
+      tyrePreferences,
+      currentNotes,
+      currentSuggestion,
+      manualStints,
+      sessionSettings,
+    };
   }, [
-    currentSessionId,
-    setSessions,
     tyreData,
     raceConfig,
     tyrePreferences,
@@ -157,23 +152,54 @@ export default function Dashboard() {
     sessionSettings,
   ]);
 
-  // Auto-save logic
+  // save function for either autosave or manual save
+  const saveSession = useCallback(() => {
+    if (!currentSessionId) return;
+
+    // Read values from the ref instead of state directly
+    const currentData = stateRef.current;
+
+    setSessions((prevSessions) =>
+      prevSessions.map((s) =>
+        s.id === currentSessionId
+          ? {
+              ...s,
+              tyreData: currentData.tyreData,
+              raceConfig: currentData.raceConfig,
+              tyrePreferences: currentData.tyrePreferences,
+              currentNotes: currentData.currentNotes,
+              currentSuggestion: currentData.currentSuggestion,
+              manualStints: currentData.manualStints,
+              meta: {
+                ...(currentData.sessionSettings["current"] || s.meta),
+                lastModified: new Date().toISOString(),
+              },
+            }
+          : s
+      )
+    );
+
+    toast.success("Session saved");
+  }, [currentSessionId, setSessions]);
+
+  // Auto-save after ref changes
   useEffect(() => {
     if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
       return;
-    const timeoutId = setTimeout(saveSession, autoSaveInterval * 1000);
+
+    const timeoutId = setTimeout(() => saveSession(), autoSaveInterval * 1000);
+
     return () => clearTimeout(timeoutId);
   }, [
-    saveSession,
     isAutosaveEnabled,
     autoSaveInterval,
+    currentSessionId,
     tyreData,
     raceConfig,
     tyrePreferences,
     currentNotes,
     sessionSettings,
     currentSuggestion,
-    currentSessionId,
     manualStints,
   ]);
 
@@ -204,7 +230,7 @@ export default function Dashboard() {
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
     return Math.floor(
-      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap,
+      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
     );
   };
 
@@ -217,7 +243,7 @@ export default function Dashboard() {
       const result = generateOptimalTimeline(
         raceConfig,
         tyrePreferences,
-        tyreData,
+        tyreData
       );
       if (result) {
         setAutoTimelineData(result.timelineData);
@@ -265,7 +291,7 @@ export default function Dashboard() {
       const ua = navigator.userAgent;
       const mobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          ua,
+          ua
         );
       if (mobile) setIsMobile(true);
     }, []);
@@ -330,7 +356,7 @@ export default function Dashboard() {
               }
               DeleteThisSession={() => {
                 setSessions((prev) =>
-                  prev.filter((s) => s.id !== currentSessionId),
+                  prev.filter((s) => s.id !== currentSessionId)
                 );
                 setCurrentSessionId(null);
               }}
@@ -392,7 +418,7 @@ export default function Dashboard() {
                     const effectiveData = getEffectiveTyreData(
                       tyre.id,
                       tyreData,
-                      tyrePreferences,
+                      tyrePreferences
                     );
                     return (
                       <div
@@ -422,14 +448,14 @@ export default function Dashboard() {
                               <p className="text-neutral-400 text-xs">
                                 Recommended Lap Count:{" "}
                                 {calcRecommendedLapCount(
-                                  effectiveData.wearPerLap,
+                                  effectiveData.wearPerLap
                                 )}{" "}
                                 (
                                 {(
                                   100 -
                                   effectiveData.wearPerLap *
                                     calcRecommendedLapCount(
-                                      effectiveData.wearPerLap,
+                                      effectiveData.wearPerLap
                                     )
                                 ).toFixed(2)}
                                 %)
