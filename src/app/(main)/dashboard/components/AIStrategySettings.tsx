@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export interface AIStrategySettingsProps {
   onClose: (settings: AIStrategySettingsS) => void;
+  currentSettings: AIStrategySettingsS;
 }
 
 // great naming i know i know
@@ -18,12 +19,17 @@ interface Model {
 
 export default function AIStrategySettings({
   onClose,
+  currentSettings,
 }: AIStrategySettingsProps) {
   const [availableModels, setAvailableModels] = useState<Model[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>("qwen/qwen3-32b");
+  const [selectedModel, setSelectedModel] = useState<string>(
+    currentSettings.model || "qwen/qwen3-32b"
+  );
 
-  const [selTemperature, setTemperature] = useState<number>(0.7);
-  const [selTopP, setTopP] = useState<number>(1);
+  const [selTemperature, setTemperature] = useState<number>(
+    currentSettings.temperature || 0.7
+  );
+  const [selTopP, setTopP] = useState<number>(currentSettings.top_p || 1);
 
   useEffect(() => {
     let isMounted = true;

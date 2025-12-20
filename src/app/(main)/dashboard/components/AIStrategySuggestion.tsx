@@ -7,6 +7,7 @@ import { AIStrategySettingsS } from "./AIStrategySettings";
 
 export interface AIStrategySuggestionProps {
   onSave: (suggestion: string) => void;
+  onSaveConfig: (settings: AIStrategySettingsS) => void;
   existingSuggestion: string | null;
   notes?: string;
 }
@@ -18,9 +19,20 @@ export default function AIStrategySuggestion({
   onSave,
   existingSuggestion,
   notes,
+  onSaveConfig,
+  aiConfig,
 }: ExpectedRequest & AIStrategySuggestionProps) {
   const [ratelimitCount, setRatelimitCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const [AISettingsOpen, setAISettingsOpen] = useState(false);
+  const [AISettings, setAISettings] = useState(
+    aiConfig || {
+      model: "qwen/qwen3-32b",
+      temperature: 0.7,
+      top_p: 1,
+    }
+  );
 
   const clientcallHCAI = async () => {
     setIsLoading(true);
@@ -36,6 +48,7 @@ export default function AIStrategySuggestion({
           raceConfig,
           tyrePreferences,
           notes,
+          aiConfig: AISettings,
         }),
       });
 
@@ -74,13 +87,6 @@ export default function AIStrategySuggestion({
   const [generatedSuggestion, setGeneratedSuggestion] =
     useState(existingSuggestion);
 
-  const [AISettingsOpen, setAISettingsOpen] = useState(false);
-  const [AISettings, setAISettings] = useState({
-    model: "qwen/qwen3-32b",
-    temperature: 0.7,
-    top_p: 1,
-  } as AIStrategySettingsS);
-
   useEffect(() => {
     setGeneratedSuggestion(existingSuggestion);
   }, [existingSuggestion]);
@@ -89,7 +95,12 @@ export default function AIStrategySuggestion({
     <>
       {AISettingsOpen && (
         <AIStrategySettings
-          onClose={() => { setAISettingsOpen(false); setAISettings(AISettings as AIStrategySettingsS); }}
+          currentSettings={AISettings}
+          onClose={(newSettings) => {
+            setAISettingsOpen(false);
+            setAISettings(newSettings);
+            onSaveConfig(newSettings);
+          }}
         />
       )}
       <div className="bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">

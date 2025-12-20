@@ -82,6 +82,12 @@ export default function Dashboard() {
     []
   );
 
+  const [aiConfigSettings, setAIConfigSettings] = useState({
+    model: "qwen/qwen3-32b",
+    temperature: 0.7,
+    top_p: 1,
+  });
+
   // Helper to convert Manual Stints (Array) to Recharts Data Format
   const manualTimelineData = useMemo(() => {
     if (manualStints.length === 0)
@@ -129,6 +135,7 @@ export default function Dashboard() {
     currentSuggestion,
     manualStints,
     sessionSettings,
+    aiConfigSettings,
   });
 
   // keep ref updated
@@ -141,6 +148,7 @@ export default function Dashboard() {
       currentSuggestion,
       manualStints,
       sessionSettings,
+      aiConfigSettings,
     };
   }, [
     tyreData,
@@ -150,6 +158,7 @@ export default function Dashboard() {
     currentSuggestion,
     manualStints,
     sessionSettings,
+    aiConfigSettings,
   ]);
 
   // save function for either autosave or manual save
@@ -170,6 +179,7 @@ export default function Dashboard() {
               currentNotes: currentData.currentNotes,
               currentSuggestion: currentData.currentSuggestion,
               manualStints: currentData.manualStints,
+              aiConfigSettings: currentData.aiConfigSettings,
               meta: {
                 ...(currentData.sessionSettings["current"] || s.meta),
                 lastModified: new Date().toISOString(),
@@ -201,7 +211,11 @@ export default function Dashboard() {
     sessionSettings,
     currentSuggestion,
     manualStints,
+    aiConfigSettings,
   ]);
+
+  // please boss im tired of this fuckass god component
+  // im truly the best programmer to ever live
 
   // ctrl+s
   useEffect(() => {
@@ -268,6 +282,13 @@ export default function Dashboard() {
     setRaceConfig(session.raceConfig || DEFAULT_RACECONFIGURATION);
     setTyrePreferences(session.tyrePreferences || DEFAULT_PREFERENCES);
     setCurrentSuggestion(session.currentSuggestion || "");
+    setAIConfigSettings(
+      session.aiConfigSettings || {
+        model: "qwen/qwen3-32b",
+        temperature: 0.7,
+        top_p: 1,
+      }
+    );
 
     setManualStints(session.manualStints || []);
 
@@ -481,6 +502,16 @@ export default function Dashboard() {
                   onSave={(suggestion: string) =>
                     setCurrentSuggestion(suggestion)
                   }
+                  onSaveConfig={(newConfig: {
+                    model: string;
+                    temperature: number;
+                    top_p: number;
+                  }) => setAIConfigSettings(newConfig)}
+                  aiConfig={{
+                    model: aiConfigSettings.model,
+                    temperature: aiConfigSettings.temperature,
+                    top_p: aiConfigSettings.top_p,
+                  }}
                 />
               </div>
 

@@ -19,6 +19,11 @@ export interface TySession {
   currentNotes?: string;
   currentSuggestion?: string;
   manualStints: ManualStint[];
+  aiConfigSettings: {
+    model: string;
+    temperature: number;
+    top_p: number;
+  };
 }
 
 export interface TyreWearData {
