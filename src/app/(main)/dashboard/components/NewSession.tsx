@@ -20,13 +20,13 @@ export default function NewSession({ onClose }: NewSessionProps) {
   // 2. Access the global sessions list from LocalStorage
   const [sessions, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    [],
+    []
   );
 
   const handleCreate = () => {
     if (!name) return; // Basic validation
 
-    const newSession = {
+    const newSession: TySession = {
       id: crypto.randomUUID(),
       meta: {
         name,
@@ -42,6 +42,11 @@ export default function NewSession({ onClose }: NewSessionProps) {
       tyrePreferences: DEFAULT_PREFERENCES,
       tyreData: {},
       manualStints: [],
+      aiConfigSettings: {
+        model: "qwen/qwen3-32b",
+        temperature: 0.7,
+        top_p: 1,
+      },
     };
 
     // 3. Save to LocalStorage
