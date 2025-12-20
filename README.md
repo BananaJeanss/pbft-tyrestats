@@ -1,40 +1,92 @@
-# pbft-tyrestats
+<div align="center">
 
-Tyre Wear/Strategy analyzer for PB Formula Truck
+<img src="./public/tyrebanner.png" >
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### PB Formula Truck raceday statistics dashboard & analyzer
 
-## Getting Started
+[![Website](https://img.shields.io/badge/Website-pbft--tyrestats.vercel.app-blue?style=flat-square&logo=vercel)](https://pbft-tyrestats.vercel.app/)
+![Next.js](https://img.shields.io/badge/Next.js-black?style=flat-square&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)
+![GitHub deployments](https://img.shields.io/github/deployments/BananaJeanss/pbft-tyrestats/Production?style=flat-square&logo=vercel&label=Deployment)
+![GitHub License](https://img.shields.io/github/license/bananajeanss/pbft-tyrestats?style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/BananaJeanss/pbft-tyrestats?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/BananaJeanss/pbft-tyrestats?style=flat-square)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/BananaJeanss/pbft-tyrestats?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/BananaJeanss/pbft-tyrestats?style=flat-square&logo=github&label=Issues)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/BananaJeanss/pbft-tyrestats?style=flat-square&logo=github&label=PRs)
+![GitHub Repo stars](https://img.shields.io/github/stars/BananaJeanss/pbft-tyrestats?style=flat-square)
+![GitHub forks](https://img.shields.io/github/forks/BananaJeanss/pbft-tyrestats?style=flat-square)
 
-First, run the development server:
+</div>
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<hr>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## About
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+TyreStats is a relatively simple to use webapp to generate strategies for PB Formula Truck races that use tyre compounds & wear.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Using it is simple, head to <https://pbft-tyrestats.vercel.app/>, create a session, insert any data & notes, and it'll generate a race strategy for you, along with the optional AI strategy generator.
 
-## Learn More
+As of now, it's 99% local (using LocalStorage), and the sessions data, settings, etc are only stored on your machine.
 
-To learn more about Next.js, take a look at the following resources:
+## Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- 99% Local, no mandatory login needed
+- Create sessions to store data
+- Insert & extract tyre data via screenshot or manually inserting data.
+- Auto & Manual timeline display
+- AI Strategy generator (with ratelimits)
+- Auto-Save, full data export/import/deletion via settings.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Quick Start for Development
 
-## Deploy on Vercel
+### Requirements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [Bun](https://bun.sh/) installed
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/BananaJeanss/pbft-tyrestats.git
+    cd pbft-tyrestats
+   ```
+
+2. Install dependencies
+
+   ```bash
+   bun i
+   ```
+
+3. Copy & fill the example environment variables
+
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Run the development server
+
+   ```bash
+   npm run dev
+   ```
+
+> [!NOTE]
+> npm run dev uses `--experimental-https` for PWA support, you may be prompteed to generate a self-signed certificate. You can alternatively run `npm run dev-nohttps` for plain http.
+
+> [!WARNING]
+> Turbopack is probably weird and may cause random hydration issues due to caching, if this happens, trigger a full refresh in your browser via CTRL+Shift+R.
+
+5. Open [https://localhost:3000](https://localhost:3000) in your browser to see the app.
+
+## Contributing
+
+Contributions are always welcome!
+
+Fork the repo, make your changes & commit them, then open a pull request.
+
+Make sure `npm run build` works before submitting a PR.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
