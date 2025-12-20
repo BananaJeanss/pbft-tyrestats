@@ -26,11 +26,12 @@ export default function AIStrategySuggestion({
   const [error, setError] = useState<string | null>(null);
 
   const [AISettingsOpen, setAISettingsOpen] = useState(false);
-  const [AISettings, setAISettings] = useState(
+  const [AISettings, setAISettings] = useState<AIStrategySettingsS>(
     aiConfig || {
       model: "qwen/qwen3-32b",
       temperature: 0.7,
       top_p: 1,
+      useExperimentalPrompt: false,
     }
   );
 

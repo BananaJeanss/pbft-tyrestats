@@ -1,4 +1,4 @@
-import { Trash2, X } from "lucide-react";
+import { Copy, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 export interface SessionSettings {
@@ -14,6 +14,7 @@ interface SessionSettingsProps {
   onClose: () => void;
   onSave: (prefs: SessionSettings) => void;
   DeleteThisSession: () => void;
+  DuplicateThisSession: () => void;
 }
 
 function DeleteConfirmationScreen({
@@ -57,6 +58,7 @@ export default function SessionSettingsPage({
   onClose,
   onSave,
   DeleteThisSession,
+  DuplicateThisSession,
 }: SessionSettingsProps) {
   const [config, setConfig] = useState<SessionSettings>(
     currentConfig || {
@@ -66,7 +68,7 @@ export default function SessionSettingsPage({
       lastModified: new Date().toISOString(),
       selectedIcon: "default",
       icon_url: "",
-    },
+    }
   );
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -180,15 +182,27 @@ export default function SessionSettingsPage({
             </div>
           </div>
           <hr className="border-neutral-800" />
-          <button
-            className="text-red-600 flex items-center gap-1 cursor-pointer text-sm hover:underline self-start"
-            onClick={() => {
-              setShowDeleteConfirm(true);
-            }}
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>Delete Session</span>
-          </button>
+          <div className="flex flex-row gap-2">
+            <button
+              className="text-red-600 flex items-center gap-1 cursor-pointer text-sm hover:underline self-start"
+              onClick={() => {
+                setShowDeleteConfirm(true);
+              }}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>Delete Session</span>
+            </button>
+            <div className="border-l border-neutral-500 h-6 self-center mx-2" />
+            <button
+              className="flex items-center gap-1 cursor-pointer text-sm hover:underline self-start"
+              onClick={() => {
+                DuplicateThisSession();
+              }}
+            >
+              <Copy className="h-4 w-4" />
+              <span>Duplicate Session</span>
+            </button>
+          </div>
 
           <button
             onClick={handleSave}

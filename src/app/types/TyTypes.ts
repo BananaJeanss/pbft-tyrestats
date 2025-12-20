@@ -1,3 +1,5 @@
+import { AIStrategySettingsS } from "../(main)/dashboard/components/AIStrategySettings";
+
 export interface TySession {
   id: string;
   meta: {
@@ -19,11 +21,7 @@ export interface TySession {
   currentNotes?: string;
   currentSuggestion?: string;
   manualStints: ManualStint[];
-  aiConfigSettings: {
-    model: string;
-    temperature: number;
-    top_p: number;
-  };
+  aiConfigSettings: AIStrategySettingsS;
 }
 
 export interface TyreWearData {

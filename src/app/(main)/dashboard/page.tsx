@@ -24,6 +24,7 @@ import SessionSettingsPage, {
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { toast } from "react-toastify";
 import { TySession } from "@/app/types/TyTypes";
+import { AIStrategySettingsS } from "./components/AIStrategySettings";
 
 const TYRE_TYPES = [
   { id: "soft", label: "S", color: "text-red-600" },
@@ -86,6 +87,7 @@ export default function Dashboard() {
     model: "qwen/qwen3-32b",
     temperature: 0.7,
     top_p: 1,
+    useExperimentalPrompt: false,
   });
 
   // Helper to convert Manual Stints (Array) to Recharts Data Format
@@ -282,13 +284,12 @@ export default function Dashboard() {
     setRaceConfig(session.raceConfig || DEFAULT_RACECONFIGURATION);
     setTyrePreferences(session.tyrePreferences || DEFAULT_PREFERENCES);
     setCurrentSuggestion(session.currentSuggestion || "");
-    setAIConfigSettings(
-      session.aiConfigSettings || {
-        model: "qwen/qwen3-32b",
-        temperature: 0.7,
-        top_p: 1,
-      }
-    );
+    setAIConfigSettings({
+      model: session.aiConfigSettings?.model || "qwen/qwen3-32b",
+      temperature: session.aiConfigSettings?.temperature || 0.7,
+      top_p: session.aiConfigSettings?.top_p || 1,
+      useExperimentalPrompt: (session.aiConfigSettings as AIStrategySettingsS)?.useExperimentalPrompt ?? false,
+    });
 
     setManualStints(session.manualStints || []);
 
@@ -380,6 +381,38 @@ export default function Dashboard() {
                   prev.filter((s) => s.id !== currentSessionId)
                 );
                 setCurrentSessionId(null);
+              }}
+              DuplicateThisSession={() => {
+                setSessions((prev) => {
+                  const sessionToDuplicate = prev.find((s) => s.id === currentSessionId);
+                  if (!sessionToDuplicate) return prev;
+                  const newId = `${sessionToDuplicate.id}_copy_${Date.now()}`;
+                  const duplicatedSession: TySession = {
+                    ...sessionToDuplicate,
+                    id: newId,
+                    meta: {
+                      ...sessionToDuplicate.meta,
+                      name: `${sessionToDuplicate.meta.name} (Copy)`,
+                      lastModified: new Date().toISOString(),
+                    },
+                  };
+                  setCurrentSessionId(newId);
+                  setSessionSettings({ current: duplicatedSession.meta });
+                  setTyreData(duplicatedSession.tyreData || {});
+                  setCurrentNotes(duplicatedSession.currentNotes || "");
+                  setRaceConfig(duplicatedSession.raceConfig || DEFAULT_RACECONFIGURATION);
+                  setTyrePreferences(duplicatedSession.tyrePreferences || DEFAULT_PREFERENCES);
+                  setCurrentSuggestion(duplicatedSession.currentSuggestion || "");
+                  setAIConfigSettings({
+                    model: duplicatedSession.aiConfigSettings?.model || "qwen/qwen3-32b",
+                    temperature: duplicatedSession.aiConfigSettings?.temperature || 0.7,
+                    top_p: duplicatedSession.aiConfigSettings?.top_p || 1,
+                    useExperimentalPrompt: duplicatedSession.aiConfigSettings?.useExperimentalPrompt || false,
+                  });
+                  setManualStints(duplicatedSession.manualStints || []);
+                  return [...prev, duplicatedSession];
+                });
+                setSessionSettingsVis(false);
               }}
             />
           )}
@@ -506,11 +539,13 @@ export default function Dashboard() {
                     model: string;
                     temperature: number;
                     top_p: number;
+                    useExperimentalPrompt: boolean;
                   }) => setAIConfigSettings(newConfig)}
                   aiConfig={{
                     model: aiConfigSettings.model,
                     temperature: aiConfigSettings.temperature,
                     top_p: aiConfigSettings.top_p,
+                    useExperimentalPrompt: aiConfigSettings.useExperimentalPrompt,
                   }}
                 />
               </div>

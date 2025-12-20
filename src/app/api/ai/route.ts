@@ -62,6 +62,7 @@ export interface ExpectedRequest {
     model: string;
     temperature: number;
     top_p: number;
+    useExperimentalPrompt: boolean;
   };
 }
 
@@ -146,8 +147,10 @@ export async function POST(request: Request) {
 
     if (body.notes) {
       // we dont want ai to be fed too much text cause costs so
-      body.notes = body.notes.slice(0, 500);
+      body.notes = body.notes.slice(0, 1250);
     }
+
+    const useExperimental = body.aiConfig.useExperimentalPrompt || false;
 
     const prompt = `
       Act as an expert Race Strategist for a Roblox racing league.
@@ -212,7 +215,117 @@ export async function POST(request: Request) {
       Keep the response concise and actionable.
     `;
 
-    const aiResponse = await CallHCAI(prompt, body.aiConfig);
+    const experimentalPrompt = `
+      Act as an expert Race Strategist for the 'Formula Truck' Roblox racing league (FIT Regulations).
+      Analyze the provided tyre data to determine the optimal pit stop strategy.
+
+      ***CRITICAL LEAGUE REGULATIONS (FIT)***:
+      1. **Pit Stop Mechanics**:
+         - Stationary time is exactly **3 seconds** [Reg 11.2].
+         - Total pit loss is strictly: Pit Lane Drive Time + 3 Seconds. (Assume ~12-15s total loss unless notes say otherwise).
+         - Because pit stops are fast, 2-stop strategies are often viable if tyre wear is high.
+      
+      2. **Mandatory Constraints**:
+         - **Standard Race**: 1 Mandatory Pit Stop required. You MUST use 2 different tyre compounds (Dry race only).
+         - **Sprint Race**: If 'Sprint' is mentioned in Notes or Laps < 15: NO mandatory stop and NO compound mixing rule.
+         - **Wet Race**: Mandatory stop still applies (unless Sprint), but mixing compounds is NOT required (Wet-Wet is allowed).
+      
+      3. **Tyre Compounds**:
+         - Soft (S): High grip, short life.
+         - Medium (M): Balanced.
+         - Hard (H): Low grip, massive durability.
+         - Wet (W): Use ONLY if forecast says Rain (C1, C2, C3). 
+
+      4. **Scoring**:
+         - 1 point is awarded for Fastest Lap. If a strategy offers a "Free Pit Stop" (large gap behind) late in the race, suggest fitting Softs to secure this point.
+
+      5. **Race Structure**:
+        ***RACE WEEKEND***:
+          - Practice Session: 
+            - 5 minutes. In wet conditions, this is extended to 10 minutes.
+          - Qualifying Session:
+            - 12 minutes.
+            - Determines starting grid positions for the race.
+            - Fastest lap earns P1, followed by next fastest, etc.
+            - Unlimited lap attempts allowed, but exceeding track limits invalidates the lap.
+          - Race:
+            - Drivers line up based on qualifying results.
+            - Formation lap: No overtaking, 20 MPH speed limit leaving grid, then 40-100 MPH until start line.
+
+        ***SPRINT WEEKEND***:
+          - 5 Minute Practice Session: All drivers may run laps freely.
+          - One-Shot Qualifying:
+            - Each driver has a single lap attempt within a 10-minute window to set their qualifying time.
+            - Failure to set a valid lap: Driver starts at the back of the grid (multiple drivers: reverse championship order).
+            - Completing more than one lap: Disqualification from qualifying, start from pit-lane.
+          - Sprint Race:
+            - Distance: ~25% of a regular race on the same track.
+            - Grid: Determined by qualifying results.
+            - Points: 1st - 6, 2nd - 4, 3rd - 3, 4th - 2, 5th - 1. No fastest lap point.
+          - Full Race:
+            - Grid: Based on Sprint Race finishing order, with top 6 positions reversed.
+
+      ***INPUT ANALYSIS***:
+      
+      **A. Tyre Calculations**:
+         - 'preferredSwitchoverPoint' (e.g., 40%) is the *remaining* life at which to pit.
+         - Usable Life % = 100% - preferredSwitchoverPoint.
+         - Usable Laps = (Usable Life %) / wearPerLap.
+         - If M/H data is missing, extrapolate using:
+           Medium Laps = Soft Laps * ${body.tyrePreferences.softToMediumRatio}
+           Hard Laps = Medium Laps * ${body.tyrePreferences.mediumToHardRatio}
+
+      **B. Weather & Timeline Decoding (STRICT PROTOCOL)**:
+         - **1. Parse the Grid**: You must vertically align the time headers (e.g., xx:00) with the weather codes below them.
+         - **2. Map to Laps**:
+           - Check the weather specifically at **xx:25**, **xx:30**, **xx:40**, and **xx:50**.
+           - If no average lap time is provided in the notes, assume an average lap time of 1:10.
+         - **Weather Codes**:
+           - Dry/OC/Mist/Fog = Slicks.
+           - C1/C2/C3 = WETS.
+           - C4 = Red Flag (Race suspended, or ends depending on remaining laps)
+
+      ***OUTPUT INSTRUCTIONS***:
+
+      Generate a structured response in clean text format. 
+
+      1. **Tyre Life Overview**: 
+         - Show the calculated "Safe Lap Limit" for each compound.
+      
+      2. **Primary Strategy**: 
+         - The fastest route to the flag.
+         - Format: [Compound] (Laps x-y) -> [Compound] (Laps y-z).
+         - Must obey the Mandatory Stop & Compound rules (unless Sprint/Wet).
+      
+      3. **Reasoning**: 
+         - Explain why this is fastest. Mention pit loss time vs. tyre degradation pace.
+         - Validates against FIT rules (e.g., "Satisfies the 2-compound rule").
+      
+      4. **Alternative Strategy**: 
+         - A valid alternative (e.g., an aggressive 2-stop if wear is high, or a conservative 1-stop).
+         - Mention if a Safety Car (speed limit 80 MPH) would benefit this strategy.
+      
+      5. **Wet/Mixed Strategy** (Conditional):
+         - ONLY if rain is explicitly forecast in Notes.
+         - Detail when to box for Wets based on the approximate "xx:25" race start alignment.
+        
+      6. **Custom Fields/User Request/Miscallaneous**: (Conditional, you may add extra fields as needed, and name them as needed, if requested by user, or if the situation needs extra information):
+          - If the user has added specific requests in the notes, address them here.
+          - Anything else you find relevant from the input data.
+          
+
+      Input Data:
+      - Race Type: ${body.raceConfig.RaceLaps < 15 ? "Likely Sprint" : "Standard Grand Prix"}
+      - Laps: ${body.raceConfig.RaceLaps}
+      - Preferences: ${JSON.stringify(body.tyrePreferences)}
+      - Tyre Data: ${JSON.stringify(body.tyreData)}
+      - Race Director Notes: "${body.notes || "None"}"
+    `;
+
+    const aiResponse = await CallHCAI(
+      useExperimental ? experimentalPrompt : prompt,
+      body.aiConfig
+    );
 
     if (!aiResponse.ok) {
       const text = await aiResponse.text();

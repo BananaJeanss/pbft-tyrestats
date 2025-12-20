@@ -46,6 +46,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
         model: "qwen/qwen3-32b",
         temperature: 0.7,
         top_p: 1,
+        useExperimentalPrompt: false,
       },
     };
 

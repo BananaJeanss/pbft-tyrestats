@@ -11,6 +11,7 @@ export interface AIStrategySettingsS {
   model: string;
   temperature: number;
   top_p: number;
+  useExperimentalPrompt: boolean;
 }
 
 interface Model {
@@ -30,6 +31,8 @@ export default function AIStrategySettings({
     currentSettings.temperature || 0.7
   );
   const [selTopP, setTopP] = useState<number>(currentSettings.top_p || 1);
+
+  const [experimentalP, setExperimentalP] = useState<boolean>(currentSettings.useExperimentalPrompt || false);
 
   useEffect(() => {
     let isMounted = true;
@@ -59,6 +62,7 @@ export default function AIStrategySettings({
                 model: selectedModel,
                 temperature: selTemperature,
                 top_p: selTopP,
+                useExperimentalPrompt: experimentalP,
               })
             }
             className="text-neutral-400 cursor-pointer"
@@ -120,6 +124,17 @@ export default function AIStrategySettings({
               setTopP(val);
             }}
           />
+          <div className="flex flex-row items-center gap-2">
+            <input
+              type="checkbox"
+              className="w-4 h-4"
+              checked={experimentalP}
+              onChange={(e) => setExperimentalP(e.target.checked)}
+            />
+            <span className="text-sm text-neutral-500">
+              Use Experimental Prompt
+            </span>
+          </div>
         </div>
       </div>
     </div>
