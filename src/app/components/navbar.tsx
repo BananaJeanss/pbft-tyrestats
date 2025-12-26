@@ -25,7 +25,7 @@ export default function Navbar() {
       {settingsMenuOpen && (
         <SettingsPage onClose={() => setSettingsMenuOpen(false)} />
       )}
-      <nav className="w-full max-h-20 p-8 bg-zinc-100 dark:bg-neutral-800 text-neutral-900 dark:text-white flex flex-row items-center">
+      <nav className="w-full max-h-20 p-8 bg-zinc-200 dark:bg-neutral-900 dark: flex flex-row items-center">
         <div className="min-w-1/2 flex items-center font-bold text-2xl gap-4">
           <Image src={logoSrc} alt="TyreStats Logo" width={64} height={64} />
           <div className="h-12 w-0.5 bg-neutral-400 dark:bg-white" />
@@ -33,7 +33,7 @@ export default function Navbar() {
         </div>
         <div className="min-w-1/2 flex flex-row justify-end items-center font-bold text-2xl gap-4">
           <button
-            className="mr-4 hover:text-neutral-400 transition cursor-pointer"
+            className="mr-4  transition cursor-pointer"
             onClick={() => setSettingsMenuOpen(true)}
           >
             <Settings />

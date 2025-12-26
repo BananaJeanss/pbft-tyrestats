@@ -54,6 +54,7 @@ export default function AIStrategySuggestion({
       });
 
       if (!response.ok) {
+        console.error("Error response:", response);
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
@@ -104,14 +105,14 @@ export default function AIStrategySuggestion({
           }}
         />
       )}
-      <div className="bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">
+      <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">
         <div className="flex flex-row items-center gap-2 justify-between">
           <div className="flex flex-row items-center gap-2">
             <h3 className="text-lg font-bold">AI Strategy Overview</h3>
-            <p className="text-neutral-500">|</p>
+            <p className="">|</p>
             {!isLoading ? (
               <button
-                className="text-white font-light cursor-pointer underline rounded"
+                className="font-light cursor-pointer underline rounded"
                 onClick={clientcallHCAI}
               >
                 Generate Analysis{" "}
@@ -121,7 +122,7 @@ export default function AIStrategySuggestion({
               </button>
             ) : (
               <button
-                className="text-neutral-500 font-light cursor-not-allowed"
+                className=" font-light cursor-not-allowed"
                 disabled
               >
                 Generating...
@@ -138,7 +139,7 @@ export default function AIStrategySuggestion({
         <hr className="border-neutral-700" />
 
         {isLoading && (
-          <p className="text-neutral-500 font-extralight ">
+          <p className=" font-extralight ">
             Generating suggestion...
           </p>
         )}
@@ -146,31 +147,22 @@ export default function AIStrategySuggestion({
           <p className="text-red-400 font-light text-sm">{error}</p>
         )}
         {!generatedSuggestion && !isLoading && !error && (
-          <p className="text-neutral-500 font-extralight ">
+          <p className=" font-extralight ">
             No suggestion generated yet.
           </p>
         )}
         {generatedSuggestion && !isLoading && (
-          <div className="text-neutral-300 leading-relaxed overflow-y-auto flex-1 text-sm wrap-break-words pr-2">
+          <div className=" leading-relaxed overflow-y-auto flex-1 text-sm wrap-break-words pr-2">
             <ReactMarkdown
               components={{
                 h1: ({ ...props }) => (
-                  <h1
-                    className="text-xl font-bold text-white mt-4 mb-2"
-                    {...props}
-                  />
+                  <h1 className="text-xl font-bold  mt-4 mb-2" {...props} />
                 ),
                 h2: ({ ...props }) => (
-                  <h2
-                    className="text-lg font-bold text-white mt-4 mb-2"
-                    {...props}
-                  />
+                  <h2 className="text-lg font-bold  mt-4 mb-2" {...props} />
                 ),
                 h3: ({ ...props }) => (
-                  <h3
-                    className="text-base font-bold text-white mt-3 mb-1"
-                    {...props}
-                  />
+                  <h3 className="text-base font-bold  mt-3 mb-1" {...props} />
                 ),
                 p: ({ ...props }) => <p className="mb-2" {...props} />,
                 ul: ({ ...props }) => (
@@ -184,7 +176,7 @@ export default function AIStrategySuggestion({
                   <hr className="border-neutral-700 my-4" {...props} />
                 ),
                 strong: ({ ...props }) => (
-                  <strong className="font-semibold text-white" {...props} />
+                  <strong className="font-semibold " {...props} />
                 ),
               }}
             >

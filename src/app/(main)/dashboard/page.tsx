@@ -324,8 +324,8 @@ export default function Dashboard() {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-5rem)] p-8 bg-neutral-800">
-        <p className="text-white text-lg font-extralight text-center">
+      <div className="flex flex-col items-center justify-center h-[calc(100vh-5rem)] p-8 bg-zinc-200 dark:bg-neutral-800">
+        <p className=" text-lg font-extralight text-center">
           TyreStats is desktop-only for now.
           <br />
           Please use a PC or laptop.
@@ -417,18 +417,18 @@ export default function Dashboard() {
             />
           )}
 
-          <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
+          <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
             <DashSidebar
               currentSessionId={currentSessionId ?? ""}
               onSelectSession={loadSession}
             />
 
-            <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
+            <div className="w-3/4 h-full pl-4 bg-zinc-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
               <div className="flex flex-row justify-between items-center">
-                <h2 className="text-white font-semibold text-2xl flex flex-row gap-2 items-center">
+                <h2 className=" font-semibold text-2xl flex flex-row gap-2 items-center">
                   {sessionSettings["current"]?.name || "Session/Race Name"}
                   <button
-                    className="cursor-pointer text-neutral-500 hover:text-neutral-300"
+                    className="cursor-pointer  "
                     onClick={() => setSessionSettingsVis(true)}
                   >
                     <Pencil />
@@ -458,7 +458,7 @@ export default function Dashboard() {
               {/* top tiles section - tyres and ai */}
               <div className="w-full flex flex-row h-2/5 gap-2">
                 {/* tyressssssss */}
-                <div className="bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
+                <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
                   <div className="flex flex-row gap-2 justify-between">
                     <p className="text-md font-bold">Tyres</p>
                     <button
@@ -477,7 +477,7 @@ export default function Dashboard() {
                     return (
                       <div
                         key={tyre.id}
-                        className="bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
+                        className="bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
                       >
                         <button
                           onClick={() => {
@@ -494,12 +494,12 @@ export default function Dashboard() {
                         <div className="flex flex-col">
                           {effectiveData ? (
                             <>
-                              <p className="text-neutral-400 text-xs">
+                              <p className=" text-xs">
                                 {effectiveData.isEstimated ? "Est. " : ""}
                                 Average wear per lap:{" "}
                                 {effectiveData.wearPerLap.toFixed(2)}%
                               </p>
-                              <p className="text-neutral-400 text-xs">
+                              <p className=" text-xs">
                                 Recommended Lap Count:{" "}
                                 {calcRecommendedLapCount(
                                   effectiveData.wearPerLap
@@ -516,7 +516,7 @@ export default function Dashboard() {
                               </p>
                             </>
                           ) : (
-                            <p className="text-neutral-400 text-xs">
+                            <p className=" text-xs">
                               No Data Yet (Click on the tyre to add data)
                             </p>
                           )}
@@ -558,15 +558,15 @@ export default function Dashboard() {
       )}
       {!currentSessionId && (
         <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
-          <div className="bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
+          <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
             <DashSidebar
               currentSessionId={currentSessionId || ""}
               onSelectSession={loadSession}
             />
 
             {/* Main Dashboard Thingy */}
-            <div className="w-3/4 h-full pl-4 bg-neutral-800 rounded-lg p-4 flex flex-col gap-2 items-center justify-center">
-              <p className="text-white text-lg font-extralight">
+            <div className="w-3/4 h-full pl-4 bg-zinc-200 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2 items-center justify-center">
+              <p className="text-lg font-extralight">
                 No session selected. Please select a session from the sidebar.
               </p>
             </div>

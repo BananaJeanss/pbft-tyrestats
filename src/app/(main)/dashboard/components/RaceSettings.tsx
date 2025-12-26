@@ -141,21 +141,21 @@ export default function RaceSettings({
 
   return (
     <div className="fixed inset-0 bg-neutral-950/95 flex flex-col items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="w-full max-w-4xl bg-neutral-900 rounded-xl flex flex-col border border-neutral-800 shadow-2xl overflow-hidden max-h-[90vh]">
+      <div className="w-full max-w-4xl bg-zinc-100 dark:bg-neutral-900 rounded-xl flex flex-col border border-neutral-800 shadow-2xl overflow-hidden max-h-[90vh]">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-neutral-800 bg-neutral-900 sticky top-0 z-10">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+        <div className="flex justify-between items-center p-6 border-b border-neutral-800 bg-zinc-100 dark:bg-neutral-900 sticky top-0 z-10">
+          <h2 className="text-xl font-bold  flex items-center gap-2">
             Race & Strategy Editor
           </h2>
-          <button onClick={onClose} className="text-neutral-400 cursor-pointer">
+          <button onClick={onClose} className=" cursor-pointer">
             <X />
           </button>
         </div>
 
         <div className="flex flex-col md:flex-row h-full overflow-hidden">
-          <div className="w-full md:w-1/3 border-r border-neutral-800 overflow-y-auto p-4 flex flex-col gap-3 bg-neutral-900/50">
+          <div className="w-full md:w-1/3 border-r border-neutral-800 overflow-y-auto p-4 flex flex-col gap-3">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-semibold text-neutral-400">
+              <span className="text-sm font-semibold ">
                 Stints
               </span>
               <span
@@ -175,8 +175,8 @@ export default function RaceSettings({
                 onClick={() => setSelectedStintId(stint.id)}
                 className={`p-3 rounded-lg border cursor-pointer flex items-center justify-between ${
                   selectedStintId === stint.id
-                    ? "bg-neutral-800 border-neutral-600 ring-1 ring-neutral-500"
-                    : "bg-neutral-800/50 border-neutral-800 hover:bg-neutral-800"
+                    ? "bg-zinc-200 dark:bg-neutral-800 border-neutral-600 ring-1 ring-neutral-500"
+                    : "bg-zinc-200/50 dark:bg-neutral-800/50 border-neutral-800 hover:bg-zinc-200 dark:hover:bg-neutral-800"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -190,10 +190,10 @@ export default function RaceSettings({
                     {TYRE_LABELS[stint.tyre]}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-white text-sm font-medium">
+                    <span className=" text-sm font-medium">
                       Stint {index + 1}
                     </span>
-                    <span className="text-neutral-400 text-xs">
+                    <span className=" text-xs">
                       {stint.laps} Laps
                     </span>
                   </div>
@@ -204,7 +204,7 @@ export default function RaceSettings({
                       e.stopPropagation();
                       handleRemoveStint(stint.id);
                     }}
-                    className="text-neutral-600 hover:text-red-500 p-1"
+                    className=" hover:text-red-500 p-1"
                   >
                     <Trash2 className="h-4 w-4 cursor-pointer" />
                   </button>
@@ -218,7 +218,7 @@ export default function RaceSettings({
                 maxStintsReached
                   ? "opacity-50 cursor-not-allowed"
                   : "cursor-pointer"
-              } py-3 border-2 border-dashed border-neutral-700 text-neutral-500 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold`}
+              } py-3 border-2 border-dashed border-neutral-700  rounded-lg flex items-center justify-center gap-2 text-sm font-semibold`}
               disabled={maxStintsReached}
             >
               <Plus className="h-4 w-4" /> Add Stint
@@ -230,7 +230,7 @@ export default function RaceSettings({
             {/* 1. Global Race Settings */}
             <div className="grid grid-cols-2 gap-4 pb-4 border-b border-neutral-800">
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-neutral-500 uppercase font-bold tracking-wider">
+                <label className="text-xs  uppercase font-bold tracking-wider">
                   Total Race Laps
                 </label>
                 <input
@@ -242,11 +242,11 @@ export default function RaceSettings({
                       RaceLaps: parseInt(e.target.value) || 0,
                     })
                   }
-                  className="bg-neutral-950 border border-neutral-700 rounded p-2 text-white focus:outline-none focus:border-neutral-500"
+                  className="bg-zinc-100 dark:bg-neutral-950 border border-neutral-700 rounded p-2 focus:outline-none focus:border-neutral-500"
                 />
               </div>
               <div className="flex flex-col justify-end">
-                <div className="flex items-center gap-2 text-sm text-neutral-400 bg-neutral-950 p-2 rounded border border-neutral-800">
+                <div className="flex items-center gap-2 text-sm bg-zinc-100 dark:bg-neutral-950 p-2 rounded border border-neutral-800">
                   {Math.abs(config.RaceLaps - getTotalLapsPlanned()) === 0 ? (
                     <CheckCircle2 className="text-green-500 h-5 w-5" />
                   ) : (
@@ -268,8 +268,8 @@ export default function RaceSettings({
             </div>
 
             {/* 2. Visual Timeline Preview */}
-            <div className="h-32 w-full bg-neutral-950 rounded-lg p-2 border border-neutral-800 relative">
-              <span className="absolute top-2 left-2 text-xs text-neutral-500 z-10">
+            <div className="h-32 w-full bg-zinc-100 dark:bg-neutral-950 rounded-lg p-2 border border-neutral-800 relative">
+              <span className="absolute top-2 left-2 text-xs  z-10">
                 Projected Timeline
               </span>
               <ResponsiveContainer width="100%" height="100%">
@@ -304,12 +304,12 @@ export default function RaceSettings({
 
             {/* 3. Selected Stint Editor */}
             {selectedStint ? (
-              <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700 flex flex-col gap-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-lg font-bold text-white">
+              <div className="bg-zinc-100/50 dark:bg-neutral-800/50 rounded-xl p-4 border border-neutral-700 flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold">
                     Edit Stint Details
                   </h3>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 bg-zinc-300 p-2 rounded-lg dark:bg-transparent dark:p-0 dark:rounded-none">
                     {["soft", "medium", "hard", "wet"].map((t) => (
                       <button
                         key={t}
@@ -335,7 +335,7 @@ export default function RaceSettings({
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm text-neutral-400">
+                    <label className="text-sm ">
                       Laps in Stint
                     </label>
                     <div className="flex items-center gap-2">
@@ -370,30 +370,30 @@ export default function RaceSettings({
                             parseInt(e.target.value),
                           )
                         }
-                        className="w-16 bg-neutral-950 border border-neutral-700 rounded p-1 text-center text-white"
+                        className="w-16 bg-zinc-100 dark:bg-neutral-950 border border-neutral-700 rounded p-1 text-center "
                       />
                     </div>
                   </div>
 
                   {/* STATS BOX */}
-                  <div className="bg-neutral-900 rounded-lg p-3 border border-neutral-800 text-xs flex flex-col gap-1">
-                    <span className="font-bold text-neutral-300 mb-1">
+                  <div className="bg-zinc-100 dark:bg-neutral-900 rounded-lg p-3 border border-neutral-800 text-xs flex flex-col gap-1">
+                    <span className="font-bold  mb-1">
                       Projections
                     </span>
                     <div className="flex justify-between">
-                      <span className="text-neutral-500">Wear/Lap:</span>
-                      <span className="text-white">
+                      <span className="">Wear/Lap:</span>
+                      <span className="">
                         {selectedTyreWear > 0
                           ? `${selectedTyreWear.toFixed(2)}%`
                           : "No Data"}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-neutral-500">Rec. Max Laps:</span>
-                      <span className="text-white">{maxSafeLaps}</span>
+                      <span className="">Rec. Max Laps:</span>
+                      <span className="">{maxSafeLaps}</span>
                     </div>
                     <div className="flex justify-between border-t border-neutral-800 pt-1 mt-1">
-                      <span className="text-neutral-500">
+                      <span className="">
                         Est. Life Remaining:
                       </span>
                       <span
@@ -408,7 +408,7 @@ export default function RaceSettings({
                 </div>
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-neutral-500 italic">
+              <div className="h-full flex items-center justify-center  italic">
                 Select a stint to edit details
               </div>
             )}
@@ -416,16 +416,16 @@ export default function RaceSettings({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-neutral-900 border-t border-neutral-800 flex justify-end gap-2">
+        <div className="p-4 bg-zinc-100 dark:bg-neutral-900 border-t border-neutral-800 flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-6 py-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 cursor-pointer"
+            className="px-6 py-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-neutral-800 cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-2 rounded-lg bg-white text-black font-bold hover:bg-neutral-200 shadow-lg shadow-white/10 cursor-pointer"
+            className="px-6 py-2 rounded-lg bg-zinc-200 dark:bg-white text-black font-bold hover:bg-zinc-300 dark:hover:bg-neutral-200 shadow-lg shadow-white/10 cursor-pointer"
           >
             Save Configuration
           </button>

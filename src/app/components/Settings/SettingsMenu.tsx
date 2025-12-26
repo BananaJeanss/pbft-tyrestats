@@ -48,12 +48,12 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
       {isExportOpen && <ExportMyData onClose={() => setIsExportOpen(false)} />}
       {isImportOpen && <ImportMyData onClose={() => setIsImportOpen(false)} />}
       <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-        <div className="w-full max-w-md bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
+        <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Settings</h2>
+            <h2 className="text-xl font-bold ">Settings</h2>
             <button
               onClick={onClose}
-              className="text-neutral-400 cursor-pointer"
+              className=" cursor-pointer"
             >
               <X />
             </button>
@@ -61,11 +61,11 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
 
           <hr className="border-neutral-800" />
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-semibold text-neutral-300">
+            <label className="text-sm font-semibold ">
               Theme
             </label>
             <select
-              className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
               value={theme}
               onChange={(e) => setTheme(e.target.value)}
             >
@@ -76,7 +76,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           </div>
           <hr className="border-neutral-800" />
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-semibold text-neutral-300">
+            <label className="text-sm font-semibold ">
               Auto-Save
             </label>
             <div className="flex flex-row">
@@ -85,17 +85,17 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
                 checked={isAutosaveEnabled}
                 onChange={(e) => setIsAutosaveEnabled(e.target.checked)}
               />
-              <span className="ml-2 text-white">Enable Auto-Save</span>
+              <span className="ml-2 ">Enable Auto-Save</span>
             </div>
             <div className="flex flex-row items-center">
               <input
                 type="number"
-                className="w-1/4 bg-neutral-800 border border-neutral-700 rounded p-2 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="w-1/4 bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  focus:outline-none focus:ring-2 focus:ring-neutral-600"
                 placeholder="2.5"
                 value={autoSaveInterval}
                 onChange={(e) => setAutoSaveInterval(Number(e.target.value))}
               />
-              <span className="ml-2 text-white text-sm">
+              <span className="ml-2  text-sm">
                 Auto-save Interval (in seconds)
               </span>
             </div>
@@ -107,12 +107,12 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
             )}
           </div>
           <hr className="border-neutral-800" />
-          <label className="text-md font-semibold text-neutral-300">
+          <label className="text-md font-semibold ">
             Your Data
           </label>
           <div className="flex flex-row items-center gap-2">
             <button
-              className="bg-neutral-700 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-pointer w-fit"
+              className="bg-zinc-300 dark:bg-neutral-700  text-sm font-semibold py-2 px-4 rounded-lg hover:bg-zinc-400 dark:hover:bg-neutral-600 transition cursor-pointer w-fit"
               onClick={() => {
                 setIsExportOpen(true);
               }}
@@ -121,7 +121,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
             </button>
             <div className="h-8 w-px bg-neutral-800 mx-2" />
             <button
-              className="bg-neutral-700 text-white text-sm font-semibold py-2 px-4 rounded-lg hover:bg-neutral-600 transition cursor-pointer w-fit"
+              className="bg-zinc-300 dark:bg-neutral-700  text-sm font-semibold py-2 px-4 rounded-lg hover:bg-zinc-400 dark:hover:bg-neutral-600 transition cursor-pointer w-fit"
               onClick={() => {
                 setIsImportOpen(true);
               }}
@@ -130,7 +130,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
             </button>
           </div>
           <button
-            className="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-500 transition cursor-pointer w-fit"
+            className="bg-red-600  font-semibold py-2 px-4 rounded-lg hover:bg-red-500 transition cursor-pointer w-fit"
             onClick={() => {
               setIsWarningOpen(true);
             }}
@@ -141,7 +141,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
             </div>
           </button>
           <hr className="border-neutral-800" />
-          <span className="text-xs text-neutral-500 text-center">
+          <span className="text-xs  text-center">
             TyreStats |{" "}
             <a
               href="https://github.com/BananaJeanss/pbft-tyrestats"

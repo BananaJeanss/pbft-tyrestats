@@ -1,15 +1,29 @@
+"use client";
+
 import { Database, Github } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const loginButtonStyles =
-  "border p-2 m-2 rounded-4xl transition hover:bg-gray-900 flex flex-row gap-2";
+  "border p-2 m-2 rounded-4xl transition hover:bg-gray-300 dark:hover:bg-gray-900 flex flex-row gap-2";
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+
+  const logoSrc =
+    mounted && resolvedTheme === "light" ? "/tslogo.png" : "/tslogow.png";
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black text-white">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black ">
       <Image
-        src="/tslogow.png"
+        src={logoSrc}
         alt="Tyrestats Logo which is very cool and awesome"
         width={256}
         height={256}

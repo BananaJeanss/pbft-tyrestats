@@ -164,7 +164,7 @@ export default function TyreWearManager({
             </button>
           </div>
           <hr className="border-neutral-700" />
-          <h4 className="text-white font-semibold text-2xl text-center">
+          <h4 className=" font-semibold text-2xl text-center">
             Add Tyre Data for {readableTyreType[tyreType]} Tyres
           </h4>
           <div className="flex flex-row items-center justify-center gap-4 h-8/10">
@@ -204,10 +204,10 @@ export default function TyreWearManager({
             />
             <Upload className="mb-4" />
             <p className="text-center">Click to upload a screenshot</p>
-            <p className="text-center mt-2 text-neutral-500">
+            <p className="text-center mt-2 ">
               or drag and drop, or ctrl+v to paste an image
             </p>
-            <p className="text-center mt-2 text-neutral-500">
+            <p className="text-center mt-2 ">
               Supported formats: PNG, JPG
             </p>
           </label>
@@ -218,7 +218,7 @@ export default function TyreWearManager({
       {currentPage == "analysis" && imageSrc && (
         <div className="w-4/5 h-5/6 p-4 rounded-xl bg-neutral-900 flex flex-col gap-2">
           <div className="flex flex-row justify-between items-center w-full h-1/20">
-            <h3 className="text-white font-semibold text-lg">
+            <h3 className=" font-semibold text-lg">
               {points.length === 0 && "Step 1: Click the TOP of the tyre bar"}
               {points.length === 1 &&
                 "Step 2: Click the BOTTOM of the tyre bar"}
@@ -273,13 +273,13 @@ export default function TyreWearManager({
                     e.stopPropagation();
                     setZoom((z) => Math.max(1, z - 0.5));
                   }}
-                  className="p-1 hover:bg-neutral-700 rounded text-white disabled:opacity-50"
+                  className="p-1 hover:bg-neutral-700 rounded  disabled:opacity-50"
                   title="Zoom Out"
                   disabled={zoom <= 1}
                 >
                   <ZoomOut size={20} />
                 </button>
-                <span className="text-white text-sm font-mono min-w-[3ch] text-center">
+                <span className=" text-sm font-mono min-w-[3ch] text-center">
                   {zoom}x
                 </span>
                 <button
@@ -287,7 +287,7 @@ export default function TyreWearManager({
                     e.stopPropagation();
                     setZoom((z) => Math.min(5, z + 0.5));
                   }}
-                  className="p-1 hover:bg-neutral-700 rounded text-white disabled:opacity-50"
+                  className="p-1 hover:bg-neutral-700 rounded  disabled:opacity-50"
                   title="Zoom In"
                   disabled={zoom >= 5}
                 >
@@ -299,8 +299,8 @@ export default function TyreWearManager({
             {/* Sidebar Controls */}
             <div className="w-64 flex flex-col gap-4 shrink-0">
               <div className="bg-neutral-800 p-4 rounded-lg">
-                <h4 className="font-semibold mb-2 text-white">Points</h4>
-                <ul className="text-sm space-y-2 text-neutral-400">
+                <h4 className="font-semibold mb-2 ">Points</h4>
+                <ul className="text-sm space-y-2 ">
                   <li
                     className={
                       points.length > 0 ? "text-red-400 font-bold" : ""
@@ -328,7 +328,7 @@ export default function TyreWearManager({
                     setPoints([]);
                     setCalculatedWear(null);
                   }}
-                  className="mt-4 text-xs text-neutral-500 underline hover:text-white"
+                  className="mt-4 text-xs  underline hover:"
                 >
                   Reset Points
                 </button>
@@ -336,30 +336,30 @@ export default function TyreWearManager({
 
               {points.length === 3 && (
                 <div className="bg-neutral-800 p-4 rounded-lg flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4">
-                  <label className="text-sm text-white">Laps Driven</label>
+                  <label className="text-sm ">Laps Driven</label>
                   <input
                     type="number"
                     value={laps}
                     onChange={(e) => setLaps(e.target.value)}
-                    className="bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:outline-none focus:border-white"
+                    className="bg-neutral-900 border border-neutral-700 rounded p-2  focus:outline-none focus:border-white"
                     placeholder="e.g. 12"
                   />
 
                   {calculatedWear !== null && (
                     <>
                       <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
-                        <p className="text-xs text-neutral-400 uppercase tracking-wider">
+                        <p className="text-xs  uppercase tracking-wider">
                           Remaining Life
                         </p>
-                        <p className="text-3xl font-bold text-white">
+                        <p className="text-3xl font-bold ">
                           {calculatedWear.toFixed(1)}%
                         </p>
                       </div>
                       <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
-                        <p className="text-xs text-neutral-400 uppercase tracking-wider">
+                        <p className="text-xs  uppercase tracking-wider">
                           wear per lap
                         </p>
-                        <p className="text-3xl font-bold text-white">
+                        <p className="text-3xl font-bold ">
                           {CalculateAverageWearPerLap(
                             100 - calculatedWear,
                             parseFloat(laps) || 0,
@@ -391,7 +391,7 @@ export default function TyreWearManager({
             </button>
           </div>
           <hr className="border-neutral-700" />
-          <h4 className="text-white font-semibold text-2xl text-center">
+          <h4 className=" font-semibold text-2xl text-center">
             Manual Tyre Data
           </h4>
           <div className="flex flex-row items-center justify-center gap-4 h-8/10">
@@ -428,7 +428,7 @@ export default function TyreWearManager({
 
                 setCalculatedWear(parseFloat(finalVal));
               }}
-              className="w-48 bg-neutral-800 rounded-md p-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              className="w-48 bg-neutral-800 rounded-md p-2 px-4  focus:outline-none focus:ring-2 focus:ring-neutral-600"
             />
             <p>and</p>
             <input
@@ -456,24 +456,24 @@ export default function TyreWearManager({
                   setManualLaps(val);
                 }
               }}
-              className="w-48 bg-neutral-800 rounded-md p-2 px-4 text-white focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              className="w-48 bg-neutral-800 rounded-md p-2 px-4  focus:outline-none focus:ring-2 focus:ring-neutral-600"
             />
           </div>
           {calculatedWear !== null && (
             <div className="w-1/2 flex flex-col mx-auto mt-4 mb-6">
               <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
-                <p className="text-xs text-neutral-400 uppercase tracking-wider">
+                <p className="text-xs  uppercase tracking-wider">
                   Remaining Life
                 </p>
-                <p className="text-3xl font-bold text-white">
+                <p className="text-3xl font-bold ">
                   {calculatedWear.toFixed(1)}%
                 </p>
               </div>
               <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
-                <p className="text-xs text-neutral-400 uppercase tracking-wider">
+                <p className="text-xs  uppercase tracking-wider">
                   wear per lap
                 </p>
-                <p className="text-3xl font-bold text-white">
+                <p className="text-3xl font-bold ">
                   {CalculateAverageWearPerLap(
                     100 - calculatedWear,
                     parseFloat(manualLaps) || 0,

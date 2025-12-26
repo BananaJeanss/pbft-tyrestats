@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function OfflinePage() {
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black text-white">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black ">
       <Image
         src="/tslogow.png"
         alt="Tyrestats Logo which is very cool and awesome"

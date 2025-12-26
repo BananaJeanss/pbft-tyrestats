@@ -32,7 +32,9 @@ export default function AIStrategySettings({
   );
   const [selTopP, setTopP] = useState<number>(currentSettings.top_p || 1);
 
-  const [experimentalP, setExperimentalP] = useState<boolean>(currentSettings.useExperimentalPrompt || false);
+  const [experimentalP, setExperimentalP] = useState<boolean>(
+    currentSettings.useExperimentalPrompt || false
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -53,9 +55,9 @@ export default function AIStrategySettings({
 
   return (
     <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-      <div className="w-full max-w-md bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
+      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">AI Configuratiobn</h2>
+          <h2 className="text-xl font-bold ">AI Configuratiobn</h2>
           <button
             onClick={() =>
               onClose({
@@ -65,18 +67,16 @@ export default function AIStrategySettings({
                 useExperimentalPrompt: experimentalP,
               })
             }
-            className="text-neutral-400 cursor-pointer"
+            className=" cursor-pointer"
           >
             <X />
           </button>
         </div>
         <hr className="border-neutral-800" />
         <div className="flex flex-col gap-4">
-          <label className="text-md font-semibold text-neutral-300">
-            Model
-          </label>
+          <label className="text-md font-semibold ">Model</label>
           <select
-            className="w-full bg-neutral-800 text-white p-2 rounded"
+            className="w-full bg-zinc-200 dark:bg-neutral-800  p-2 rounded"
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
@@ -86,12 +86,10 @@ export default function AIStrategySettings({
               </option>
             ))}
           </select>
-          <label className="text-md font-semibold text-neutral-300">
-            Temperature
-          </label>
+          <label className="text-md font-semibold ">Temperature</label>
           <input
             type="number"
-            className="w-full bg-neutral-800 text-white p-2 rounded"
+            className="w-full bg-zinc-200 dark:bg-neutral-800  p-2 rounded"
             value={selTemperature}
             min={0}
             max={2}
@@ -105,12 +103,10 @@ export default function AIStrategySettings({
               setTemperature(val);
             }}
           />
-          <label className="text-md font-semibold text-neutral-300">
-            Top_P
-          </label>
+          <label className="text-md font-semibold ">Top_P</label>
           <input
             type="number"
-            className="w-full bg-neutral-800 text-white p-2 rounded"
+            className="w-full bg-zinc-200 dark:bg-neutral-800  p-2 rounded"
             value={selTopP}
             min={0}
             max={1}
@@ -131,9 +127,7 @@ export default function AIStrategySettings({
               checked={experimentalP}
               onChange={(e) => setExperimentalP(e.target.checked)}
             />
-            <span className="text-sm text-neutral-500">
-              Use Experimental Prompt
-            </span>
+            <span className="text-sm ">Use Experimental Prompt</span>
           </div>
         </div>
       </div>
