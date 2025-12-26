@@ -1,10 +1,24 @@
 import type { NextConfig } from "next";
+import { execSync } from "child_process";
+
+const getCommitHash = () => {
+  try {
+    return execSync("git rev-parse --short HEAD").toString().trim();
+  } catch {
+    return "dev";
+  }
+};
+
+const commitHash = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || getCommitHash();
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  env: {
+    NEXT_PUBLIC_BUILD_ID: commitHash,
+  },
   generateBuildId: async () => {
-    return process.env.VERCEL_GIT_COMMIT_SHA || null;
+    return commitHash;
   },
   async headers() {
     return [

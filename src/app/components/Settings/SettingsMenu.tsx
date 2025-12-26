@@ -27,14 +27,17 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
   );
 
   const { theme, setTheme } = useTheme();
+  const [nextBuildId, setNextBuildId] = useState("dev");
 
   // Avoid hydration mismatch
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
+    fetch("/api/build-id")
+      .then((res) => res.json())
+      .then((data) => setNextBuildId(data.buildId))
+      .catch(() => setNextBuildId("dev"));
   }, []);
-
-  const nextBuildId = process.env.NEXT_PUBLIC_BUILD_ID || "dev";
 
   if (!mounted) return null;
 
