@@ -16,7 +16,7 @@ import {
   TimelineData,
   TyreWearData,
 } from "@/app/types/TyTypes";
-import { TyrePreferences } from "./TyreSettings";
+import { TyrePreferences } from "@/app/types/TyTypes";
 import { getEffectiveTyreData } from "../TyreMath";
 
 export const DEFAULT_RACECONFIGURATION: RaceConfiguration = {

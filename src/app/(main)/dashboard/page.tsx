@@ -1,13 +1,14 @@
 "use client";
 
-import { Pencil, Settings } from "lucide-react";
+import { Pencil } from "lucide-react";
 import TyreWearManager from "./components/TyreWearManager";
-import { Stint, TimelineData, TyreWearData } from "@/app/types/TyTypes";
-import { useEffect, useState, useRef, useMemo, useCallback } from "react";
-import TyreSettings, {
+import {
+  Stint,
+  TimelineData,
   TyrePreferences,
-  DEFAULT_PREFERENCES,
-} from "./components/TyreSettings";
+  TyreWearData,
+} from "@/app/types/TyTypes";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import RaceSettings, {
   DEFAULT_RACECONFIGURATION,
 } from "./components/RaceSettings";
@@ -16,7 +17,7 @@ import { ManualStint } from "@/app/types/TyTypes";
 import DashSidebar from "./components/DashSidebar";
 import AIStrategySuggestion from "./components/AIStrategySuggestion";
 import DashNotes from "./components/DashNotes";
-import { generateOptimalTimeline, getEffectiveTyreData } from "./TyreMath";
+import { generateOptimalTimeline } from "./TyreMath";
 import DashTimeline from "./components/DashTimeline";
 import SessionSettingsPage, {
   SessionSettings,
@@ -25,21 +26,14 @@ import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { toast } from "react-toastify";
 import { TySession } from "@/app/types/TyTypes";
 import { AIStrategySettingsS } from "./components/AIStrategySettings";
-
-const TYRE_TYPES = [
-  { id: "soft", label: "S", color: "text-red-600" },
-  { id: "medium", label: "M", color: "text-yellow-500" },
-  { id: "hard", label: "H", color: "text-white" },
-  { id: "wet", label: "W", color: "text-blue-700" },
-] as const;
+import TyresView from "./components/TyresView";
+import { DEFAULT_PREFERENCES } from "./components/TyreSettings";
 
 export default function Dashboard() {
   const [tyremanVis, settyremanVis] = useState(false);
-  const [tyresettingsVis, settyresettingsVis] = useState(false);
   const [selectedTyre, setSelectedTyre] = useState<
     "soft" | "medium" | "hard" | "wet" | null
   >(null);
-
   const [tyreData, setTyreData] = useState<Record<string, TyreWearData>>({});
   const [tyrePreferences, setTyrePreferences] =
     useState<TyrePreferences>(DEFAULT_PREFERENCES);
@@ -73,7 +67,7 @@ export default function Dashboard() {
   );
   const [autoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5,
+    0.5,
   );
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -242,14 +236,6 @@ export default function Dashboard() {
     }
   };
 
-  // return how many laps recommended to run on this tyre based on switchover point
-  const calcRecommendedLapCount = (wearPerLap: number) => {
-    if (wearPerLap === 0) return 0;
-    return Math.floor(
-      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap,
-    );
-  };
-
   // timeline auto regenerator
   useEffect(() => {
     const hasRaceConfig = raceConfig && raceConfig.RaceLaps > 0;
@@ -357,13 +343,7 @@ export default function Dashboard() {
               }}
             />
           )}
-          {tyresettingsVis && (
-            <TyreSettings
-              currentPreferences={tyrePreferences}
-              onClose={() => settyresettingsVis(false)}
-              onSave={setTyrePreferences}
-            />
-          )}
+
           {tyremanVis && selectedTyre && (
             <TyreWearManager
               tyreType={selectedTyre}
@@ -473,73 +453,29 @@ export default function Dashboard() {
               {/* top tiles section - tyres and ai */}
               <div className="w-full flex flex-row h-2/5 gap-2">
                 {/* tyressssssss */}
-                <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
-                  <div className="flex flex-row gap-2 justify-between">
-                    <p className="text-md font-bold">Tyres</p>
-                    <button
-                      className="cursor-pointer text-sm"
-                      onClick={() => settyresettingsVis(true)}
-                    >
-                      <Settings className="h-5 w-5" />
-                    </button>
-                  </div>
-                  {TYRE_TYPES.map((tyre) => {
-                    const effectiveData = getEffectiveTyreData(
-                      tyre.id,
-                      tyreData,
-                      tyrePreferences,
-                    );
-                    return (
-                      <div
-                        key={tyre.id}
-                        className="bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
-                      >
-                        <button
-                          onClick={() => {
-                            setSelectedTyre(tyre.id);
-                            settyremanVis(true);
-                          }}
-                        >
-                          <h3
-                            className={`${tyre.color} text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
-                          >
-                            {tyre.label}
-                          </h3>
-                        </button>
-                        <div className="flex flex-col">
-                          {effectiveData ? (
-                            <>
-                              <p className=" text-xs">
-                                {effectiveData.isEstimated ? "Est. " : ""}
-                                Average wear per lap:{" "}
-                                {effectiveData.wearPerLap.toFixed(2)}%
-                              </p>
-                              <p className=" text-xs">
-                                Recommended Lap Count:{" "}
-                                {calcRecommendedLapCount(
-                                  effectiveData.wearPerLap,
-                                )}{" "}
-                                (
-                                {(
-                                  100 -
-                                  effectiveData.wearPerLap *
-                                    calcRecommendedLapCount(
-                                      effectiveData.wearPerLap,
-                                    )
-                                ).toFixed(2)}
-                                %)
-                              </p>
-                            </>
-                          ) : (
-                            <p className=" text-xs">
-                              No Data Yet (Click on the tyre to add data)
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <TyresView
+                  tyreData={tyreData}
+                  tyrePreferences={tyrePreferences}
+                  setTyrePreferences={setTyrePreferences}
+                  settyremanVis={(
+                    vis: boolean,
+                    tyreType?: "soft" | "medium" | "hard" | "wet",
+                  ) => {
+                    settyremanVis(vis);
+                    if (tyreType) setSelectedTyre(tyreType);
+                  }}
+                  setSelectedTyre={(tyreId: string) => {
+                    // Only allow valid tyre types
+                    if (["soft", "medium", "hard", "wet"].includes(tyreId)) {
+                      setSelectedTyre(
+                        tyreId as "soft" | "medium" | "hard" | "wet",
+                      );
+                    } else {
+                      setSelectedTyre(null);
+                    }
+                  }}
+                />
+
                 {/* AI strategy overview cause i cant think of anything better */}
                 <AIStrategySuggestion
                   tyreData={tyreData}

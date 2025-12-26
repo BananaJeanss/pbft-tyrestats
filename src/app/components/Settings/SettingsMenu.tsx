@@ -23,7 +23,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
   );
   const [autoSaveInterval, setAutoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5,
+    0.5,
   );
 
   const { theme, setTheme } = useTheme();
@@ -87,7 +87,8 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
               <input
                 type="number"
                 className="w-1/4 bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  focus:outline-none focus:ring-2 focus:ring-neutral-600"
-                placeholder="2.5"
+                placeholder="0.5"
+                min={0.1}
                 value={autoSaveInterval}
                 onChange={(e) => setAutoSaveInterval(Number(e.target.value))}
               />

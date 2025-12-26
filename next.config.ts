@@ -9,7 +9,8 @@ const getCommitHash = () => {
   }
 };
 
-const commitHash = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || getCommitHash();
+const commitHash =
+  process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || getCommitHash();
 
 const nextConfig: NextConfig = {
   /* config options here */

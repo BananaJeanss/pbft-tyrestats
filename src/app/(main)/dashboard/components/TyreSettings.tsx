@@ -1,11 +1,6 @@
+import { TyrePreferences } from "@/app/types/TyTypes";
 import { X } from "lucide-react";
 import { useState } from "react";
-
-export interface TyrePreferences {
-  preferredSwitchoverPoint: number; // percentage (e.g. 40%)
-  softToMediumRatio: number;
-  mediumToHardRatio: number;
-}
 
 export const DEFAULT_PREFERENCES: TyrePreferences = {
   preferredSwitchoverPoint: 40,

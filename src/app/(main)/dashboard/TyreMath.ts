@@ -1,5 +1,5 @@
 import { RaceConfiguration, Stint, TimelineData } from "@/app/types/TyTypes";
-import { TyrePreferences } from "./components/TyreSettings";
+import { TyrePreferences } from "@/app/types/TyTypes";
 import { TyreWearData } from "@/app/types/TyTypes";
 
 interface StrategyStint {
