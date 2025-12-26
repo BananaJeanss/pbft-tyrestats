@@ -207,9 +207,7 @@ export default function TyreWearManager({
             <p className="text-center mt-2 ">
               or drag and drop, or ctrl+v to paste an image
             </p>
-            <p className="text-center mt-2 ">
-              Supported formats: PNG, JPG
-            </p>
+            <p className="text-center mt-2 ">Supported formats: PNG, JPG</p>
           </label>
         </div>
       )}

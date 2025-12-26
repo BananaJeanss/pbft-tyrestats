@@ -38,8 +38,10 @@ export async function GET() {
     }
 
     const filteredModels = data.data
-      .filter((model: GetModelsDataType) =>
-        model.architecture?.input_modalities?.includes("text") && model.architecture?.modality != "text+image->text+image"  
+      .filter(
+        (model: GetModelsDataType) =>
+          model.architecture?.input_modalities?.includes("text") &&
+          model.architecture?.modality != "text+image->text+image",
       )
       .map((model: GetModelsDataType) => ({ id: model.id }));
 

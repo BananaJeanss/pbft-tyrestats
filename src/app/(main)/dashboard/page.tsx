@@ -55,7 +55,7 @@ export default function Dashboard() {
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
   const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(
-    DEFAULT_RACECONFIGURATION
+    DEFAULT_RACECONFIGURATION,
   );
 
   const [sessionSettingsVis, setSessionSettingsVis] = useState(false);
@@ -69,18 +69,18 @@ export default function Dashboard() {
 
   const [isAutosaveEnabled] = useLocalStorage<boolean>(
     "tyrestats_autosave_enabled",
-    true
+    true,
   );
   const [autoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5
+    2.5,
   );
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const isLoadingSession = useRef(false);
   const [, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    []
+    [],
   );
 
   const [aiConfigSettings, setAIConfigSettings] = useState({
@@ -187,8 +187,8 @@ export default function Dashboard() {
                 lastModified: new Date().toISOString(),
               },
             }
-          : s
-      )
+          : s,
+      ),
     );
 
     toast.success("Session saved");
@@ -246,7 +246,7 @@ export default function Dashboard() {
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
     return Math.floor(
-      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
+      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap,
     );
   };
 
@@ -259,7 +259,7 @@ export default function Dashboard() {
       const result = generateOptimalTimeline(
         raceConfig,
         tyrePreferences,
-        tyreData
+        tyreData,
       );
       if (result) {
         setAutoTimelineData(result.timelineData);
@@ -288,7 +288,9 @@ export default function Dashboard() {
       model: session.aiConfigSettings?.model || "qwen/qwen3-32b",
       temperature: session.aiConfigSettings?.temperature || 0.7,
       top_p: session.aiConfigSettings?.top_p || 1,
-      useExperimentalPrompt: (session.aiConfigSettings as AIStrategySettingsS)?.useExperimentalPrompt ?? false,
+      useExperimentalPrompt:
+        (session.aiConfigSettings as AIStrategySettingsS)
+          ?.useExperimentalPrompt ?? false,
     });
 
     setManualStints(session.manualStints || []);
@@ -313,7 +315,7 @@ export default function Dashboard() {
       const ua = navigator.userAgent;
       const mobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          ua
+          ua,
         );
       if (mobile) setIsMobile(true);
     }, []);
@@ -378,13 +380,15 @@ export default function Dashboard() {
               }
               DeleteThisSession={() => {
                 setSessions((prev) =>
-                  prev.filter((s) => s.id !== currentSessionId)
+                  prev.filter((s) => s.id !== currentSessionId),
                 );
                 setCurrentSessionId(null);
               }}
               DuplicateThisSession={() => {
                 setSessions((prev) => {
-                  const sessionToDuplicate = prev.find((s) => s.id === currentSessionId);
+                  const sessionToDuplicate = prev.find(
+                    (s) => s.id === currentSessionId,
+                  );
                   if (!sessionToDuplicate) return prev;
                   const newId = `${sessionToDuplicate.id}_copy_${Date.now()}`;
                   const duplicatedSession: TySession = {
@@ -400,14 +404,25 @@ export default function Dashboard() {
                   setSessionSettings({ current: duplicatedSession.meta });
                   setTyreData(duplicatedSession.tyreData || {});
                   setCurrentNotes(duplicatedSession.currentNotes || "");
-                  setRaceConfig(duplicatedSession.raceConfig || DEFAULT_RACECONFIGURATION);
-                  setTyrePreferences(duplicatedSession.tyrePreferences || DEFAULT_PREFERENCES);
-                  setCurrentSuggestion(duplicatedSession.currentSuggestion || "");
+                  setRaceConfig(
+                    duplicatedSession.raceConfig || DEFAULT_RACECONFIGURATION,
+                  );
+                  setTyrePreferences(
+                    duplicatedSession.tyrePreferences || DEFAULT_PREFERENCES,
+                  );
+                  setCurrentSuggestion(
+                    duplicatedSession.currentSuggestion || "",
+                  );
                   setAIConfigSettings({
-                    model: duplicatedSession.aiConfigSettings?.model || "qwen/qwen3-32b",
-                    temperature: duplicatedSession.aiConfigSettings?.temperature || 0.7,
+                    model:
+                      duplicatedSession.aiConfigSettings?.model ||
+                      "qwen/qwen3-32b",
+                    temperature:
+                      duplicatedSession.aiConfigSettings?.temperature || 0.7,
                     top_p: duplicatedSession.aiConfigSettings?.top_p || 1,
-                    useExperimentalPrompt: duplicatedSession.aiConfigSettings?.useExperimentalPrompt || false,
+                    useExperimentalPrompt:
+                      duplicatedSession.aiConfigSettings
+                        ?.useExperimentalPrompt || false,
                   });
                   setManualStints(duplicatedSession.manualStints || []);
                   return [...prev, duplicatedSession];
@@ -472,7 +487,7 @@ export default function Dashboard() {
                     const effectiveData = getEffectiveTyreData(
                       tyre.id,
                       tyreData,
-                      tyrePreferences
+                      tyrePreferences,
                     );
                     return (
                       <div
@@ -502,14 +517,14 @@ export default function Dashboard() {
                               <p className=" text-xs">
                                 Recommended Lap Count:{" "}
                                 {calcRecommendedLapCount(
-                                  effectiveData.wearPerLap
+                                  effectiveData.wearPerLap,
                                 )}{" "}
                                 (
                                 {(
                                   100 -
                                   effectiveData.wearPerLap *
                                     calcRecommendedLapCount(
-                                      effectiveData.wearPerLap
+                                      effectiveData.wearPerLap,
                                     )
                                 ).toFixed(2)}
                                 %)
@@ -545,7 +560,8 @@ export default function Dashboard() {
                     model: aiConfigSettings.model,
                     temperature: aiConfigSettings.temperature,
                     top_p: aiConfigSettings.top_p,
-                    useExperimentalPrompt: aiConfigSettings.useExperimentalPrompt,
+                    useExperimentalPrompt:
+                      aiConfigSettings.useExperimentalPrompt,
                   }}
                 />
               </div>

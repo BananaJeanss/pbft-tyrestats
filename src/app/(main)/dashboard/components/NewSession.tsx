@@ -20,7 +20,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
   // 2. Access the global sessions list from LocalStorage
   const [sessions, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    []
+    [],
   );
 
   const handleCreate = () => {
@@ -69,9 +69,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
 
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">
-              Session Name
-            </label>
+            <label className="text-sm font-semibold ">Session Name</label>
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -83,9 +81,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">
-              Date
-            </label>
+            <label className="text-sm font-semibold ">Date</label>
             <div className="flex items-center gap-2">
               <input
                 type="date"
@@ -96,9 +92,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">
-              Race Laps
-            </label>
+            <label className="text-sm font-semibold ">Race Laps</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
@@ -110,9 +104,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">
-              Thumbnail Icon
-            </label>
+            <label className="text-sm font-semibold ">Thumbnail Icon</label>
             <div className="flex items-center gap-2">
               <select
                 name="Thumbnail Icon"

@@ -19,11 +19,11 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
   // atuo save
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
     "tyrestats_autosave_enabled",
-    true
+    true,
   );
   const [autoSaveInterval, setAutoSaveInterval] = useLocalStorage<number>(
     "tyrestats_autosave_interval",
-    2.5
+    2.5,
   );
 
   const { theme, setTheme } = useTheme();
@@ -51,19 +51,14 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
         <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold ">Settings</h2>
-            <button
-              onClick={onClose}
-              className=" cursor-pointer"
-            >
+            <button onClick={onClose} className=" cursor-pointer">
               <X />
             </button>
           </div>
 
           <hr className="border-neutral-800" />
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-semibold ">
-              Theme
-            </label>
+            <label className="text-sm font-semibold ">Theme</label>
             <select
               className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
               value={theme}
@@ -76,9 +71,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           </div>
           <hr className="border-neutral-800" />
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-semibold ">
-              Auto-Save
-            </label>
+            <label className="text-sm font-semibold ">Auto-Save</label>
             <div className="flex flex-row">
               <input
                 type="checkbox"
@@ -107,9 +100,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
             )}
           </div>
           <hr className="border-neutral-800" />
-          <label className="text-md font-semibold ">
-            Your Data
-          </label>
+          <label className="text-md font-semibold ">Your Data</label>
           <div className="flex flex-row items-center gap-2">
             <button
               className="bg-zinc-300 dark:bg-neutral-700  text-sm font-semibold py-2 px-4 rounded-lg hover:bg-zinc-400 dark:hover:bg-neutral-600 transition cursor-pointer w-fit"
@@ -148,8 +139,8 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
               className="underline"
             >
               {"View Source"}
-            </a>
-            {" "}| Build{" "}
+            </a>{" "}
+            | Build{" "}
             <a
               href={`https://github.com/BananaJeanss/pbft-tyrestats/commit/${nextBuildId}`}
               className="underline"

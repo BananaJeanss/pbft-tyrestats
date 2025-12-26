@@ -25,9 +25,7 @@ export default function ExportMyData({ onClose }: ExportMyDataProps) {
     <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-150">
       <div className="w-full max-w-2xl bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold ">
-            Your LocalStorage Data Export
-          </h2>
+          <h2 className="text-xl font-bold ">Your LocalStorage Data Export</h2>
           <X onClick={onClose} className=" cursor-pointer" />
         </div>
         <textarea

@@ -24,16 +24,16 @@ export default function AIStrategySettings({
 }: AIStrategySettingsProps) {
   const [availableModels, setAvailableModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>(
-    currentSettings.model || "qwen/qwen3-32b"
+    currentSettings.model || "qwen/qwen3-32b",
   );
 
   const [selTemperature, setTemperature] = useState<number>(
-    currentSettings.temperature || 0.7
+    currentSettings.temperature || 0.7,
   );
   const [selTopP, setTopP] = useState<number>(currentSettings.top_p || 1);
 
   const [experimentalP, setExperimentalP] = useState<boolean>(
-    currentSettings.useExperimentalPrompt || false
+    currentSettings.useExperimentalPrompt || false,
   );
 
   useEffect(() => {

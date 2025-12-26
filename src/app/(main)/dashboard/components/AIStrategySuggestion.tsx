@@ -32,7 +32,7 @@ export default function AIStrategySuggestion({
       temperature: 0.7,
       top_p: 1,
       useExperimentalPrompt: false,
-    }
+    },
   );
 
   const clientcallHCAI = async () => {
@@ -58,7 +58,7 @@ export default function AIStrategySuggestion({
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`
+            : `Server responded with status: ${response.status}`,
         );
       }
 
@@ -78,7 +78,7 @@ export default function AIStrategySuggestion({
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
+        error instanceof Error ? error.message : "An unknown error occurred",
       );
     } finally {
       setIsLoading(false);
@@ -121,10 +121,7 @@ export default function AIStrategySuggestion({
                   : ""}
               </button>
             ) : (
-              <button
-                className=" font-light cursor-not-allowed"
-                disabled
-              >
+              <button className=" font-light cursor-not-allowed" disabled>
                 Generating...
               </button>
             )}
@@ -139,17 +136,13 @@ export default function AIStrategySuggestion({
         <hr className="border-neutral-700" />
 
         {isLoading && (
-          <p className=" font-extralight ">
-            Generating suggestion...
-          </p>
+          <p className=" font-extralight ">Generating suggestion...</p>
         )}
         {error && !isLoading && (
           <p className="text-red-400 font-light text-sm">{error}</p>
         )}
         {!generatedSuggestion && !isLoading && !error && (
-          <p className=" font-extralight ">
-            No suggestion generated yet.
-          </p>
+          <p className=" font-extralight ">No suggestion generated yet.</p>
         )}
         {generatedSuggestion && !isLoading && (
           <div className=" leading-relaxed overflow-y-auto flex-1 text-sm wrap-break-words pr-2">

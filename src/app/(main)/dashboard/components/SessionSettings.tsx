@@ -69,7 +69,7 @@ export default function SessionSettingsPage({
       lastModified: new Date().toISOString(),
       selectedIcon: "default",
       icon_url: "",
-    }
+    },
   );
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -95,10 +95,7 @@ export default function SessionSettingsPage({
         <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold ">Session Settings</h2>
-            <button
-              onClick={onClose}
-              className="cursor-pointer"
-            >
+            <button onClick={onClose} className="cursor-pointer">
               <X />
             </button>
           </div>
@@ -108,9 +105,7 @@ export default function SessionSettingsPage({
           <div className="flex flex-col gap-6">
             {/* session name */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold">
-                Session Name
-              </label>
+              <label className="text-sm font-semibold">Session Name</label>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -127,9 +122,7 @@ export default function SessionSettingsPage({
             </div>
             {/* date selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold">
-                Session Date
-              </label>
+              <label className="text-sm font-semibold">Session Date</label>
               <div className="flex items-center gap-2">
                 <input
                   type="date"
@@ -146,9 +139,7 @@ export default function SessionSettingsPage({
             </div>
             {/* icon selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold">
-                Thumbnail Icon
-              </label>
+              <label className="text-sm font-semibold">Thumbnail Icon</label>
               <div className="flex items-center gap-2">
                 <select
                   name="Thumbnail Icon"

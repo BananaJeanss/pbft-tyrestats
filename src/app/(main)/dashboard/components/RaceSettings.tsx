@@ -155,9 +155,7 @@ export default function RaceSettings({
         <div className="flex flex-col md:flex-row h-full overflow-hidden">
           <div className="w-full md:w-1/3 border-r border-neutral-800 overflow-y-auto p-4 flex flex-col gap-3">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-semibold ">
-                Stints
-              </span>
+              <span className="text-sm font-semibold ">Stints</span>
               <span
                 className={`text-xs ${
                   getTotalLapsPlanned() === config.RaceLaps
@@ -193,9 +191,7 @@ export default function RaceSettings({
                     <span className=" text-sm font-medium">
                       Stint {index + 1}
                     </span>
-                    <span className=" text-xs">
-                      {stint.laps} Laps
-                    </span>
+                    <span className=" text-xs">{stint.laps} Laps</span>
                   </div>
                 </div>
                 {manualStints.length > 1 && (
@@ -306,9 +302,7 @@ export default function RaceSettings({
             {selectedStint ? (
               <div className="bg-zinc-100/50 dark:bg-neutral-800/50 rounded-xl p-4 border border-neutral-700 flex flex-col gap-4">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-bold">
-                    Edit Stint Details
-                  </h3>
+                  <h3 className="text-lg font-bold">Edit Stint Details</h3>
                   <div className="flex gap-2 bg-zinc-300 p-2 rounded-lg dark:bg-transparent dark:p-0 dark:rounded-none">
                     {["soft", "medium", "hard", "wet"].map((t) => (
                       <button
@@ -335,9 +329,7 @@ export default function RaceSettings({
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm ">
-                      Laps in Stint
-                    </label>
+                    <label className="text-sm ">Laps in Stint</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="range"
@@ -377,9 +369,7 @@ export default function RaceSettings({
 
                   {/* STATS BOX */}
                   <div className="bg-zinc-100 dark:bg-neutral-900 rounded-lg p-3 border border-neutral-800 text-xs flex flex-col gap-1">
-                    <span className="font-bold  mb-1">
-                      Projections
-                    </span>
+                    <span className="font-bold  mb-1">Projections</span>
                     <div className="flex justify-between">
                       <span className="">Wear/Lap:</span>
                       <span className="">
@@ -393,9 +383,7 @@ export default function RaceSettings({
                       <span className="">{maxSafeLaps}</span>
                     </div>
                     <div className="flex justify-between border-t border-neutral-800 pt-1 mt-1">
-                      <span className="">
-                        Est. Life Remaining:
-                      </span>
+                      <span className="">Est. Life Remaining:</span>
                       <span
                         className={`font-bold ${
                           isOverLimit ? "text-red-500" : "text-green-500"

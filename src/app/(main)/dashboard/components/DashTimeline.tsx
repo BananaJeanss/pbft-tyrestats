@@ -70,7 +70,9 @@ export default function DashTimeline({
           <div className="flex items-center gap-1 bg-transparent p-1 rounded-lg border border-neutral-700">
             <span
               className={`text-xs font-bold px-2 cursor-pointer transition ${
-                !isManualMode ? "text-black dark:text-white" : "text-neutral-700 dark:text-neutral-500"
+                !isManualMode
+                  ? "text-black dark:text-white"
+                  : "text-neutral-700 dark:text-neutral-500"
               }`}
               onClick={() => setIsManualMode(false)}
             >
@@ -79,7 +81,9 @@ export default function DashTimeline({
             |
             <span
               className={`text-xs font-bold px-2 cursor-pointer transition ${
-                isManualMode ? "text-black dark:text-white" : "text-neutral-700 dark:text-neutral-500"
+                isManualMode
+                  ? "text-black dark:text-white"
+                  : "text-neutral-700 dark:text-neutral-500"
               }`}
               onClick={() => setIsManualMode(true)}
             >

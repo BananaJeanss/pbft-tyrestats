@@ -9,7 +9,7 @@ export default function DangerousDeletionWarningWaaazaaa({
 }) {
   const [, setSessions] = useLocalStorage<TySession[]>(
     "tyrestats_sessions",
-    []
+    [],
   );
   const handleClearData = () => {
     if (window.prompt("Type DELETE to confirm data clearance.") === "DELETE") {

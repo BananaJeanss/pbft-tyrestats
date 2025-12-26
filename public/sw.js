@@ -9,9 +9,9 @@ self.addEventListener("install", (event) => {
       const cache = await caches.open(CACHE_NAME);
       // Cache the essential list of assets
       await cache.addAll(
-        ESSENTIAL_ASSETS.map((url) => new Request(url, { cache: "reload" }))
+        ESSENTIAL_ASSETS.map((url) => new Request(url, { cache: "reload" })),
       );
-    })()
+    })(),
   );
   self.skipWaiting();
 });
@@ -28,9 +28,9 @@ self.addEventListener("activate", (event) => {
           if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
-        })
+        }),
       );
-    })()
+    })(),
   );
   self.clients.claim();
 });
@@ -51,13 +51,13 @@ self.addEventListener("fetch", (event) => {
         } catch (error) {
           // Fallback to offline page for navigation failure
           console.warn(
-            `Navigation failed; returning offline page instead. ${error}`
+            `Navigation failed; returning offline page instead. ${error}`,
           );
           const cache = await caches.open(CACHE_NAME);
           const cachedResponse = await cache.match(OFFLINE_URL);
           return cachedResponse;
         }
-      })()
+      })(),
     );
     return;
   }
@@ -91,7 +91,7 @@ self.addEventListener("fetch", (event) => {
           .catch(() => {
             // womp womp
           });
-      })
+      }),
     );
   }
 });

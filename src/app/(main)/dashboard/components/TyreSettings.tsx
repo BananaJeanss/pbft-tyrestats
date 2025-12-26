@@ -61,9 +61,7 @@ export default function TyreSettings({
                 }
                 className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-24 focus:outline-none focus:ring-2 focus:ring-neutral-600"
               />
-              <span className=" text-sm">
-                Tyre life remaining
-              </span>
+              <span className=" text-sm">Tyre life remaining</span>
             </div>
             <p className="text-xs ">
               Used to calculate recommended lap counts.
@@ -74,9 +72,7 @@ export default function TyreSettings({
 
           {/* Estimation Ratios */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-md font-bold ">
-              Life Estimation Ratios
-            </h3>
+            <h3 className="text-md font-bold ">Life Estimation Ratios</h3>
 
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold ">
@@ -105,9 +101,7 @@ export default function TyreSettings({
                 Medium to Hard Ratio
               </label>
               <div className="flex items-center gap-2">
-                <span className=" text-sm">
-                  1 Medium Lap ={" "}
-                </span>
+                <span className=" text-sm">1 Medium Lap = </span>
                 <input
                   type="number"
                   step="0.1"
