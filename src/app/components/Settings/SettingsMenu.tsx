@@ -1,9 +1,10 @@
 import { Trash2, TriangleAlert, X } from "lucide-react";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DangerousDeletionWarningWaaazaaa from "./DangerousDeletionWarningWaaazaaa";
 import ExportMyData from "./ExportMyData";
 import ImportMyData from "./ImportMyData";
+import { useTheme } from "next-themes";
 
 export interface SettingsMenuProps {
   onClose: () => void;
@@ -13,6 +14,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // atuo save
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
@@ -24,12 +26,17 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
     2.5
   );
 
-  const [selectedTheme, setSelectedTheme] = useLocalStorage<string>(
-    "tyrestats_theme",
-    "system"
-  );
+  const { theme, setTheme } = useTheme();
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const nextBuildId = process.env.NEXT_PUBLIC_BUILD_ID || "dev";
+
+  if (!mounted) return null;
 
   return (
     <>
@@ -55,12 +62,12 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           <hr className="border-neutral-800" />
           <div className="flex flex-col gap-4">
             <label className="text-sm font-semibold text-neutral-300">
-              Theme (non functional rn)
+              Theme
             </label>
             <select
               className="bg-neutral-800 border border-neutral-700 rounded p-2 text-white w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
-              value={selectedTheme}
-              onChange={(e) => setSelectedTheme(e.target.value)}
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
             >
               <option value="system">System Default</option>
               <option value="light">Light</option>

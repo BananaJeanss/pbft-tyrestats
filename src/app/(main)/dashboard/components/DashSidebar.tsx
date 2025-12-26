@@ -20,7 +20,7 @@ export default function DashSidebar({
 
   if (!mounted) {
     return (
-      <div className="w-1/4 h-full bg-neutral-800 rounded-lg p-4 overflow-y-auto">
+      <div className="w-1/4 h-full bg-zinc-100 dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-lg p-4 overflow-y-auto">
         <p className="text-neutral-500 text-sm p-2">Loading sessions…</p>
       </div>
     );
@@ -32,20 +32,20 @@ export default function DashSidebar({
         <NewSession onClose={() => setNewSessionOpen(false)} />
       )}
       <div
-        className="w-1/4 h-full bg-neutral-800 rounded-lg p-4 overflow-y-auto"
+        className="w-1/4 h-full bg-zinc-100 dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-lg p-4 overflow-y-auto"
         style={{
           scrollbarGutter: "stable",
           scrollbarColor: "rgba(100, 116, 139) transparent",
         }}
       >
         <button
-          className="w-full mb-4 px-4 py-2 bg-transparent border border-blue-800 text-white rounded hover:bg-blue-950 cursor-pointer transition-colors"
+          className="w-full mb-4 px-4 py-2 bg-transparent border border-blue-800 text-neutral-900 dark:text-white rounded hover:bg-blue-100 dark:hover:bg-blue-950 cursor-pointer transition-colors"
           onClick={() => setNewSessionOpen(true)}
         >
           + New Session
         </button>
         <details open className="mb-2">
-          <summary className="cursor-pointer text-white font-semibold py-2 px-2 rounded hover:bg-neutral-700 transition">
+          <summary className="cursor-pointer text-neutral-900 dark:text-white font-semibold py-2 px-2 rounded hover:bg-zinc-200 dark:hover:bg-neutral-700 transition">
             Sessions (LocalStorage)
           </summary>
           <div className="mt-2 flex flex-col gap-2">

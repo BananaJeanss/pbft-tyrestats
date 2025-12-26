@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { Bounce, ToastContainer } from "react-toastify";
 import ServiceWorkerRegister from "./components/ServiceWorkerRegister";
+import { ThemeProvider } from "next-themes";
 
 const spaceMono = Space_Mono({
   subsets: ["latin"],
@@ -26,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${spaceMono.variable} antialiased`}>
         <Analytics />
         <ServiceWorkerRegister />
@@ -44,7 +45,9 @@ export default function RootLayout({
           transition={Bounce}
           className={"z-1000000"} // css is my passion
         />
-        {children}
+        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
