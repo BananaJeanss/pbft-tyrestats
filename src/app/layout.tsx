@@ -41,11 +41,16 @@ export default function RootLayout({
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="dark"
+          theme="auto"
           transition={Bounce}
-          className={"z-1000000"} // css is my passion
+          className="z-1000"
+          toastClassName="!text-black !bg-white dark:!text-white dark:!bg-neutral-900"
         />
-        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="system"
+          enableSystem
+        >
           {children}
         </ThemeProvider>
       </body>
