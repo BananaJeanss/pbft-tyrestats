@@ -1,5 +1,12 @@
 import { TyreWearData } from "@/app/types/TyTypes";
-import { Upload, X, ZoomIn, ZoomOut } from "lucide-react";
+import {
+  Edit3Icon,
+  LucideImage,
+  Upload,
+  X,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface TyreWearManagerProps {
@@ -100,7 +107,7 @@ export default function TyreWearManager({
     const validLaps = isNaN(lapsValue) ? 0 : lapsValue;
     const wearPerLap = CalculateAverageWearPerLap(
       100 - calculatedWear,
-      validLaps,
+      validLaps
     );
 
     onSave({
@@ -118,7 +125,7 @@ export default function TyreWearManager({
           items.forEach((item) => {
             // Try common image formats
             const imageTypes = item.types.filter((type) =>
-              type.startsWith("image/"),
+              type.startsWith("image/")
             );
             if (imageTypes.length > 0) {
               item
@@ -158,26 +165,39 @@ export default function TyreWearManager({
       {/* options page */}
       {currentPage == "options" && (
         <div className="w-3/5 h-3/4 p-4 rounded-xl bg-zinc-100 dark:bg-neutral-900 flex flex-col gap-2">
-          <div className="flex flex-row-reverse items-center w-full h-1/20">
+          <div className="flex flex-row items-center w-full h-1/20">
+            <h4 className="flex-grow font-semibold text-2xl">
+              Add Tyre Data for {readableTyreType[tyreType]} Tyres
+            </h4>
             <button onClick={onClose}>
               <X className="cursor-pointer" />
             </button>
           </div>
           <hr className="border-neutral-700" />
-          <h4 className=" font-semibold text-2xl text-center">
-            Add Tyre Data for {readableTyreType[tyreType]} Tyres
-          </h4>
           <div className="flex flex-row items-center justify-center gap-4 h-8/10">
-            <button onClick={() => setCurrentPage("screenshot")}>
-              <div className="border rounded-4xl p-2 px-4 border-neutral-700 cursor-pointer hover:bg-neutral-800 transition">
-                Extract from Screenshot
-              </div>
+            <button
+              className="aspect-square max-h-1/2 border rounded-4xl p-4 px-4 border-neutral-700 cursor-pointer hover:bg-zinc-300 dark:hover:bg-neutral-800 transition flex flex-col items-center"
+              onClick={() => setCurrentPage("screenshot")}
+            >
+              <LucideImage className="h-1/2 w-1/2 p-1/4" />
+              <hr className="my-2 border-neutral-700 w-full" />
+              <span>Extract from Screenshot</span>
+              <p className="text-sm font-extralight opacity-80">
+                Upload an screenshot, click to set the 3 points, and enter laps
+                driven.
+              </p>
             </button>
-            or
-            <button onClick={() => setCurrentPage("manual")}>
-              <div className="border rounded-4xl p-2 px-4 border-neutral-700 cursor-pointer hover:bg-neutral-800 transition">
-                Add Percentage Manually
-              </div>
+            <p className="text-bold text-xl">or</p>
+            <button
+              className="aspect-square max-h-1/2 border rounded-4xl p-4 px-4 border-neutral-700 cursor-pointer hover:bg-zinc-300 dark:hover:bg-neutral-800 transition flex flex-col items-center"
+              onClick={() => setCurrentPage("manual")}
+            >
+              <Edit3Icon className="h-1/2 w-1/2 p-1/4" />
+              <hr className="my-2 border-neutral-700 w-full" />
+              <span>Add Percentage Manually</span>
+              <p className="text-sm font-extralight opacity-80">
+                Add the remaining tyre life percentage and laps driven manually.
+              </p>
             </button>
           </div>
         </div>
@@ -360,7 +380,7 @@ export default function TyreWearManager({
                         <p className="text-3xl font-bold ">
                           {CalculateAverageWearPerLap(
                             100 - calculatedWear,
-                            parseFloat(laps) || 0,
+                            parseFloat(laps) || 0
                           ).toFixed(2)}
                           %
                         </p>
@@ -383,15 +403,16 @@ export default function TyreWearManager({
       {/* manual percentage & laps page */}
       {currentPage == "manual" && (
         <div className="w-3/5 h-3/4 p-4 rounded-xl bg-zinc-100 dark:bg-neutral-900 flex flex-col gap-2">
-          <div className="flex flex-row-reverse items-center w-full h-1/20">
+          <div className="flex flex-row items-center w-full h-1/20">
+            <h4 className="flex-grow font-semibold text-2xl">
+              Manual Tyre Data
+            </h4>
             <button onClick={onClose}>
               <X className="cursor-pointer" />
             </button>
           </div>
           <hr className="border-neutral-700" />
-          <h4 className=" font-semibold text-2xl text-center">
-            Manual Tyre Data
-          </h4>
+
           <div className="flex flex-row items-center justify-center gap-4 h-8/10">
             <input
               type="number"
@@ -474,7 +495,7 @@ export default function TyreWearManager({
                 <p className="text-3xl font-bold ">
                   {CalculateAverageWearPerLap(
                     100 - calculatedWear,
-                    parseFloat(manualLaps) || 0,
+                    parseFloat(manualLaps) || 0
                   ).toFixed(2)}
                   %
                 </p>
