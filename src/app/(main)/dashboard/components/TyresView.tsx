@@ -32,7 +32,7 @@ export default function TyresView({
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
     return Math.floor(
-      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap,
+      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
     );
   };
 
@@ -55,57 +55,59 @@ export default function TyresView({
             <Settings className="h-5 w-5" />
           </button>
         </div>
-        {TYRE_TYPES.map((tyre) => {
-          const effectiveData = getEffectiveTyreData(
-            tyre.id,
-            tyreData,
-            tyrePreferences,
-          );
-          return (
-            <div
-              key={tyre.id}
-              className="bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full h-1/4 flex flex-row items-center gap-4"
-            >
-              <button
-                onClick={() => {
-                  setSelectedTyre(tyre.id);
-                  settyremanVis(true);
-                }}
+        <div className="flex flex-col flex-grow gap-2 justify-evenly overflow-y-auto">
+          {TYRE_TYPES.map((tyre) => {
+            const effectiveData = getEffectiveTyreData(
+              tyre.id,
+              tyreData,
+              tyrePreferences
+            );
+            return (
+              <div
+                key={tyre.id}
+                className="@container bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full max-h-1/4 flex flex-row flex-grow flex-shrink items-center gap-4"
               >
-                <h3
-                  className={`${tyre.color} text-2xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
+                <button
+                  onClick={() => {
+                    setSelectedTyre(tyre.id);
+                    settyremanVis(true);
+                  }}
                 >
-                  {tyre.label}
-                </h3>
-              </button>
-              <div className="flex flex-col">
-                {effectiveData ? (
-                  <>
-                    <p className="text-zinc-800 dark:text-neutral-400 text-xs">
-                      {effectiveData.isEstimated ? "Est. " : ""}
-                      Average wear per lap:{" "}
-                      {effectiveData.wearPerLap.toFixed(2)}%
+                  <h3
+                    className={`${tyre.color} text-xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
+                  >
+                    {tyre.label}
+                  </h3>
+                </button>
+                <div className="flex flex-col justify-center flex-1 min-w-0">
+                  {effectiveData ? (
+                    <>
+                      <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
+                        {effectiveData.isEstimated ? "Est. " : ""}
+                        Average wear per lap:{" "}
+                        {effectiveData.wearPerLap.toFixed(2)}%
+                      </p>
+                      <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
+                        Recommended Lap Count:{" "}
+                        {calcRecommendedLapCount(effectiveData.wearPerLap)} (
+                        {(
+                          100 -
+                          effectiveData.wearPerLap *
+                            calcRecommendedLapCount(effectiveData.wearPerLap)
+                        ).toFixed(2)}
+                        %)
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
+                      No Data Yet (Click on the tyre to add data)
                     </p>
-                    <p className="text-zinc-800 dark:text-neutral-400 text-xs">
-                      Recommended Lap Count:{" "}
-                      {calcRecommendedLapCount(effectiveData.wearPerLap)} (
-                      {(
-                        100 -
-                        effectiveData.wearPerLap *
-                          calcRecommendedLapCount(effectiveData.wearPerLap)
-                      ).toFixed(2)}
-                      %)
-                    </p>
-                  </>
-                ) : (
-                  <p className="text-zinc-800 dark:text-neutral-400 text-xs">
-                    No Data Yet (Click on the tyre to add data)
-                  </p>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </>
   );
