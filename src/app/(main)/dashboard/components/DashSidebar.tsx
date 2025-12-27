@@ -108,7 +108,7 @@ export default function DashSidebar({
                     {folder.name}
                   </span>
                   <span
-                    className="font-extralight text-xs opacity-50 z-10"
+                    className="font-extralight text-xs opacity-50"
                     onClick={(e) => {
                       e.stopPropagation();
                       setEditFolderOpen([true, folder.id]);

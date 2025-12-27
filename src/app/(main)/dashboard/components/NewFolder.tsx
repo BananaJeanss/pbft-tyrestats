@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import IconSelector, { IconName } from "../../../components/lucide-selector";
 
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -12,7 +12,15 @@ interface NewFolderProps {
 export default function NewFolder({ onClose }: NewFolderProps) {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState<IconName>("folder");
-  const [color, setColor] = useState("#ffffff");
+  const getDefaultColor = () => {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "#000000"
+        : "#ffffff";
+    }
+    return "#000000";
+  };
+  const [color, setColor] = useState<string>(getDefaultColor);
   const [folders, setFolders] = useLocalStorage<Folder[]>(
     "tyrestats_folders",
     [],
@@ -32,6 +40,8 @@ export default function NewFolder({ onClose }: NewFolderProps) {
     setFolders([...folders, newFolder]);
     onClose();
   };
+
+// Removed useEffect for setting color
 
   return (
     <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">

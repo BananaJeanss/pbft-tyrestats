@@ -154,10 +154,10 @@ export default function TyreWearManager({
   }, []);
 
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-10">
+    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
       {/* options page */}
       {currentPage == "options" && (
-        <div className="w-3/5 h-3/4 p-4 rounded-xl bg-neutral-900 flex flex-col gap-2">
+        <div className="w-3/5 h-3/4 p-4 rounded-xl bg-zinc-100 dark:bg-neutral-900 flex flex-col gap-2">
           <div className="flex flex-row-reverse items-center w-full h-1/20">
             <button onClick={onClose}>
               <X className="cursor-pointer" />
@@ -184,7 +184,7 @@ export default function TyreWearManager({
       )}
       {/* screenshot extraction page */}
       {currentPage == "screenshot" && (
-        <div className="w-3/5 h-3/4 p-4 rounded-xl bg-neutral-900 flex flex-col gap-2">
+        <div className="w-3/5 h-3/4 p-4 rounded-xl bg-zinc-100 dark:bg-neutral-900 flex flex-col gap-2">
           <div className="flex flex-row-reverse items-center w-full h-1/20">
             <button onClick={onClose}>
               <X className="cursor-pointer" />
@@ -214,7 +214,7 @@ export default function TyreWearManager({
 
       {/* analysis page */}
       {currentPage == "analysis" && imageSrc && (
-        <div className="w-4/5 h-5/6 p-4 rounded-xl bg-neutral-900 flex flex-col gap-2">
+        <div className="w-4/5 h-5/6 p-4 rounded-xl bg-zinc-100 dark:bg-neutral-900 flex flex-col gap-2">
           <div className="flex flex-row justify-between items-center w-full h-1/20">
             <h3 className=" font-semibold text-lg">
               {points.length === 0 && "Step 1: Click the TOP of the tyre bar"}
@@ -232,7 +232,7 @@ export default function TyreWearManager({
 
           <div className="flex flex-row h-full gap-4 min-h-0">
             {/* Image Area */}
-            <div className="flex-1 bg-neutral-950 rounded-lg overflow-auto flex items-center justify-center p-4 border border-neutral-800 relative">
+            <div className="flex-1 bg-zinc-100 dark:bg-neutral-950 rounded-lg overflow-auto flex items-center justify-center p-4 border border-neutral-800 relative">
               <div
                 className="relative inline-block cursor-crosshair"
                 onClick={handleImageClick}
@@ -265,7 +265,7 @@ export default function TyreWearManager({
               </div>
 
               {/* Zoom Controls Overlay */}
-              <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-neutral-900/90 p-2 rounded-lg border border-neutral-700 shadow-xl backdrop-blur-sm z-20">
+              <div className="absolute bottom-6 right-6 flex items-center gap-2 bg-zinc-100/90 dark:bg-neutral-900/90 p-2 rounded-lg border border-neutral-700 shadow-xl backdrop-blur-sm z-20">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -296,7 +296,7 @@ export default function TyreWearManager({
 
             {/* Sidebar Controls */}
             <div className="w-64 flex flex-col gap-4 shrink-0">
-              <div className="bg-neutral-800 p-4 rounded-lg">
+              <div className="bg-zinc-200 dark:bg-neutral-800 p-4 rounded-lg">
                 <h4 className="font-semibold mb-2 ">Points</h4>
                 <ul className="text-sm space-y-2 ">
                   <li
@@ -333,19 +333,19 @@ export default function TyreWearManager({
               </div>
 
               {points.length === 3 && (
-                <div className="bg-neutral-800 p-4 rounded-lg flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4">
+                <div className="bg-zinc-200 dark:bg-neutral-800 p-4 rounded-lg flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4">
                   <label className="text-sm ">Laps Driven</label>
                   <input
                     type="number"
                     value={laps}
                     onChange={(e) => setLaps(e.target.value)}
-                    className="bg-neutral-900 border border-neutral-700 rounded p-2  focus:outline-none focus:border-white"
+                    className="bg-zinc-100 dark:bg-neutral-900 border border-neutral-700 rounded p-2  focus:outline-none focus:border-white"
                     placeholder="e.g. 12"
                   />
 
                   {calculatedWear !== null && (
                     <>
-                      <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
+                      <div className="mt-4 p-3 bg-zinc-100 dark:bg-neutral-900 rounded border border-neutral-700">
                         <p className="text-xs  uppercase tracking-wider">
                           Remaining Life
                         </p>
@@ -353,7 +353,7 @@ export default function TyreWearManager({
                           {calculatedWear.toFixed(1)}%
                         </p>
                       </div>
-                      <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
+                      <div className="mt-4 p-3 bg-zinc-100 dark:bg-neutral-900 rounded border border-neutral-700">
                         <p className="text-xs  uppercase tracking-wider">
                           wear per lap
                         </p>
@@ -369,7 +369,7 @@ export default function TyreWearManager({
                   )}
                   <button
                     onClick={handleSave}
-                    className="mt-4 bg-white text-black font-bold py-2 rounded cursor-pointer hover:bg-neutral-200 transition"
+                    className="mt-4 bg-zinc-300 dark:bg-neutral-800 text-black font-bold py-2 rounded cursor-pointer hover:bg-zinc-400 dark:hover:bg-neutral-200 transition"
                   >
                     Save Data
                   </button>
@@ -382,7 +382,7 @@ export default function TyreWearManager({
 
       {/* manual percentage & laps page */}
       {currentPage == "manual" && (
-        <div className="w-3/5 h-3/4 p-4 rounded-xl bg-neutral-900 flex flex-col gap-2">
+        <div className="w-3/5 h-3/4 p-4 rounded-xl bg-zinc-100 dark:bg-neutral-900 flex flex-col gap-2">
           <div className="flex flex-row-reverse items-center w-full h-1/20">
             <button onClick={onClose}>
               <X className="cursor-pointer" />
@@ -426,7 +426,7 @@ export default function TyreWearManager({
 
                 setCalculatedWear(parseFloat(finalVal));
               }}
-              className="w-48 bg-neutral-800 rounded-md p-2 px-4  focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              className="w-48 bg-zinc-200 dark:bg-neutral-800 rounded-md p-2 px-4 focus:outline-none focus:ring-2 focus:ring-neutral-600"
             />
             <p>and</p>
             <input
@@ -454,12 +454,12 @@ export default function TyreWearManager({
                   setManualLaps(val);
                 }
               }}
-              className="w-48 bg-neutral-800 rounded-md p-2 px-4  focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              className="w-48 bg-zinc-200 dark:bg-neutral-800 rounded-md p-2 px-4  focus:outline-none focus:ring-2 focus:ring-neutral-600"
             />
           </div>
           {calculatedWear !== null && (
             <div className="w-1/2 flex flex-col mx-auto mt-4 mb-6">
-              <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
+              <div className="mt-4 p-3 bg-zinc-100 dark:bg-neutral-900 rounded border border-neutral-700">
                 <p className="text-xs  uppercase tracking-wider">
                   Remaining Life
                 </p>
@@ -467,7 +467,7 @@ export default function TyreWearManager({
                   {calculatedWear.toFixed(1)}%
                 </p>
               </div>
-              <div className="mt-4 p-3 bg-neutral-900 rounded border border-neutral-700">
+              <div className="mt-4 p-3 bg-zinc-100 dark:bg-neutral-900 rounded border border-neutral-700">
                 <p className="text-xs  uppercase tracking-wider">
                   wear per lap
                 </p>
@@ -484,7 +484,7 @@ export default function TyreWearManager({
           <div className="flex items-center justify-center">
             <button
               onClick={handleSave}
-              className="bg-white text-black font-bold py-2 px-4 rounded cursor-pointer hover:bg-neutral-200 transition"
+              className="bg-zinc-300 dark:bg-white text-black font-bold py-2 px-4 rounded cursor-pointer hover:bg-zinc-400 dark:hover:bg-neutral-200 transition"
             >
               Save Data
             </button>
