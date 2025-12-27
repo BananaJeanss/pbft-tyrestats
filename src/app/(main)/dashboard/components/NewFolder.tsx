@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import IconSelector, { IconName } from "../../../components/lucide-selector";
 
 import { useLocalStorage } from "@/hooks/useLocalStorage";

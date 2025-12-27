@@ -329,7 +329,7 @@ export default function Dashboard() {
   return (
     <>
       {currentSessionId && (
-        <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
+        <>
           {raceSettingsVis && (
             <RaceSettings
               currentConfig={raceConfig}
@@ -420,13 +420,17 @@ export default function Dashboard() {
               }}
             />
           )}
+        </>
+      )}
 
-          <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
-            <DashSidebar
-              currentSessionId={currentSessionId ?? ""}
-              onSelectSession={loadSession}
-            />
+      <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
+        <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
+          <DashSidebar
+            currentSessionId={currentSessionId ?? ""}
+            onSelectSession={loadSession}
+          />
 
+          {currentSessionId ? (
             <div className="w-3/4 h-full pl-4 bg-zinc-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
               <div className="flex flex-row justify-between items-center">
                 <h2 className=" font-semibold text-2xl flex flex-row gap-2 items-center">
@@ -514,26 +518,15 @@ export default function Dashboard() {
               {/* Notes section*/}
               <DashNotes notes={currentNotes} onChange={setCurrentNotes} />
             </div>
-          </div>
-        </div>
-      )}
-      {!currentSessionId && (
-        <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
-          <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
-            <DashSidebar
-              currentSessionId={currentSessionId || ""}
-              onSelectSession={loadSession}
-            />
-
-            {/* Main Dashboard Thingy */}
+          ) : (
             <div className="w-3/4 h-full pl-4 bg-zinc-200 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2 items-center justify-center">
               <p className="text-lg font-extralight">
                 No session selected. Please select a session from the sidebar.
               </p>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </>
   );
 }
