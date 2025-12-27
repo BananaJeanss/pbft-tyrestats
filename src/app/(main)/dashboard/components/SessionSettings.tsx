@@ -1,9 +1,12 @@
+import { Folder } from "@/app/types/TyTypes";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Copy, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 export interface SessionSettings {
   name: string;
   date: string;
+  folder: string | null;
   lastModified: string;
   selectedIcon: string;
   icon_url?: string;
@@ -64,8 +67,8 @@ export default function SessionSettingsPage({
   const [config, setConfig] = useState<SessionSettings>(
     currentConfig || {
       name: "New Session",
+      folder: null,
       date: new Date().toISOString().split("T")[0],
-
       lastModified: new Date().toISOString(),
       selectedIcon: "default",
       icon_url: "",
@@ -73,6 +76,7 @@ export default function SessionSettingsPage({
   );
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);
 
   const handleSave = () => {
     onSave(config);
@@ -106,18 +110,38 @@ export default function SessionSettingsPage({
             {/* session name */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold">Session Name</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={config.name}
+              <div className="flex flex-row gap-2">
+                <div className="flex items-center gap-2 flex-grow">
+                  <input
+                    type="text"
+                    value={config.name}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        name: e.target.value,
+                      })
+                    }
+                    className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                  />
+                </div>
+                <select
+                  name="Folder"
+                  value={config.folder ?? ""}
                   onChange={(e) =>
                     setConfig({
                       ...config,
-                      name: e.target.value,
+                      folder: e.target.value,
                     })
                   }
-                  className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
-                />
+                  className="bg-none appearance-none w-20 bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded focus:outline-none focus:ring-2 focus:ring-neutral-600 text-center"
+                >
+                  <option value="">—</option>
+                  {folders.map((folder) => (
+                    <option key={folder.id} value={folder.id}>
+                      {folder.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
             {/* date selector */}

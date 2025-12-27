@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { DEFAULT_RACECONFIGURATION } from "./RaceSettings";
 import { DEFAULT_PREFERENCES } from "./TyreSettings";
-import { TySession } from "@/app/types/TyTypes";
+import { Folder, TySession } from "@/app/types/TyTypes";
 
 interface NewSessionProps {
   onClose: () => void;
@@ -12,6 +12,7 @@ interface NewSessionProps {
 export default function NewSession({ onClose }: NewSessionProps) {
   // 1. Local state for the form inputs
   const [name, setName] = useState("");
+  const [folder, setFolder] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [laps, setLaps] = useState("");
   const [icon, setIcon] = useState("default");
@@ -22,12 +23,14 @@ export default function NewSession({ onClose }: NewSessionProps) {
     "tyrestats_sessions",
     [],
   );
+  const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);
 
   const handleCreate = () => {
     if (!name) return; // Basic validation
 
     const newSession: TySession = {
       id: crypto.randomUUID(),
+      folder: folder || null,
       meta: {
         name,
         date,
@@ -69,15 +72,29 @@ export default function NewSession({ onClose }: NewSessionProps) {
 
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">Session Name</label>
-            <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold">Session Name</label>
+            <div className="flex flex-row gap-2">
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. FT1 Kubica Island Autodrome"
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="h-10 w-full bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded px-2 focus:outline-none focus:ring-2 focus:ring-neutral-600"
               />
+
+              <select
+                name="Folder"
+                value={folder}
+                onChange={(e) => setFolder(e.target.value)}
+                className="bg-none appearance-none w-20 bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded focus:outline-none focus:ring-2 focus:ring-neutral-600 text-center"
+              >
+                <option value="">—</option>
+                {folders.map((folder) => (
+                  <option key={folder.id} value={folder.id}>
+                    {folder.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div className="flex flex-col gap-2">

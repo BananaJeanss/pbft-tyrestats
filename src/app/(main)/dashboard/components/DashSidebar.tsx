@@ -3,7 +3,11 @@ import DashSidebarSession from "./DashSidebarSession";
 import NewSession from "./NewSession";
 import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { useMounted } from "@/hooks/useMounted";
-import { TySession } from "@/app/types/TyTypes";
+import { Folder, TySession } from "@/app/types/TyTypes";
+import { FolderPlus, ChevronRight, Database, Pencil } from "lucide-react";
+import { DynamicIcon } from "lucide-react/dynamic";
+import NewFolder from "./NewFolder";
+import EditFolder from "./EditFolder";
 
 interface DashSidebarProps {
   currentSessionId: string;
@@ -17,10 +21,16 @@ export default function DashSidebar({
   const [newSessionOpen, setNewSessionOpen] = useState(false);
   const [sessions] = useLocalStorage<TySession[]>("tyrestats_sessions", []);
   const mounted = useMounted();
+  const [newFolderOpen, setNewFolderOpen] = useState(false);
+  const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);
+  const [editFolderOpen, setEditFolderOpen] = useState<[boolean, string?]>([
+    false,
+    "",
+  ]);
 
   if (!mounted) {
     return (
-      <div className="w-1/4 h-full bg-zinc-100 dark:bg-neutral-800  dark: rounded-lg p-4 overflow-y-auto">
+      <div className="w-1/4 h-full bg-zinc-100 dark:bg-neutral-800 rounded-lg p-4 overflow-y-auto">
         <p className=" text-sm p-2">Loading sessions…</p>
       </div>
     );
@@ -31,6 +41,13 @@ export default function DashSidebar({
       {newSessionOpen && (
         <NewSession onClose={() => setNewSessionOpen(false)} />
       )}
+      {newFolderOpen && <NewFolder onClose={() => setNewFolderOpen(false)} />}
+      {editFolderOpen[0] && (
+        <EditFolder
+          onClose={() => setEditFolderOpen([false, ""])}
+          folderId={editFolderOpen[1] || ""}
+        />
+      )}
       <div
         className="w-1/4 h-full bg-zinc-100 dark:bg-neutral-800 rounded-lg p-4 overflow-y-auto"
         style={{
@@ -38,15 +55,27 @@ export default function DashSidebar({
           scrollbarColor: "rgba(100, 116, 139) transparent",
         }}
       >
-        <button
-          className="w-full mb-4 px-4 py-2 bg-transparent border border-blue-800 rounded hover:bg-blue-100 dark:hover:bg-blue-950 cursor-pointer transition-colors"
-          onClick={() => setNewSessionOpen(true)}
-        >
-          + New Session
-        </button>
-        <details open className="mb-2">
-          <summary className="cursor-pointer font-semibold py-2 px-2 rounded hover:bg-zinc-200 dark:hover:bg-neutral-700 transition">
-            Sessions (LocalStorage)
+        <div className="flex flex-row gap-2">
+          <button
+            className="flex-grow mb-4 px-4 py-2 bg-transparent border border-blue-800 rounded hover:bg-blue-100 dark:hover:bg-blue-950 cursor-pointer transition-colors"
+            onClick={() => setNewSessionOpen(true)}
+          >
+            + New Session
+          </button>
+          <button
+            className=" mb-4 px-4 py-2 bg-transparent border border-blue-900 rounded hover:bg-blue-100 dark:hover:bg-blue-950 cursor-pointer transition-colors"
+            onClick={() => setNewFolderOpen(true)}
+          >
+            <FolderPlus size={16} />
+          </button>
+        </div>
+        <details open className="mb-2 group/main">
+          <summary className="flex items-center gap-2 cursor-pointer font-semibold border-b py-2 px-2 hover:bg-zinc-200 dark:hover:bg-neutral-700 transition list-none [&::-webkit-details-marker]:hidden">
+            <ChevronRight
+              size={16}
+              className="transition-transform group-open/main:rotate-90 shrink-0"
+            />
+            <Database size={16} /> Sessions (LocalStorage)
           </summary>
           <div className="mt-2 flex flex-col gap-2">
             {sessions.length === 0 && (
@@ -54,18 +83,88 @@ export default function DashSidebar({
                 No sessions found. Maybe create one?
               </p>
             )}
-            {sessions.map((session) => (
-              <DashSidebarSession
-                key={session.id}
-                name={session.meta.name}
-                date={session.meta.date}
-                lastModified={session.meta.lastModified}
-                icon={session.meta.selectedIcon}
-                iconUrl={session.meta.icon_url || ""}
-                isActive={currentSessionId === session.id}
-                onClick={() => onSelectSession(session)}
-              />
+            {/* render folders first, then sessions not in folders */}
+            {folders.map((folder) => (
+              <details key={folder.id} className="ml-4 group">
+                <summary
+                  className={`flex items-center gap-2 cursor-pointer font-semibold border-b py-2 px-2 hover:bg-zinc-200 dark:hover:bg-neutral-700 transition list-none [&::-webkit-details-marker]:hidden`}
+                  style={{
+                    borderColor: folder.color,
+                  }}
+                >
+                  <DynamicIcon
+                    name={folder.icon}
+                    size={16}
+                    className="shrink-0"
+                    style={{
+                      color: folder.color,
+                    }}
+                  />
+                  <ChevronRight
+                    size={14}
+                    className="transition-transform group-open:rotate-90 shrink-0"
+                  />
+                  <span className="flex-grow overflow-hidden whitespace-nowrap overflow-ellipsis">
+                    {folder.name}
+                  </span>
+                  <span
+                    className="font-extralight text-xs opacity-50 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditFolderOpen([true, folder.id]);
+                    }}
+                  >
+                    <Pencil size={14} />
+                  </span>
+                  <span className="font-extralight text-xs opacity-50">
+                    (
+                    {
+                      sessions.filter((session) => session.folder === folder.id)
+                        .length
+                    }
+                    )
+                  </span>
+                </summary>
+                <div className="mt-2 flex flex-col gap-2">
+                  {sessions.filter((session) => session.folder === folder.id)
+                    .length === 0 ? (
+                    <p className=" text-sm p-2 text-center font-extralight opacity-50">
+                      No sessions in this folder. Add some!
+                    </p>
+                  ) : (
+                    sessions
+                      .filter((session) => session.folder === folder.id)
+                      .map((session) => (
+                        <DashSidebarSession
+                          key={session.id}
+                          name={session.meta.name}
+                          date={session.meta.date}
+                          lastModified={session.meta.lastModified}
+                          icon={session.meta.selectedIcon}
+                          iconUrl={session.meta.icon_url || ""}
+                          isActive={currentSessionId === session.id}
+                          onClick={() => onSelectSession(session)}
+                        />
+                      ))
+                  )}
+                </div>
+              </details>
             ))}
+            {sessions.map(
+              (session) =>
+                !session.folder && (
+                  <DashSidebarSession
+                    key={session.id}
+                    name={session.meta.name}
+                    date={session.meta.date}
+                    lastModified={session.meta.lastModified}
+                    icon={session.meta.selectedIcon}
+                    iconUrl={session.meta.icon_url || ""}
+                    isActive={currentSessionId === session.id}
+                    onClick={() => onSelectSession(session)}
+                  />
+                ),
+            )}
           </div>
         </details>
       </div>

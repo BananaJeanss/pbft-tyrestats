@@ -176,6 +176,8 @@ export default function Dashboard() {
               currentSuggestion: currentData.currentSuggestion,
               manualStints: currentData.manualStints,
               aiConfigSettings: currentData.aiConfigSettings,
+              folder:
+                currentData.sessionSettings["current"]?.folder || s.folder,
               meta: {
                 ...(currentData.sessionSettings["current"] || s.meta),
                 lastModified: new Date().toISOString(),
@@ -281,7 +283,9 @@ export default function Dashboard() {
 
     setManualStints(session.manualStints || []);
 
-    setSessionSettings({ current: session.meta });
+    setSessionSettings({
+      current: { ...session.meta, folder: session.folder },
+    });
     setTimeout(() => {
       isLoadingSession.current = false;
     }, 1000);
@@ -381,7 +385,12 @@ export default function Dashboard() {
                     },
                   };
                   setCurrentSessionId(newId);
-                  setSessionSettings({ current: duplicatedSession.meta });
+                  setSessionSettings({
+                    current: {
+                      ...duplicatedSession.meta,
+                      folder: duplicatedSession.folder,
+                    },
+                  });
                   setTyreData(duplicatedSession.tyreData || {});
                   setCurrentNotes(duplicatedSession.currentNotes || "");
                   setRaceConfig(

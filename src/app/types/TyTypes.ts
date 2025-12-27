@@ -1,7 +1,9 @@
 import { AIStrategySettingsS } from "../(main)/dashboard/components/AIStrategySettings";
+import { IconName } from "../components/lucide-selector";
 
 export interface TySession {
   id: string;
+  folder: string | null;
   meta: {
     name: string;
     date: string;
@@ -64,4 +66,11 @@ export interface TyreData {
   medium?: TyreWearData;
   hard?: TyreWearData;
   wet?: TyreWearData;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  icon: IconName;
+  color: string;
 }
