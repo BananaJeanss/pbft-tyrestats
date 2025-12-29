@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Settings, XCircle } from "lucide-react";
+import { CheckCircle2, Settings, Share2Icon, XCircle } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -17,7 +17,7 @@ import {
 
 const validateTimelineData = (
   timelineData: TimelineData[],
-  timelineStints: { tyreId: string }[],
+  timelineStints: { tyreId: string }[]
 ) => {
   // per FIT regulations 2 or more compounds must be used
   if (timelineStints.length > 0) {
@@ -26,7 +26,7 @@ const validateTimelineData = (
   }
 
   const usedTyres = Object.values(timelineData[0]).filter(
-    (val) => typeof val === "number" && val > 0,
+    (val) => typeof val === "number" && val > 0
   ).length;
   if (usedTyres < 2) {
     return false;
@@ -49,6 +49,7 @@ interface DashTimelineProps {
   raceConfig: RaceConfiguration;
   isManualMode?: boolean;
   setIsManualMode: (mode: boolean) => void;
+  openDashShare: () => void;
 }
 
 export default function DashTimeline({
@@ -59,6 +60,7 @@ export default function DashTimeline({
   raceConfig,
   isManualMode = false,
   setIsManualMode,
+  openDashShare,
 }: DashTimelineProps) {
   return (
     <div className="w-full bg-zinc-200 dark:bg-neutral-900 p-4 rounded-lg flex flex-col relative gap-2">
@@ -126,6 +128,9 @@ export default function DashTimeline({
             }}
           >
             <Settings />
+          </button>
+          <button className="cursor-pointer" onClick={openDashShare}>
+            <Share2Icon />
           </button>
         </div>
       </div>

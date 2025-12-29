@@ -28,6 +28,7 @@ import { TySession } from "@/app/types/TyTypes";
 import { AIStrategySettingsS } from "./components/AIStrategySettings";
 import TyresView from "./components/TyresView";
 import { DEFAULT_PREFERENCES } from "./components/TyreSettings";
+import DashShare from "./components/DashShare";
 
 export default function Dashboard() {
   const [tyremanVis, settyremanVis] = useState(false);
@@ -76,6 +77,9 @@ export default function Dashboard() {
     "tyrestats_sessions",
     [],
   );
+
+  // asdasdfdsfdsf share
+  const [dashShareOpen, setDashShareOpen] = useState(false);
 
   const [aiConfigSettings, setAIConfigSettings] = useState({
     model: "qwen/qwen3-32b",
@@ -423,6 +427,35 @@ export default function Dashboard() {
         </>
       )}
 
+      {dashShareOpen && currentSessionId && (
+        <DashShare
+          onClose={() => setDashShareOpen(false)}
+          SessionData={
+            {
+              id: currentSessionId,
+              folder: null, // in share url we dont include folder info
+              meta: {
+                name: sessionSettings["current"]?.name || "Unnamed Session",
+                date: sessionSettings["current"]?.date || "",
+                lastModified:
+                  sessionSettings["current"]?.lastModified ||
+                  new Date().toISOString(),
+                selectedIcon:
+                  sessionSettings["current"]?.selectedIcon || "default",
+                icon_url: sessionSettings["current"]?.icon_url,
+              },
+              raceConfig,
+              tyrePreferences,
+              tyreData,
+              currentNotes,
+              currentSuggestion,
+              manualStints,
+              aiConfigSettings,
+            } as TySession
+          }
+        />
+      )}
+
       <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
         <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
           <DashSidebar
@@ -461,6 +494,7 @@ export default function Dashboard() {
                 raceConfig={raceConfig}
                 isManualMode={isManualMode}
                 setIsManualMode={setIsManualMode}
+                openDashShare={() => setDashShareOpen(true)}
               />
 
               {/* top tiles section - tyres and ai */}

@@ -9,6 +9,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --tyrestats-blue: #0059ff;
 }
 
 [data-theme="dark"] {
