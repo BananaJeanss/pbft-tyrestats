@@ -22,6 +22,7 @@ export interface TySession {
   tyreData: Record<string, TyreWearData>;
   currentNotes?: string;
   currentSuggestion?: string;
+  shortUrl?: string;
   manualStints: ManualStint[];
   aiConfigSettings: AIStrategySettingsS;
 }

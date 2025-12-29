@@ -16,6 +16,7 @@ import { DEFAULT_PREFERENCES } from "./TyreSettings";
 export interface DashShareProps {
   onClose: () => void;
   SessionData: TySession;
+  onShortUrlUpdate: (url: string) => void;
 }
 
 // Map tyre IDs to Discord-friendly Emojis and Colors
@@ -28,7 +29,7 @@ const TYRE_DISPLAY_MAP: Record<string, { emoji: string; label: string }> = {
 
 const TYRE_ORDER = ["soft", "medium", "hard", "wet"];
 
-export default function DashShare({ onClose, SessionData }: DashShareProps) {
+export default function DashShare({ onClose, SessionData, onShortUrlUpdate }: DashShareProps) {
   const [copiedType, setCopiedType] = useState<"static" | "short" | null>(null);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -155,6 +156,7 @@ export default function DashShare({ onClose, SessionData }: DashShareProps) {
 
   const handleShortUrlGenerated = (newShortUrl: string) => {
     setShortUrl(newShortUrl);
+    onShortUrlUpdate(newShortUrl);
     handleCopy(newShortUrl, "short");
   };
 
@@ -162,11 +164,11 @@ export default function DashShare({ onClose, SessionData }: DashShareProps) {
     setIsSending(true);
     // send data to api to generate short link
     fetch("/api/short", {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        sessionData: JSON.stringify(SessionData),
       },
+      body: JSON.stringify({ sessionData: SessionData }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -216,7 +218,7 @@ export default function DashShare({ onClose, SessionData }: DashShareProps) {
               type="text"
               readOnly
               value={shortUrl || "Shortened URL not generated"}
-              className={`flex-grow p-2.5 pr-10 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-zinc-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 ${
+              className={`grow p-2.5 pr-10 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-zinc-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 ${
                 !shortUrl &&
                 "italic text-neutral-400 opacity-60 cursor-not-allowed"
               }`}
@@ -231,13 +233,13 @@ export default function DashShare({ onClose, SessionData }: DashShareProps) {
                 }
               }}
               className={`
-                h-[42px] px-4 rounded-lg flex items-center justify-center gap-2 font-medium text-sm text-white min-w-[100px]
+                h-10.5 px-4 rounded-lg flex items-center justify-center gap-2 font-medium text-sm text-white min-w-25
                 ${
                   isSending
                     ? "bg-neutral-400 dark:bg-neutral-700 cursor-not-allowed opacity-70"
                     : shortUrl
-                      ? "bg-[var(--tyrestats-blue)] hover:bg-[var(--tyrestats-blue)]/90 cursor-pointer"
-                      : "bg-[var(--tyrestats-blue)] hover:bg-[var(--tyrestats-blue)]/90 cursor-pointer"
+                      ? "bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 cursor-pointer"
+                      : "bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 cursor-pointer"
                 }
               `}
             >
@@ -303,17 +305,17 @@ export default function DashShare({ onClose, SessionData }: DashShareProps) {
                 setWebhookUrl(e.target.value);
                 setSendStatus("idle");
               }}
-              className="flex-grow p-2.5 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-zinc-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#5865F2]"
+              className="grow p-2.5 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-zinc-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#5865F2]"
             />
             <button
               disabled={isSending || !webhookUrl}
               onClick={handleSendToDiscord}
               className={`
-                h-[42px] px-4 rounded-lg flex items-center justify-center gap-2 font-medium text-sm text-white min-w-[100px]
+                h-10.5 px-4 rounded-lg flex items-center justify-center gap-2 font-medium text-sm text-white min-w-25
                 ${
                   isSending || !webhookUrl
                     ? "bg-neutral-400 dark:bg-neutral-700 cursor-not-allowed opacity-70"
-                    : "bg-[var(--tyrestats-blue)] hover:bg-[var(--tyrestats-blue)]/90 cursor-pointer"
+                    : "bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 cursor-pointer"
                 }
               `}
             >

@@ -61,6 +61,7 @@ export default function Dashboard() {
   // notes & AI
   const [currentNotes, setCurrentNotes] = useState("");
   const [currentSuggestion, setCurrentSuggestion] = useState("");
+  const [shortUrl, setShortUrl] = useState<string>("");
 
   const [isAutosaveEnabled] = useLocalStorage<boolean>(
     "tyrestats_autosave_enabled",
@@ -133,6 +134,7 @@ export default function Dashboard() {
     tyrePreferences,
     currentNotes,
     currentSuggestion,
+    shortUrl,
     manualStints,
     sessionSettings,
     aiConfigSettings,
@@ -144,10 +146,10 @@ export default function Dashboard() {
       tyreData,
       raceConfig,
       tyrePreferences,
-      currentNotes,
-      currentSuggestion,
-      manualStints,
-      sessionSettings,
+          currentNotes,
+          currentSuggestion,
+          shortUrl,
+          manualStints,      sessionSettings,
       aiConfigSettings,
     };
   }, [
@@ -156,6 +158,7 @@ export default function Dashboard() {
     tyrePreferences,
     currentNotes,
     currentSuggestion,
+    shortUrl,
     manualStints,
     sessionSettings,
     aiConfigSettings,
@@ -178,6 +181,7 @@ export default function Dashboard() {
               tyrePreferences: currentData.tyrePreferences,
               currentNotes: currentData.currentNotes,
               currentSuggestion: currentData.currentSuggestion,
+              shortUrl: currentData.shortUrl,
               manualStints: currentData.manualStints,
               aiConfigSettings: currentData.aiConfigSettings,
               folder:
@@ -214,6 +218,7 @@ export default function Dashboard() {
     currentSuggestion,
     manualStints,
     aiConfigSettings,
+    shortUrl,
   ]);
 
   // please boss im tired of this fuckass god component
@@ -276,6 +281,7 @@ export default function Dashboard() {
     setRaceConfig(session.raceConfig || DEFAULT_RACECONFIGURATION);
     setTyrePreferences(session.tyrePreferences || DEFAULT_PREFERENCES);
     setCurrentSuggestion(session.currentSuggestion || "");
+    setShortUrl(session.shortUrl || "");
     setAIConfigSettings({
       model: session.aiConfigSettings?.model || "qwen/qwen3-32b",
       temperature: session.aiConfigSettings?.temperature || 0.7,
@@ -382,6 +388,7 @@ export default function Dashboard() {
                   const duplicatedSession: TySession = {
                     ...sessionToDuplicate,
                     id: newId,
+                    shortUrl: "",
                     meta: {
                       ...sessionToDuplicate.meta,
                       name: `${sessionToDuplicate.meta.name} (Copy)`,
@@ -429,7 +436,9 @@ export default function Dashboard() {
 
       {dashShareOpen && currentSessionId && (
         <DashShare
+          key={currentSessionId}
           onClose={() => setDashShareOpen(false)}
+          onShortUrlUpdate={(url) => setShortUrl(url)}
           SessionData={
             {
               id: currentSessionId,
@@ -449,6 +458,7 @@ export default function Dashboard() {
               tyreData,
               currentNotes,
               currentSuggestion,
+              shortUrl,
               manualStints,
               aiConfigSettings,
             } as TySession
