@@ -10,6 +10,7 @@ export interface AIStrategySuggestionProps {
   onSaveConfig: (settings: AIStrategySettingsS) => void;
   existingSuggestion: string | null;
   notes?: string;
+  readOnly?: boolean;
 }
 
 export default function AIStrategySuggestion({
@@ -21,6 +22,7 @@ export default function AIStrategySuggestion({
   notes,
   onSaveConfig,
   aiConfig,
+  readOnly = false,
 }: ExpectedRequest & AIStrategySuggestionProps) {
   const [ratelimitCount, setRatelimitCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,10 +34,11 @@ export default function AIStrategySuggestion({
       temperature: 0.7,
       top_p: 1,
       useExperimentalPrompt: false,
-    },
+    }
   );
 
   const clientcallHCAI = async () => {
+    if (readOnly) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -58,7 +61,7 @@ export default function AIStrategySuggestion({
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`,
+            : `Server responded with status: ${response.status}`
         );
       }
 
@@ -78,7 +81,7 @@ export default function AIStrategySuggestion({
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred",
+        error instanceof Error ? error.message : "An unknown error occurred"
       );
     } finally {
       setIsLoading(false);
@@ -109,29 +112,36 @@ export default function AIStrategySuggestion({
         <div className="flex flex-row items-center gap-2 justify-between">
           <div className="flex flex-row items-center gap-2">
             <h3 className="text-lg font-bold">AI Strategy Overview</h3>
-            <p className="">|</p>
             {!isLoading ? (
-              <button
-                className="font-light cursor-pointer underline rounded"
-                onClick={clientcallHCAI}
-              >
-                Generate Analysis{" "}
-                {ratelimitCount !== null
-                  ? `(${ratelimitCount}/5 requests (24 hours))`
-                  : ""}
-              </button>
+              <div className={`${readOnly ? "hidden" : "flex flex-row gap-2 items-center"}`}>
+                <p>|</p>
+                <button
+                  disabled={readOnly}
+                  className={`font-light rounded ${
+                    readOnly ? "hidden" : "cursor-pointer underline"
+                  }`}
+                  onClick={clientcallHCAI}
+                >
+                  Generate Analysis{" "}
+                  {ratelimitCount !== null
+                    ? `(${ratelimitCount}/5 requests (24 hours))`
+                    : ""}
+                </button>
+              </div>
             ) : (
               <button className=" font-light cursor-not-allowed" disabled>
                 Generating...
               </button>
             )}
           </div>
-          <Settings
-            className="cursor-pointer"
-            onClick={() => {
-              setAISettingsOpen(true);
-            }}
-          />
+          {!readOnly && (
+            <Settings
+              className="cursor-pointer"
+              onClick={() => {
+                setAISettingsOpen(true);
+              }}
+            />
+          )}
         </div>
         <hr className="border-neutral-700" />
 

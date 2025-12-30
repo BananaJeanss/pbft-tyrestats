@@ -10,6 +10,7 @@ export interface TyresViewProps {
   setTyrePreferences: (prefs: TyrePreferences) => void;
   settyremanVis: (vis: boolean) => void;
   setSelectedTyre: (tyreId: string) => void;
+  readOnly?: boolean;
 }
 
 const TYRE_TYPES = [
@@ -25,6 +26,7 @@ export default function TyresView({
   setTyrePreferences,
   settyremanVis,
   setSelectedTyre,
+  readOnly = false,
 }: TyresViewProps) {
   const [tyresettingsVis, settyresettingsVis] = useState<boolean>(false);
 
@@ -48,14 +50,16 @@ export default function TyresView({
       <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
         <div className="flex flex-row gap-2 justify-between">
           <p className="text-md font-bold">Tyres</p>
-          <button
-            className="cursor-pointer text-sm"
-            onClick={() => settyresettingsVis(true)}
-          >
-            <Settings className="h-5 w-5" />
-          </button>
+          {!readOnly && (
+            <button
+              className="cursor-pointer text-sm"
+              onClick={() => settyresettingsVis(true)}
+            >
+              <Settings className="h-5 w-5" />
+            </button>
+          )}
         </div>
-        <div className="flex flex-col flex-grow gap-2 justify-evenly overflow-y-auto">
+        <div className="flex flex-col grow gap-2 justify-evenly overflow-y-auto">
           {TYRE_TYPES.map((tyre) => {
             const effectiveData = getEffectiveTyreData(
               tyre.id,
@@ -65,16 +69,20 @@ export default function TyresView({
             return (
               <div
                 key={tyre.id}
-                className="@container bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full max-h-1/4 flex flex-row flex-grow flex-shrink items-center gap-4"
+                className="@container bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full max-h-1/4 flex flex-row grow shrink items-center gap-4"
               >
                 <button
+                  disabled={readOnly}
                   onClick={() => {
                     setSelectedTyre(tyre.id);
                     settyremanVis(true);
                   }}
+                  className={readOnly ? "cursor-default" : ""}
                 >
                   <h3
-                    className={`${tyre.color} text-xl border-3 font-extrabold rounded-full px-2 cursor-pointer`}
+                    className={`${tyre.color} text-xl border-3 font-extrabold rounded-full px-2 ${
+                      !readOnly ? "cursor-pointer" : ""
+                    }`}
                   >
                     {tyre.label}
                   </h3>
@@ -100,7 +108,7 @@ export default function TyresView({
                     </>
                   ) : (
                     <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
-                      No Data Yet (Click on the tyre to add data)
+                      No Data Yet {readOnly ? "" : "(Click on the tyre to add data)"}
                     </p>
                   )}
                 </div>

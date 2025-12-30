@@ -1,6 +1,5 @@
 "use client";
 
-import { Pencil } from "lucide-react";
 import TyreWearManager from "./components/TyreWearManager";
 import {
   Stint,
@@ -15,10 +14,7 @@ import RaceSettings, {
 import { RaceConfiguration } from "@/app/types/TyTypes";
 import { ManualStint } from "@/app/types/TyTypes";
 import DashSidebar from "./components/DashSidebar";
-import AIStrategySuggestion from "./components/AIStrategySuggestion";
-import DashNotes from "./components/DashNotes";
 import { generateOptimalTimeline } from "./TyreMath";
-import DashTimeline from "./components/DashTimeline";
 import SessionSettingsPage, {
   SessionSettings,
 } from "./components/SessionSettings";
@@ -26,9 +22,9 @@ import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { toast } from "react-toastify";
 import { TySession } from "@/app/types/TyTypes";
 import { AIStrategySettingsS } from "./components/AIStrategySettings";
-import TyresView from "./components/TyresView";
 import { DEFAULT_PREFERENCES } from "./components/TyreSettings";
 import DashShare from "./components/DashShare";
+import DashboardView from "./components/DashboardView";
 
 export default function Dashboard() {
   const [tyremanVis, settyremanVis] = useState(false);
@@ -474,93 +470,42 @@ export default function Dashboard() {
           />
 
           {currentSessionId ? (
-            <div className="w-3/4 h-full pl-4 bg-zinc-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
-              <div className="flex flex-row justify-between items-center">
-                <h2 className=" font-semibold text-2xl flex flex-row gap-2 items-center">
-                  {sessionSettings["current"]?.name || "Session/Race Name"}
-                  <button
-                    className="cursor-pointer  "
-                    onClick={() => setSessionSettingsVis(true)}
-                  >
-                    <Pencil />
-                  </button>
-                </h2>
-              </div>
-              <hr className="border-neutral-700" />
-
-              {/* Timeline Section */}
-              <DashTimeline
-                timelineGenerated={
-                  isManualMode ? manualStints.length > 0 : timelineGenerated
-                }
-                timelineData={
-                  isManualMode ? manualTimelineData : autoTimelineData
-                }
-                timelineStints={
-                  isManualMode ? manualTimelineStintsDef : autoTimelineStints
-                }
+            <div className="w-3/4 h-full">
+              <DashboardView
+                sessionName={sessionSettings["current"]?.name || "Session/Race Name"}
+                onEditSessionSettings={() => setSessionSettingsVis(true)}
                 tyreData={tyreData}
-                setRaceSettingsVis={setRaceSettingsVis}
                 raceConfig={raceConfig}
+                tyrePreferences={tyrePreferences}
+                manualStints={manualStints}
+                currentNotes={currentNotes}
+                currentSuggestion={currentSuggestion}
+                aiConfigSettings={aiConfigSettings}
+                timelineGenerated={timelineGenerated}
+                autoTimelineData={autoTimelineData}
+                autoTimelineStints={autoTimelineStints}
+                manualTimelineData={manualTimelineData}
+                manualTimelineStintsDef={manualTimelineStintsDef}
                 isManualMode={isManualMode}
+                setRaceSettingsVis={setRaceSettingsVis}
+                settyremanVis={(vis, tyreType) => {
+                  settyremanVis(vis);
+                  if (tyreType) setSelectedTyre(tyreType);
+                }}
+                setSelectedTyre={(tyreId) => {
+                  if (["soft", "medium", "hard", "wet"].includes(tyreId)) {
+                    setSelectedTyre(tyreId as "soft" | "medium" | "hard" | "wet");
+                  } else {
+                    setSelectedTyre(null);
+                  }
+                }}
+                setTyrePreferences={setTyrePreferences}
+                setCurrentNotes={setCurrentNotes}
+                setCurrentSuggestion={setCurrentSuggestion}
+                setAIConfigSettings={setAIConfigSettings}
                 setIsManualMode={setIsManualMode}
                 openDashShare={() => setDashShareOpen(true)}
               />
-
-              {/* top tiles section - tyres and ai */}
-              <div className="w-full flex flex-row h-2/5 gap-2">
-                {/* tyressssssss */}
-                <TyresView
-                  tyreData={tyreData}
-                  tyrePreferences={tyrePreferences}
-                  setTyrePreferences={setTyrePreferences}
-                  settyremanVis={(
-                    vis: boolean,
-                    tyreType?: "soft" | "medium" | "hard" | "wet",
-                  ) => {
-                    settyremanVis(vis);
-                    if (tyreType) setSelectedTyre(tyreType);
-                  }}
-                  setSelectedTyre={(tyreId: string) => {
-                    // Only allow valid tyre types
-                    if (["soft", "medium", "hard", "wet"].includes(tyreId)) {
-                      setSelectedTyre(
-                        tyreId as "soft" | "medium" | "hard" | "wet",
-                      );
-                    } else {
-                      setSelectedTyre(null);
-                    }
-                  }}
-                />
-
-                {/* AI strategy overview cause i cant think of anything better */}
-                <AIStrategySuggestion
-                  tyreData={tyreData}
-                  raceConfig={raceConfig}
-                  tyrePreferences={tyrePreferences}
-                  notes={currentNotes}
-                  existingSuggestion={currentSuggestion}
-                  onSave={(suggestion: string) =>
-                    setCurrentSuggestion(suggestion)
-                  }
-                  onSaveConfig={(newConfig: {
-                    model: string;
-                    temperature: number;
-                    top_p: number;
-                    useExperimentalPrompt: boolean;
-                  }) => setAIConfigSettings(newConfig)}
-                  aiConfig={{
-                    model: aiConfigSettings.model,
-                    temperature: aiConfigSettings.temperature,
-                    top_p: aiConfigSettings.top_p,
-                    useExperimentalPrompt:
-                      aiConfigSettings.useExperimentalPrompt,
-                  }}
-                />
-              </div>
-
-              {/* Notes section*/}
-              <DashNotes notes={currentNotes} onChange={setCurrentNotes} />
             </div>
           ) : (
             <div className="w-3/4 h-full pl-4 bg-zinc-200 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2 items-center justify-center">

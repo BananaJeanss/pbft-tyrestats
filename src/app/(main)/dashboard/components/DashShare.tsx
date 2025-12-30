@@ -171,6 +171,12 @@ export default function DashShare({ onClose, SessionData, onShortUrlUpdate }: Da
       body: JSON.stringify({ sessionData: SessionData }),
     })
       .then((response) => response.json())
+      .then((response) => {
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        return response;
+      })
       .then((data) => {
         if (data.finalizedUrl) {
           handleShortUrlGenerated(data.finalizedUrl);

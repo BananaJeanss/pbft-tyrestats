@@ -57,7 +57,7 @@ export default function DashSidebar({
       >
         <div className="flex flex-row gap-2">
           <button
-            className="flex-grow mb-4 px-4 py-2 bg-transparent border border-blue-800 rounded hover:bg-blue-100 dark:hover:bg-blue-950 cursor-pointer transition-colors"
+            className="grow mb-4 px-4 py-2 bg-transparent border border-blue-800 rounded hover:bg-blue-100 dark:hover:bg-blue-950 cursor-pointer transition-colors"
             onClick={() => setNewSessionOpen(true)}
           >
             + New Session
@@ -104,7 +104,7 @@ export default function DashSidebar({
                     size={14}
                     className="transition-transform group-open:rotate-90 shrink-0"
                   />
-                  <span className="flex-grow overflow-hidden whitespace-nowrap overflow-ellipsis">
+                  <span className="grow overflow-hidden whitespace-nowrap overflow-ellipsis">
                     {folder.name}
                   </span>
                   <span

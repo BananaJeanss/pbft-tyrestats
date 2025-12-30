@@ -50,6 +50,7 @@ interface DashTimelineProps {
   isManualMode?: boolean;
   setIsManualMode: (mode: boolean) => void;
   openDashShare: () => void;
+  readOnly?: boolean;
 }
 
 export default function DashTimeline({
@@ -61,6 +62,7 @@ export default function DashTimeline({
   isManualMode = false,
   setIsManualMode,
   openDashShare,
+  readOnly = false,
 }: DashTimelineProps) {
   return (
     <div className="w-full bg-zinc-200 dark:bg-neutral-900 p-4 rounded-lg flex flex-col relative gap-2">
@@ -69,29 +71,31 @@ export default function DashTimeline({
           <h3 className="text-lg font-bold flex items-center gap-1.5 ">
             Timeline
           </h3>
-          <div className="flex items-center gap-1 bg-transparent p-1 rounded-lg border border-neutral-700">
-            <span
-              className={`text-xs font-bold px-2 cursor-pointer transition ${
-                !isManualMode
-                  ? "text-black dark:text-white"
-                  : "text-neutral-700 dark:text-neutral-500"
-              }`}
-              onClick={() => setIsManualMode(false)}
-            >
-              Auto
-            </span>
-            |
-            <span
-              className={`text-xs font-bold px-2 cursor-pointer transition ${
-                isManualMode
-                  ? "text-black dark:text-white"
-                  : "text-neutral-700 dark:text-neutral-500"
-              }`}
-              onClick={() => setIsManualMode(true)}
-            >
-              Manual
-            </span>
-          </div>
+          {!readOnly && (
+            <div className="flex items-center gap-1 bg-transparent p-1 rounded-lg border border-neutral-700">
+              <span
+                className={`text-xs font-bold px-2 cursor-pointer transition ${
+                  !isManualMode
+                    ? "text-black dark:text-white"
+                    : "text-neutral-700 dark:text-neutral-500"
+                }`}
+                onClick={() => setIsManualMode(false)}
+              >
+                Auto
+              </span>
+              |
+              <span
+                className={`text-xs font-bold px-2 cursor-pointer transition ${
+                  isManualMode
+                    ? "text-black dark:text-white"
+                    : "text-neutral-700 dark:text-neutral-500"
+                }`}
+                onClick={() => setIsManualMode(true)}
+              >
+                Manual
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
@@ -121,17 +125,21 @@ export default function DashTimeline({
             </div>
           )}
 
-          <button
-            className="cursor-pointer  hover: transition"
-            onClick={() => {
-              setRaceSettingsVis(true);
-            }}
-          >
-            <Settings />
-          </button>
-          <button className="cursor-pointer" onClick={openDashShare}>
-            <Share2Icon />
-          </button>
+          {!readOnly && (
+            <>
+              <button
+                className="cursor-pointer  hover: transition"
+                onClick={() => {
+                  setRaceSettingsVis(true);
+                }}
+              >
+                <Settings />
+              </button>
+              <button className="cursor-pointer" onClick={openDashShare}>
+                <Share2Icon />
+              </button>
+            </>
+          )}
         </div>
       </div>
 
