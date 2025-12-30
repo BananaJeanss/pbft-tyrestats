@@ -23,7 +23,9 @@ export async function GET(req: Request) {
         "REDIS_URL not set in environment variables\nShort link access will still work, but rate limiting is disabled.",
       );
     } else {
-      const redisClient = createClient();
+      const redisClient = createClient({
+        url: process.env.REDIS_URL,
+      });
       await redisClient.connect();
       const ip = req.headers.get("x-forwarded-for") || "unknown";
       const rateLimitKey = `short_access_rate_${ip}`;
@@ -93,7 +95,9 @@ export async function POST(req: Request) {
         "REDIS_URL not set in environment variables\nShort link creation will still work, but rate limiting is disabled.",
       );
     } else {
-      const redisClient = createClient();
+      const redisClient = createClient({
+        url: process.env.REDIS_URL,
+      });
       await redisClient.connect();
       const ip = req.headers.get("x-forwarded-for") || "unknown";
       const rateLimitKey = `share_rate_${ip}`;
