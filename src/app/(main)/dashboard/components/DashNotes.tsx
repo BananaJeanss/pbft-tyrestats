@@ -6,7 +6,11 @@ export interface DashNotesProps {
   readOnly?: boolean;
 }
 
-export default function DashNotes({ notes = "", onChange, readOnly = false }: DashNotesProps) {
+export default function DashNotes({
+  notes = "",
+  onChange,
+  readOnly = false,
+}: DashNotesProps) {
   return (
     <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-2/7 max-h-2/5 grow flex flex-col gap-2">
       <h3 className="font-semibold">

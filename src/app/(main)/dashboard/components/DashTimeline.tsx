@@ -17,7 +17,7 @@ import {
 
 const validateTimelineData = (
   timelineData: TimelineData[],
-  timelineStints: { tyreId: string }[]
+  timelineStints: { tyreId: string }[],
 ) => {
   // per FIT regulations 2 or more compounds must be used
   if (timelineStints.length > 0) {
@@ -26,7 +26,7 @@ const validateTimelineData = (
   }
 
   const usedTyres = Object.values(timelineData[0]).filter(
-    (val) => typeof val === "number" && val > 0
+    (val) => typeof val === "number" && val > 0,
   ).length;
   if (usedTyres < 2) {
     return false;

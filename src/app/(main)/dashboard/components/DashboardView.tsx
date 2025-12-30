@@ -18,7 +18,7 @@ import { AIStrategySettingsS } from "./AIStrategySettings";
 interface DashboardViewProps {
   sessionName: string;
   readOnly?: boolean;
-  
+
   // Data
   tyreData: Record<string, TyreWearData>;
   raceConfig: RaceConfiguration;
@@ -49,7 +49,10 @@ interface DashboardViewProps {
   // Actions
   onEditSessionSettings?: () => void;
   setRaceSettingsVis: (vis: boolean) => void;
-  settyremanVis: (vis: boolean, tyreType?: "soft" | "medium" | "hard" | "wet") => void;
+  settyremanVis: (
+    vis: boolean,
+    tyreType?: "soft" | "medium" | "hard" | "wet",
+  ) => void;
   setSelectedTyre: (tyre: string) => void;
   setTyrePreferences: (prefs: TyrePreferences) => void;
   setCurrentNotes: (notes: string) => void;
@@ -57,7 +60,7 @@ interface DashboardViewProps {
   setAIConfigSettings: (config: AIStrategySettingsS) => void;
   setIsManualMode: (mode: boolean) => void;
   openDashShare?: () => void;
-  
+
   // Share specific
   onCopySession?: () => void;
 }
@@ -96,27 +99,24 @@ export default function DashboardView({
         <h2 className="font-semibold text-2xl flex flex-row gap-2 items-center">
           {sessionName}
           {!readOnly && onEditSessionSettings && (
-            <button
-              className="cursor-pointer"
-              onClick={onEditSessionSettings}
-            >
+            <button className="cursor-pointer" onClick={onEditSessionSettings}>
               <Pencil />
             </button>
           )}
           {readOnly && (
-              <span className="text-sm font-normal text-neutral-500 px-2 py-0.5 bg-neutral-200 dark:bg-neutral-900 rounded-full">
+            <span className="text-sm font-normal text-neutral-500 px-2 py-0.5 bg-neutral-200 dark:bg-neutral-900 rounded-full">
               Read Only
             </span>
           )}
         </h2>
         {readOnly && onCopySession && (
-             <button
-             onClick={onCopySession}
-             className="flex items-center gap-2 border border-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 px-4 py-2 rounded-lg font-semibold cursor-pointer text-sm"
-           >
-             <Copy size={16} />
-             Copy Session & Edit
-           </button>
+          <button
+            onClick={onCopySession}
+            className="flex items-center gap-2 border border-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 px-4 py-2 rounded-lg font-semibold cursor-pointer text-sm"
+          >
+            <Copy size={16} />
+            Copy Session & Edit
+          </button>
         )}
       </div>
       <hr className="border-neutral-700" />
@@ -126,9 +126,7 @@ export default function DashboardView({
         timelineGenerated={
           isManualMode ? manualStints.length > 0 : timelineGenerated
         }
-        timelineData={
-          isManualMode ? manualTimelineData : autoTimelineData
-        }
+        timelineData={isManualMode ? manualTimelineData : autoTimelineData}
         timelineStints={
           isManualMode ? manualTimelineStintsDef : autoTimelineStints
         }
@@ -168,9 +166,9 @@ export default function DashboardView({
       </div>
 
       {/* Notes section*/}
-      <DashNotes 
-        notes={currentNotes} 
-        onChange={setCurrentNotes} 
+      <DashNotes
+        notes={currentNotes}
+        onChange={setCurrentNotes}
         readOnly={readOnly}
       />
     </div>

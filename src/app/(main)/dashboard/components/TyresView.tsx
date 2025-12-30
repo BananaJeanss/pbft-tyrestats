@@ -34,7 +34,7 @@ export default function TyresView({
   const calcRecommendedLapCount = (wearPerLap: number) => {
     if (wearPerLap === 0) return 0;
     return Math.floor(
-      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap
+      (100 - tyrePreferences.preferredSwitchoverPoint) / wearPerLap,
     );
   };
 
@@ -64,7 +64,7 @@ export default function TyresView({
             const effectiveData = getEffectiveTyreData(
               tyre.id,
               tyreData,
-              tyrePreferences
+              tyrePreferences,
             );
             return (
               <div
@@ -108,7 +108,8 @@ export default function TyresView({
                     </>
                   ) : (
                     <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
-                      No Data Yet {readOnly ? "" : "(Click on the tyre to add data)"}
+                      No Data Yet{" "}
+                      {readOnly ? "" : "(Click on the tyre to add data)"}
                     </p>
                   )}
                 </div>

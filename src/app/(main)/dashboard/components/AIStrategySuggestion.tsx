@@ -34,7 +34,7 @@ export default function AIStrategySuggestion({
       temperature: 0.7,
       top_p: 1,
       useExperimentalPrompt: false,
-    }
+    },
   );
 
   const clientcallHCAI = async () => {
@@ -61,7 +61,7 @@ export default function AIStrategySuggestion({
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`
+            : `Server responded with status: ${response.status}`,
         );
       }
 
@@ -81,7 +81,7 @@ export default function AIStrategySuggestion({
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
+        error instanceof Error ? error.message : "An unknown error occurred",
       );
     } finally {
       setIsLoading(false);
@@ -113,7 +113,9 @@ export default function AIStrategySuggestion({
           <div className="flex flex-row items-center gap-2">
             <h3 className="text-lg font-bold">AI Strategy Overview</h3>
             {!isLoading ? (
-              <div className={`${readOnly ? "hidden" : "flex flex-row gap-2 items-center"}`}>
+              <div
+                className={`${readOnly ? "hidden" : "flex flex-row gap-2 items-center"}`}
+              >
                 <p>|</p>
                 <button
                   disabled={readOnly}

@@ -21,7 +21,7 @@ function SharedSessionContent() {
   // Initialize state based on shortCode to avoid synchronous updates in useEffect
   const [loading, setLoading] = useState(!!shortCode);
   const [error, setError] = useState<string | null>(
-    !shortCode ? "Invalid link" : null
+    !shortCode ? "Invalid link" : null,
   );
 
   const [isManualMode, setIsManualMode] = useState(false);
@@ -137,7 +137,7 @@ function SharedSessionContent() {
         key: `manual_${index}_${stint.tyre}`,
         color: colors[stint.tyre],
         label: `${labels[stint.tyre]} (${stint.laps}L)`,
-      })
+      }),
     );
   }, [sessionData]);
 
@@ -160,11 +160,11 @@ function SharedSessionContent() {
 
       // Save to LocalStorage
       const existing = JSON.parse(
-        localStorage.getItem("tyrestats_sessions") || "[]"
+        localStorage.getItem("tyrestats_sessions") || "[]",
       );
       localStorage.setItem(
         "tyrestats_sessions",
-        JSON.stringify([...existing, newSession])
+        JSON.stringify([...existing, newSession]),
       );
 
       // Dispatch event so other tabs/components update if needed

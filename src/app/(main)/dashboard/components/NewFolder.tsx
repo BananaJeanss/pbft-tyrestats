@@ -41,7 +41,7 @@ export default function NewFolder({ onClose }: NewFolderProps) {
     onClose();
   };
 
-// Removed useEffect for setting color
+  // Removed useEffect for setting color
 
   return (
     <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">

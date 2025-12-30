@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   if (!shortUrl) {
     return NextResponse.json(
       { error: "No short URL provided" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   if (process.env.NODE_ENV !== "development") {
     if (!process.env.REDIS_URL) {
       console.error(
-        "REDIS_URL not set in environment variables\nShort link access will still work, but rate limiting is disabled."
+        "REDIS_URL not set in environment variables\nShort link access will still work, but rate limiting is disabled.",
       );
     } else {
       const redisClient = createClient();
@@ -32,7 +32,7 @@ export async function GET(req: Request) {
         redisClient.destroy();
         return NextResponse.json(
           { error: "Rate limit exceeded. Try again later." },
-          { status: 429 }
+          { status: 429 },
         );
       }
       await redisClient
@@ -54,13 +54,13 @@ export async function GET(req: Request) {
   try {
     const res = await client.query(
       "SELECT session_data FROM shared_sessions WHERE short_url = $1",
-      [shortUrl]
+      [shortUrl],
     );
 
     if (res.rows.length === 0) {
       return NextResponse.json(
         { error: "Short URL not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
   if (!body.sessionData) {
     return NextResponse.json(
       { error: "No session data provided" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
     // no ratey limitey in developmenty modey
     if (!process.env.REDIS_URL) {
       console.error(
-        "REDIS_URL not set in environment variables\nShort link creation will still work, but rate limiting is disabled."
+        "REDIS_URL not set in environment variables\nShort link creation will still work, but rate limiting is disabled.",
       );
     } else {
       const redisClient = createClient();
@@ -102,7 +102,7 @@ export async function POST(req: Request) {
         redisClient.destroy();
         return NextResponse.json(
           { error: "Rate limit exceeded. Try again later." },
-          { status: 429 }
+          { status: 429 },
         );
       }
       await redisClient
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
   } catch (_err) {
     return NextResponse.json(
       { error: "Invalid session data format" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -149,7 +149,7 @@ export async function POST(req: Request) {
 
     const hashcheck = crypto.subtle.digest(
       "SHA-256",
-      new TextEncoder().encode(JSON.stringify(sessionData))
+      new TextEncoder().encode(JSON.stringify(sessionData)),
     );
     const hashHex = Array.from(new Uint8Array(await hashcheck))
       .map((b) => b.toString(16).padStart(2, "0"))
@@ -158,9 +158,8 @@ export async function POST(req: Request) {
     // Check for existing entry
     const existingRes = await client.query(
       "SELECT short_url FROM shared_sessions WHERE hashcheck = $1",
-      [hashHex]
+      [hashHex],
     );
-
 
     let shortUrl: string = "";
     if (existingRes.rows.length > 0) {
@@ -172,7 +171,7 @@ export async function POST(req: Request) {
         shortUrl = crypto.randomUUID().split("-")[0]; // simple short URL
         const checkRes = await client.query(
           "SELECT 1 FROM shared_sessions WHERE short_url = $1",
-          [shortUrl]
+          [shortUrl],
         );
         exists = checkRes.rows.length > 0;
       }
@@ -180,7 +179,7 @@ export async function POST(req: Request) {
       // Insert new entry
       await client.query(
         "INSERT INTO shared_sessions (short_url, session_data, hashcheck) VALUES ($1, $2, $3)",
-        [shortUrl, sessionData, hashHex]
+        [shortUrl, sessionData, hashHex],
       );
     }
 

@@ -142,10 +142,11 @@ export default function Dashboard() {
       tyreData,
       raceConfig,
       tyrePreferences,
-          currentNotes,
-          currentSuggestion,
-          shortUrl,
-          manualStints,      sessionSettings,
+      currentNotes,
+      currentSuggestion,
+      shortUrl,
+      manualStints,
+      sessionSettings,
       aiConfigSettings,
     };
   }, [
@@ -472,7 +473,9 @@ export default function Dashboard() {
           {currentSessionId ? (
             <div className="w-3/4 h-full">
               <DashboardView
-                sessionName={sessionSettings["current"]?.name || "Session/Race Name"}
+                sessionName={
+                  sessionSettings["current"]?.name || "Session/Race Name"
+                }
                 onEditSessionSettings={() => setSessionSettingsVis(true)}
                 tyreData={tyreData}
                 raceConfig={raceConfig}
@@ -494,7 +497,9 @@ export default function Dashboard() {
                 }}
                 setSelectedTyre={(tyreId) => {
                   if (["soft", "medium", "hard", "wet"].includes(tyreId)) {
-                    setSelectedTyre(tyreId as "soft" | "medium" | "hard" | "wet");
+                    setSelectedTyre(
+                      tyreId as "soft" | "medium" | "hard" | "wet",
+                    );
                   } else {
                     setSelectedTyre(null);
                   }

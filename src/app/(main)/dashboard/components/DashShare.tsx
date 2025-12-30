@@ -29,12 +29,16 @@ const TYRE_DISPLAY_MAP: Record<string, { emoji: string; label: string }> = {
 
 const TYRE_ORDER = ["soft", "medium", "hard", "wet"];
 
-export default function DashShare({ onClose, SessionData, onShortUrlUpdate }: DashShareProps) {
+export default function DashShare({
+  onClose,
+  SessionData,
+  onShortUrlUpdate,
+}: DashShareProps) {
   const [copiedType, setCopiedType] = useState<"static" | "short" | null>(null);
   const [webhookUrl, setWebhookUrl] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">(
-    "idle"
+    "idle",
   );
   const [shortUrl, setShortUrl] = useState<string>(SessionData.shortUrl || "");
   const [includeShortLink, setIncludeShortLink] = useState<boolean>(false);
@@ -73,7 +77,7 @@ export default function DashShare({ onClose, SessionData, onShortUrlUpdate }: Da
         const effectiveData = getEffectiveTyreData(
           tyreId,
           SessionData.tyreData,
-          mergedPrefs
+          mergedPrefs,
         );
 
         const display = TYRE_DISPLAY_MAP[tyreId] || {
@@ -92,7 +96,7 @@ export default function DashShare({ onClose, SessionData, onShortUrlUpdate }: Da
           tyreFields.push({
             name: `${display.emoji} ${display.label}`,
             value: `**Wear:** ${wearPerLap.toFixed(
-              2
+              2,
             )}%/lap${estLabel}\n**Rec:** ${recLaps} Laps (~${remainingLifeAtRec}%)`,
             inline: true,
           });
@@ -264,8 +268,8 @@ export default function DashShare({ onClose, SessionData, onShortUrlUpdate }: Da
               )}
             </button>
           </div>
-            {shortUrl && (
-              <div className="flex flex-row items-center gap-2">
+          {shortUrl && (
+            <div className="flex flex-row items-center gap-2">
               <button
                 className="underline cursor-pointer text-sm opacity-70 text-left"
                 onClick={() => {

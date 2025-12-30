@@ -107,7 +107,7 @@ export default function TyreWearManager({
     const validLaps = isNaN(lapsValue) ? 0 : lapsValue;
     const wearPerLap = CalculateAverageWearPerLap(
       100 - calculatedWear,
-      validLaps
+      validLaps,
     );
 
     onSave({
@@ -125,7 +125,7 @@ export default function TyreWearManager({
           items.forEach((item) => {
             // Try common image formats
             const imageTypes = item.types.filter((type) =>
-              type.startsWith("image/")
+              type.startsWith("image/"),
             );
             if (imageTypes.length > 0) {
               item
@@ -380,7 +380,7 @@ export default function TyreWearManager({
                         <p className="text-3xl font-bold ">
                           {CalculateAverageWearPerLap(
                             100 - calculatedWear,
-                            parseFloat(laps) || 0
+                            parseFloat(laps) || 0,
                           ).toFixed(2)}
                           %
                         </p>
@@ -495,7 +495,7 @@ export default function TyreWearManager({
                 <p className="text-3xl font-bold ">
                   {CalculateAverageWearPerLap(
                     100 - calculatedWear,
-                    parseFloat(manualLaps) || 0
+                    parseFloat(manualLaps) || 0,
                   ).toFixed(2)}
                   %
                 </p>
