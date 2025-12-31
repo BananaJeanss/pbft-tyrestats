@@ -11,33 +11,33 @@ export interface BetterReactMDProps {
 
 export default function BetterReactMD({ content }: BetterReactMDProps) {
   return (
-    <div className="text-sm leading-relaxed text-neutral-200 [&_code]:rounded [&_code]:border [&_code]:border-neutral-700/50 [&_code]:bg-neutral-800 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_code]:text-neutral-200 [&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit">
+    <div className="text-sm leading-relaxed [&_code]:rounded [&_code]:border [&_code]:border-neutral-700/50 [&_code]:bg-neutral-800 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
         components={{
           h1: (props) => (
             <h1
-              className="mt-2 mb-4 border-b border-neutral-800 pb-2 text-2xl font-bold text-white"
+              className="mt-2 mb-4 border-b border-neutral-800 pb-2 text-2xl font-bold"
               {...props}
             />
           ),
           h2: (props) => (
-            <h2 className="mt-6 mb-3 text-xl font-bold text-white" {...props} />
+            <h2 className="mt-6 mb-3 text-xl font-bold" {...props} />
           ),
           h3: (props) => (
             <h3
-              className="mt-4 mb-2 text-lg font-semibold text-neutral-100"
+              className="mt-4 mb-2 text-lg font-semibold"
               {...props}
             />
           ),
           h4: (props) => (
             <h4
-              className="mt-4 mb-2 text-base font-semibold text-neutral-100"
+              className="mt-4 mb-2 text-base font-semibold "
               {...props}
             />
           ),
-          p: (props) => <div className="mb-4 last:mb-0" {...props} />,
+          p: (props) => <div className="mb-4 last:mb-0" {...props} />, 
           ul: (props) => (
             <ul
               className="mb-4 ml-5 list-inside list-disc space-y-1 marker:text-neutral-500"
@@ -50,10 +50,10 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
               {...props}
             />
           ),
-          li: (props) => <li className="pl-1" {...props} />,
-          hr: (props) => <hr className="my-6 border-neutral-800" {...props} />,
+          li: (props) => <li className="pl-1" {...props} />, 
+          hr: (props) => <hr className="my-6 border-neutral-800" {...props} />, 
           strong: (props) => (
-            <strong className="font-bold text-white" {...props} />
+            <strong className="font-bold" {...props} />
           ),
           a: (props) => (
             <a
@@ -65,19 +65,19 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
           ),
           blockquote: (props) => (
             <blockquote
-              className="my-4 rounded-r border-l-4 border-(--tyrestats-blue) bg-neutral-900/50 py-1 pl-4 text-neutral-400 italic"
+              className="my-4 rounded-r border-l-4 border-(--tyrestats-blue) bg-neutral-900/50 py-1 pl-4 italic"
               {...props}
             />
           ),
           pre: (props) => (
             <div className="my-4 overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900">
               <pre
-                className="overflow-x-auto p-4 font-mono text-sm text-neutral-300"
+                className="overflow-x-auto p-4 font-mono text-sm"
                 {...props}
               />
             </div>
           ),
-          code: (props) => <code {...props} />,
+          code: (props) => <code {...props} />, 
           table: (props) => (
             <div className="my-6 w-full overflow-x-auto rounded-lg border border-neutral-800">
               <table className="w-full text-left text-sm" {...props} />
@@ -85,7 +85,7 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
           ),
           thead: (props) => (
             <thead
-              className="bg-neutral-800 font-semibold text-neutral-200"
+              className="bg-neutral-800 font-semibold"
               {...props}
             />
           ),
@@ -102,9 +102,9 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
             />
           ),
           th: (props) => (
-            <th className="px-4 py-3 whitespace-nowrap" {...props} />
+            <th className="px-4 py-3 whitespace-nowrap text-white" {...props} />
           ),
-          td: (props) => <td className="px-4 py-3 align-top" {...props} />,
+          td: (props) => <td className="px-4 py-3 align-top" {...props} />, 
           img: (props) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img

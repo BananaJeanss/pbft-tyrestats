@@ -75,9 +75,6 @@ As of now, it's 99% local (using LocalStorage), and the sessions data, settings,
 > [!NOTE]
 > npm run dev uses `--experimental-https` for PWA support, you may be prompted to generate a self-signed certificate. You can alternatively run `npm run dev-nohttps` for plain http.
 
-> [!WARNING]
-> Turbopack is probably weird and may cause random hydration issues due to caching, if this happens, trigger a full refresh in your browser via CTRL+Shift+R.
-
 5. Open [https://localhost:3000](https://localhost:3000) in your browser to see the app.
 
 ## Contributing

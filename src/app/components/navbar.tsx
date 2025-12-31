@@ -25,7 +25,7 @@ export default function Navbar() {
       {settingsMenuOpen && (
         <SettingsPage onClose={() => setSettingsMenuOpen(false)} />
       )}
-      <nav className="dark: flex max-h-20 w-full flex-row items-center bg-zinc-200 p-8 dark:bg-neutral-900">
+      <nav className="flex max-h-20 w-full flex-row items-center bg-zinc-200 p-8 dark:bg-neutral-900">
         <div className="flex min-w-1/2 items-center gap-4 text-2xl font-bold">
           <Image src={logoSrc} alt="TyreStats Logo" width={64} height={64} />
           <div className="h-12 w-0.5 bg-neutral-400 dark:bg-white" />
