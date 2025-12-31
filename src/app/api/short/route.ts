@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { Pool } from "pg";
-import { createClient } from "redis";
+import postgresPool from "@/app/db/postgresClient";
+import redisClient from "@/app/db/redisClient";
 import { TySession } from "@/app/types/TyTypes";
 
 const restrictedFields = ["id", "folder"];
+const IsDevvingRatelimits = process.env.ENABLE_RDISPSTGRS_INDEV === "true";
 
 // for getting data from short links
 export async function GET(req: Request) {
@@ -12,29 +13,28 @@ export async function GET(req: Request) {
   if (!shortUrl) {
     return NextResponse.json(
       { error: "No short URL provided" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
   // redis ratelimit of 50/hour per IP cause we dont want people to spam shit
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NODE_ENV !== "development" || IsDevvingRatelimits) {
     if (!process.env.REDIS_URL) {
       console.error(
-        "REDIS_URL not set in environment variables\nShort link access will still work, but rate limiting is disabled.",
+        "REDIS_URL not set in environment variables\nShort link access will still work, but rate limiting is disabled."
       );
     } else {
-      const redisClient = createClient({
-        url: process.env.REDIS_URL,
-      });
-      await redisClient.connect();
-      const ip = req.headers.get("x-forwarded-for") || "unknown";
+      const ip =
+        req.headers.get("x-forwarded-for") ||
+        req.headers.get("x-real-ip") ||
+        req.headers.get("host") ||
+        "unknown";
       const rateLimitKey = `short_access_rate_${ip}`;
       const currentCount = await redisClient.get(rateLimitKey);
       if (currentCount && parseInt(currentCount) >= 50) {
-        redisClient.destroy();
         return NextResponse.json(
           { error: "Rate limit exceeded. Try again later." },
-          { status: 429 },
+          { status: 429 }
         );
       }
       await redisClient
@@ -42,27 +42,20 @@ export async function GET(req: Request) {
         .incr(rateLimitKey)
         .expire(rateLimitKey, 3600) // 1 hour
         .exec();
-      redisClient.destroy();
     }
   }
 
-  // Connect to the database & retrieve session data
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-  });
-
-  const client = await pool.connect();
+  const client = await postgresPool.connect();
   try {
     const res = await client.query(
       "SELECT session_data FROM shared_sessions WHERE short_url = $1",
-      [shortUrl],
+      [shortUrl]
     );
 
     if (res.rows.length === 0) {
       return NextResponse.json(
         { error: "Short URL not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -73,7 +66,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Database error" }, { status: 500 });
   } finally {
     client.release();
-    await pool.end();
   }
 }
 
@@ -83,30 +75,29 @@ export async function POST(req: Request) {
   if (!body.sessionData) {
     return NextResponse.json(
       { error: "No session data provided" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
   // use redis for rate limiting (20 links per hour per IP)
-  if (process.env.NODE_ENV !== "development") {
+  if (process.env.NODE_ENV !== "development" || IsDevvingRatelimits) {
     // no ratey limitey in developmenty modey
     if (!process.env.REDIS_URL) {
       console.error(
-        "REDIS_URL not set in environment variables\nShort link creation will still work, but rate limiting is disabled.",
+        "REDIS_URL not set in environment variables\nShort link creation will still work, but rate limiting is disabled."
       );
     } else {
-      const redisClient = createClient({
-        url: process.env.REDIS_URL,
-      });
-      await redisClient.connect();
-      const ip = req.headers.get("x-forwarded-for") || "unknown";
+      const ip =
+        req.headers.get("x-forwarded-for") ||
+        req.headers.get("x-real-ip") ||
+        req.headers.get("host") ||
+        "unknown";
       const rateLimitKey = `share_rate_${ip}`;
       const currentCount = await redisClient.get(rateLimitKey);
       if (currentCount && parseInt(currentCount) >= 20) {
-        redisClient.destroy();
         return NextResponse.json(
           { error: "Rate limit exceeded. Try again later." },
-          { status: 429 },
+          { status: 429 }
         );
       }
       await redisClient
@@ -114,7 +105,6 @@ export async function POST(req: Request) {
         .incr(rateLimitKey)
         .expire(rateLimitKey, 3600) // 1 hour
         .exec();
-      redisClient.destroy();
     }
   }
 
@@ -130,17 +120,21 @@ export async function POST(req: Request) {
   } catch (_err) {
     return NextResponse.json(
       { error: "Invalid session data format" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 
-  // Connect to the database & verify & create if not exists
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-  });
+  // if json is too large, reject
+  const jsonString = JSON.stringify(sessionData);
+  if (jsonString.length > 100000) {
+    // 100 KB limit
+    return NextResponse.json(
+      { error: "Session data too large to share" },
+      { status: 400 }
+    );
+  }
 
-  const client = await pool.connect();
+  const client = await postgresPool.connect();
   try {
     await client.query(`
             CREATE TABLE IF NOT EXISTS shared_sessions (
@@ -153,7 +147,7 @@ export async function POST(req: Request) {
 
     const hashcheck = crypto.subtle.digest(
       "SHA-256",
-      new TextEncoder().encode(JSON.stringify(sessionData)),
+      new TextEncoder().encode(JSON.stringify(sessionData))
     );
     const hashHex = Array.from(new Uint8Array(await hashcheck))
       .map((b) => b.toString(16).padStart(2, "0"))
@@ -162,7 +156,7 @@ export async function POST(req: Request) {
     // Check for existing entry
     const existingRes = await client.query(
       "SELECT short_url FROM shared_sessions WHERE hashcheck = $1",
-      [hashHex],
+      [hashHex]
     );
 
     let shortUrl: string = "";
@@ -175,7 +169,7 @@ export async function POST(req: Request) {
         shortUrl = crypto.randomUUID().split("-")[0]; // simple short URL
         const checkRes = await client.query(
           "SELECT 1 FROM shared_sessions WHERE short_url = $1",
-          [shortUrl],
+          [shortUrl]
         );
         exists = checkRes.rows.length > 0;
       }
@@ -183,7 +177,7 @@ export async function POST(req: Request) {
       // Insert new entry
       await client.query(
         "INSERT INTO shared_sessions (short_url, session_data, hashcheck) VALUES ($1, $2, $3)",
-        [shortUrl, sessionData, hashHex],
+        [shortUrl, sessionData, hashHex]
       );
     }
 
@@ -195,6 +189,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Database error" }, { status: 500 });
   } finally {
     client.release();
-    await pool.end();
   }
 }
