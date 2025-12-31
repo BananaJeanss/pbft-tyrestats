@@ -21,6 +21,18 @@ const nextConfig: NextConfig = {
   generateBuildId: async () => {
     return commitHash;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "pbft-tyrestats.vercel.app",
+      },
+      {
+        protocol: "https",
+        hostname: "tyrestats.vercel.app",
+      },
+    ],
+  },
   async headers() {
     return [
       {
