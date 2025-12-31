@@ -30,7 +30,7 @@ function DeleteConfirmationScreen({
   return (
     /* delete session confimration screen */
     <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-4 z-100">
-      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-red-500 border-2 shadow-2xl">
+      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border-red-500 border-2 shadow-2xl">
         <h2 className="text-xl font-bold ">Confirm Deletion</h2>
         <hr className="border-neutral-800" />
         <p className="text-red-500 font-light">
@@ -111,7 +111,7 @@ export default function SessionSettingsPage({
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold">Session Name</label>
               <div className="flex flex-row gap-2">
-                <div className="flex items-center gap-2 flex-grow">
+                <div className="flex items-center gap-2 grow">
                   <input
                     type="text"
                     value={config.name}

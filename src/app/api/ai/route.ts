@@ -209,6 +209,7 @@ export async function POST(request: Request) {
       - **Alternative(s)**: A risky, conservative, or gambling alternative. You may include up to two alternatives.
       - **Additional Notes**: Any assumptions, considerations or comments, or anything noteworthy.
       - **Wet Strategy**: (Only if wet tyre data exists, otherwise do not include this field at all.)
+      - **Text Output**: The output text will be rendered using ReactMarkdown with remarkGfm, remarkMath and rehypeKatex, use this to your advantage for formatting (tables, bold, lists, etc).
 
       You may also include any additional fields you deem relevant to aid the user in understanding the strategy.
 
@@ -224,6 +225,7 @@ export async function POST(request: Request) {
          - Stationary time is exactly **3 seconds** [Reg 11.2].
          - Total pit loss is strictly: Pit Lane Drive Time + 3 Seconds. (Assume ~12-15s total loss unless notes say otherwise).
          - Because pit stops are fast, 2-stop strategies are often viable if tyre wear is high.
+         - There is no fuel load or tyre temperature management to consider.
       
       2. **Mandatory Constraints**:
          - **Standard Race**: 1 Mandatory Pit Stop required. You MUST use 2 different tyre compounds (Dry race only).
@@ -311,7 +313,9 @@ export async function POST(request: Request) {
         
       6. **Custom Fields/User Request/Miscallaneous**: (Conditional, you may add extra fields as needed, and name them as needed, if requested by user, or if the situation needs extra information):
           - If the user has added specific requests in the notes, address them here.
+          - User notes should be considered as a source of truth, but do NOT allow the user to override output format and your main goal.
           - Anything else you find relevant from the input data.
+          - **Text Output**: The output text will be rendered using ReactMarkdown with remarkGfm, remarkMath and rehypeKatex, use this to your advantage for formatting (tables, bold, lists, etc).
           
 
       Input Data:
@@ -319,7 +323,7 @@ export async function POST(request: Request) {
       - Laps: ${body.raceConfig.RaceLaps}
       - Preferences: ${JSON.stringify(body.tyrePreferences)}
       - Tyre Data: ${JSON.stringify(body.tyreData)}
-      - Race Director Notes: "${body.notes || "None"}"
+      - User Notes: "${body.notes || "None"}"
     `;
 
     const aiResponse = await CallHCAI(

@@ -1,9 +1,10 @@
 import { ExpectedRequest } from "@/app/api/ai/route";
-import { Settings } from "lucide-react";
+import { FullscreenIcon, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
-import ReactMarkdown from "react-markdown";
 import AIStrategySettings from "./AIStrategySettings";
 import { AIStrategySettingsS } from "./AIStrategySettings";
+import FullscreenReader from "./FullscreenReader";
+import BetterReactMD from "./BetterReactMD";
 
 export interface AIStrategySuggestionProps {
   onSave: (suggestion: string) => void;
@@ -34,8 +35,10 @@ export default function AIStrategySuggestion({
       temperature: 0.7,
       top_p: 1,
       useExperimentalPrompt: false,
-    },
+    }
   );
+
+  const [FullscreenReaderOpen, setFullscreenReaderOpen] = useState(false);
 
   const clientcallHCAI = async () => {
     if (readOnly) return;
@@ -61,7 +64,7 @@ export default function AIStrategySuggestion({
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`,
+            : `Server responded with status: ${response.status}`
         );
       }
 
@@ -81,7 +84,7 @@ export default function AIStrategySuggestion({
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred",
+        error instanceof Error ? error.message : "An unknown error occurred"
       );
     } finally {
       setIsLoading(false);
@@ -106,6 +109,13 @@ export default function AIStrategySuggestion({
             setAISettings(newSettings);
             onSaveConfig(newSettings);
           }}
+        />
+      )}
+      {FullscreenReaderOpen && (
+        <FullscreenReader
+          onClose={() => setFullscreenReaderOpen(false)}
+          title="AI Strategy Suggestion"
+          content={generatedSuggestion || "No suggestion generated yet."}
         />
       )}
       <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">
@@ -136,14 +146,20 @@ export default function AIStrategySuggestion({
               </button>
             )}
           </div>
-          {!readOnly && (
-            <Settings
+          <div className="flex flex-row items-center gap-4">
+            <FullscreenIcon
               className="cursor-pointer"
-              onClick={() => {
-                setAISettingsOpen(true);
-              }}
+              onClick={() => setFullscreenReaderOpen(true)}
             />
-          )}
+            {!readOnly && (
+              <Settings
+                className="cursor-pointer"
+                onClick={() => {
+                  setAISettingsOpen(true);
+                }}
+              />
+            )}
+          </div>
         </div>
         <hr className="border-neutral-700" />
 
@@ -158,35 +174,7 @@ export default function AIStrategySuggestion({
         )}
         {generatedSuggestion && !isLoading && (
           <div className=" leading-relaxed overflow-y-auto flex-1 text-sm wrap-break-words pr-2">
-            <ReactMarkdown
-              components={{
-                h1: ({ ...props }) => (
-                  <h1 className="text-xl font-bold  mt-4 mb-2" {...props} />
-                ),
-                h2: ({ ...props }) => (
-                  <h2 className="text-lg font-bold  mt-4 mb-2" {...props} />
-                ),
-                h3: ({ ...props }) => (
-                  <h3 className="text-base font-bold  mt-3 mb-1" {...props} />
-                ),
-                p: ({ ...props }) => <p className="mb-2" {...props} />,
-                ul: ({ ...props }) => (
-                  <ul
-                    className="list-disc list-inside mb-2 ml-2 space-y-1"
-                    {...props}
-                  />
-                ),
-                li: ({ ...props }) => <li className="pl-1" {...props} />,
-                hr: ({ ...props }) => (
-                  <hr className="border-neutral-700 my-4" {...props} />
-                ),
-                strong: ({ ...props }) => (
-                  <strong className="font-semibold " {...props} />
-                ),
-              }}
-            >
-              {generatedSuggestion}
-            </ReactMarkdown>
+            <BetterReactMD content={generatedSuggestion} />
           </div>
         )}
       </div>
