@@ -11,58 +11,53 @@ export interface BetterReactMDProps {
 
 export default function BetterReactMD({ content }: BetterReactMDProps) {
   return (
-    <div className="text-neutral-200 text-sm leading-relaxed [&_code]:bg-neutral-800 [&_code]:text-neutral-200 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono [&_code]:border [&_code]:border-neutral-700/50 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:border-0 [&_pre_code]:text-inherit">
+    <div className="text-sm leading-relaxed text-neutral-200 [&_code]:rounded [&_code]:border [&_code]:border-neutral-700/50 [&_code]:bg-neutral-800 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_code]:text-neutral-200 [&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}
         components={{
           h1: (props) => (
             <h1
-              className="text-2xl font-bold text-white mt-2 mb-4 pb-2 border-b border-neutral-800"
+              className="mt-2 mb-4 border-b border-neutral-800 pb-2 text-2xl font-bold text-white"
               {...props}
             />
           ),
           h2: (props) => (
-            <h2
-              className="text-xl font-bold text-white mt-6 mb-3"
-              {...props}
-            />
+            <h2 className="mt-6 mb-3 text-xl font-bold text-white" {...props} />
           ),
           h3: (props) => (
             <h3
-              className="text-lg font-semibold text-neutral-100 mt-4 mb-2"
+              className="mt-4 mb-2 text-lg font-semibold text-neutral-100"
               {...props}
             />
           ),
           h4: (props) => (
             <h4
-              className="text-base font-semibold text-neutral-100 mt-4 mb-2"
+              className="mt-4 mb-2 text-base font-semibold text-neutral-100"
               {...props}
             />
           ),
           p: (props) => <div className="mb-4 last:mb-0" {...props} />,
           ul: (props) => (
             <ul
-              className="list-disc list-inside ml-5 mb-4 space-y-1 marker:text-neutral-500"
+              className="mb-4 ml-5 list-inside list-disc space-y-1 marker:text-neutral-500"
               {...props}
             />
           ),
           ol: (props) => (
             <ol
-              className="list-decimal list-inside ml-5 mb-4 space-y-1 marker:text-neutral-500"
+              className="mb-4 ml-5 list-inside list-decimal space-y-1 marker:text-neutral-500"
               {...props}
             />
           ),
           li: (props) => <li className="pl-1" {...props} />,
-          hr: (props) => (
-            <hr className="border-neutral-800 my-6" {...props} />
-          ),
+          hr: (props) => <hr className="my-6 border-neutral-800" {...props} />,
           strong: (props) => (
             <strong className="font-bold text-white" {...props} />
           ),
           a: (props) => (
             <a
-              className="text-(--tyrestats-blue) hover:underline hover:text-blue-400 transition-colors font-medium"
+              className="font-medium text-(--tyrestats-blue) transition-colors hover:text-blue-400 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
               {...props}
@@ -70,13 +65,16 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
           ),
           blockquote: (props) => (
             <blockquote
-              className="border-l-4 border-(--tyrestats-blue) pl-4 py-1 my-4 bg-neutral-900/50 italic text-neutral-400 rounded-r"
+              className="my-4 rounded-r border-l-4 border-(--tyrestats-blue) bg-neutral-900/50 py-1 pl-4 text-neutral-400 italic"
               {...props}
             />
           ),
           pre: (props) => (
-            <div className="my-4 rounded-lg overflow-hidden border border-neutral-800 bg-neutral-900">
-               <pre className="p-4 overflow-x-auto text-sm text-neutral-300 font-mono" {...props} />
+            <div className="my-4 overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900">
+              <pre
+                className="overflow-x-auto p-4 font-mono text-sm text-neutral-300"
+                {...props}
+              />
             </div>
           ),
           code: (props) => <code {...props} />,
@@ -86,24 +84,35 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
             </div>
           ),
           thead: (props) => (
-            <thead className="bg-neutral-800 text-neutral-200 font-semibold" {...props} />
+            <thead
+              className="bg-neutral-800 font-semibold text-neutral-200"
+              {...props}
+            />
           ),
           tbody: (props) => (
-            <tbody className="divide-y divide-neutral-800 bg-neutral-900/30" {...props} />
+            <tbody
+              className="divide-y divide-neutral-800 bg-neutral-900/30"
+              {...props}
+            />
           ),
           tr: (props) => (
-            <tr className="hover:bg-neutral-800/50 transition-colors" {...props} />
+            <tr
+              className="transition-colors hover:bg-neutral-800/50"
+              {...props}
+            />
           ),
           th: (props) => (
             <th className="px-4 py-3 whitespace-nowrap" {...props} />
           ),
-          td: (props) => (
-            <td className="px-4 py-3 align-top" {...props} />
-          ),
+          td: (props) => <td className="px-4 py-3 align-top" {...props} />,
           img: (props) => (
-             // eslint-disable-next-line @next/next/no-img-element
-            <img className="max-w-full h-auto rounded-lg my-4 border border-neutral-800" {...props} alt={props.alt || ''} />
-          )
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="my-4 h-auto max-w-full rounded-lg border border-neutral-800"
+              {...props}
+              alt={props.alt || ""}
+            />
+          ),
         }}
       >
         {content}

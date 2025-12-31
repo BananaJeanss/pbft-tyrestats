@@ -197,18 +197,18 @@ export default function DashShare({
   };
 
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-      <div className="w-full max-w-lg bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+    <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="animate-in fade-in zoom-in-95 flex w-full max-w-lg flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl duration-200 dark:bg-neutral-900">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <h2 className="text-xl font-bold flex items-center gap-2">
+            <h2 className="flex items-center gap-2 text-xl font-bold">
               <LinkIcon size={20} /> Share Session
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="cursor-pointer p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-800"
+            className="cursor-pointer rounded p-1 hover:bg-neutral-200 dark:hover:bg-neutral-800"
           >
             <X size={20} />
           </button>
@@ -220,17 +220,17 @@ export default function DashShare({
 
         {/* Short URL Section */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 flex justify-between">
+          <label className="flex justify-between text-sm font-semibold text-neutral-700 dark:text-neutral-300">
             <span>Short Link</span>
           </label>
-          <div className="flex items-center gap-2 relative">
+          <div className="relative flex items-center gap-2">
             <input
               type="text"
               readOnly
               value={shortUrl || "Shortened URL not generated"}
-              className={`grow p-2.5 pr-10 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-zinc-50 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 ${
+              className={`grow rounded-lg border border-neutral-300 bg-zinc-50 p-2.5 pr-10 text-sm text-neutral-600 focus:ring-2 focus:ring-neutral-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 ${
                 !shortUrl &&
-                "italic text-neutral-400 opacity-60 cursor-not-allowed"
+                "cursor-not-allowed text-neutral-400 italic opacity-60"
               }`}
             />
             <button
@@ -242,16 +242,13 @@ export default function DashShare({
                   handleCopy(shortUrl, "short");
                 }
               }}
-              className={`
-                h-10.5 px-4 rounded-lg flex items-center justify-center gap-2 font-medium text-sm text-white min-w-25
-                ${
-                  isSending
-                    ? "bg-neutral-400 dark:bg-neutral-700 cursor-not-allowed opacity-70"
-                    : shortUrl
-                      ? "bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 cursor-pointer"
-                      : "bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 cursor-pointer"
-                }
-              `}
+              className={`flex h-10.5 min-w-25 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium text-white ${
+                isSending
+                  ? "cursor-not-allowed bg-neutral-400 opacity-70 dark:bg-neutral-700"
+                  : shortUrl
+                    ? "cursor-pointer bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90"
+                    : "cursor-pointer bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90"
+              } `}
             >
               {isSending ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -271,7 +268,7 @@ export default function DashShare({
           {shortUrl && (
             <div className="flex flex-row items-center gap-2">
               <button
-                className="underline cursor-pointer text-sm opacity-70 text-left"
+                className="cursor-pointer text-left text-sm underline opacity-70"
                 onClick={() => {
                   // regenerate a new one
                   handleShortUrlGeneration();
@@ -293,15 +290,15 @@ export default function DashShare({
 
         {/* Discord Section */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
+          <label className="flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
             Send to Discord
             {sendStatus === "error" && (
-              <span className="text-xs text-red-500 font-normal flex items-center gap-1">
+              <span className="flex items-center gap-1 text-xs font-normal text-red-500">
                 <AlertCircle size={12} /> Failed (Check URL)
               </span>
             )}
             {sendStatus === "success" && (
-              <span className="text-xs text-green-500 font-normal flex items-center gap-1">
+              <span className="flex items-center gap-1 text-xs font-normal text-green-500">
                 <Check size={12} /> Sent!
               </span>
             )}
@@ -315,19 +312,16 @@ export default function DashShare({
                 setWebhookUrl(e.target.value);
                 setSendStatus("idle");
               }}
-              className="grow p-2.5 border border-neutral-300 dark:border-neutral-700 rounded-lg bg-zinc-50 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#5865F2]"
+              className="grow rounded-lg border border-neutral-300 bg-zinc-50 p-2.5 text-sm text-neutral-900 focus:ring-2 focus:ring-[#5865F2] focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
             />
             <button
               disabled={isSending || !webhookUrl}
               onClick={handleSendToDiscord}
-              className={`
-                h-10.5 px-4 rounded-lg flex items-center justify-center gap-2 font-medium text-sm text-white min-w-25
-                ${
-                  isSending || !webhookUrl
-                    ? "bg-neutral-400 dark:bg-neutral-700 cursor-not-allowed opacity-70"
-                    : "bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 cursor-pointer"
-                }
-              `}
+              className={`flex h-10.5 min-w-25 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium text-white ${
+                isSending || !webhookUrl
+                  ? "cursor-not-allowed bg-neutral-400 opacity-70 dark:bg-neutral-700"
+                  : "cursor-pointer bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90"
+              } `}
             >
               {isSending ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -339,11 +333,11 @@ export default function DashShare({
               )}
             </button>
           </div>
-          <p className="text-[10px] text-neutral-500 pl-1">
+          <p className="pl-1 text-[10px] text-neutral-500">
             Posts a summary of tyre wear and race strategy to your Discord
             channel.
           </p>
-          <label className="flex items-center gap-2 pl-1 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2 pl-1">
             <input
               type="checkbox"
               checked={includeShortLink}

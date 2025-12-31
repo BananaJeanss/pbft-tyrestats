@@ -29,11 +29,11 @@ function DeleteConfirmationScreen({
 }) {
   return (
     /* delete session confimration screen */
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-4 z-100">
-      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border-red-500 border-2 shadow-2xl">
-        <h2 className="text-xl font-bold ">Confirm Deletion</h2>
+    <div className="absolute top-0 left-0 z-100 flex h-full w-full flex-col items-center justify-center gap-4 bg-neutral-950/95 p-8">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border-2 border-red-500 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+        <h2 className="text-xl font-bold">Confirm Deletion</h2>
         <hr className="border-neutral-800" />
-        <p className="text-red-500 font-light">
+        <p className="font-light text-red-500">
           Are you sure you want to delete this session? This action cannot be
           undone.
         </p>
@@ -41,13 +41,13 @@ function DeleteConfirmationScreen({
         <div className="flex justify-end gap-4">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-neutral-700  rounded hover:bg-neutral-600 transition cursor-pointer"
+            className="cursor-pointer rounded bg-neutral-700 px-4 py-2 transition hover:bg-neutral-600"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600  rounded hover:bg-red-700 transition cursor-pointer"
+            className="cursor-pointer rounded bg-red-600 px-4 py-2 transition hover:bg-red-700"
           >
             Delete
           </button>
@@ -95,10 +95,10 @@ export default function SessionSettingsPage({
           onCancel={() => setShowDeleteConfirm(false)}
         />
       )}
-      <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-        <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold ">Session Settings</h2>
+      <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+        <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Session Settings</h2>
             <button onClick={onClose} className="cursor-pointer">
               <X />
             </button>
@@ -111,7 +111,7 @@ export default function SessionSettingsPage({
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold">Session Name</label>
               <div className="flex flex-row gap-2">
-                <div className="flex items-center gap-2 grow">
+                <div className="flex grow items-center gap-2">
                   <input
                     type="text"
                     value={config.name}
@@ -121,7 +121,7 @@ export default function SessionSettingsPage({
                         name: e.target.value,
                       })
                     }
-                    className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                    className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                   />
                 </div>
                 <select
@@ -133,7 +133,7 @@ export default function SessionSettingsPage({
                       folder: e.target.value,
                     })
                   }
-                  className="bg-none appearance-none w-20 bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded focus:outline-none focus:ring-2 focus:ring-neutral-600 text-center"
+                  className="w-20 appearance-none rounded border border-neutral-700 bg-zinc-200 bg-none text-center focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                 >
                   <option value="">—</option>
                   {folders.map((folder) => (
@@ -157,7 +157,7 @@ export default function SessionSettingsPage({
                       date: e.target.value,
                     })
                   }
-                  className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                  className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                 />
               </div>
             </div>
@@ -167,7 +167,7 @@ export default function SessionSettingsPage({
               <div className="flex items-center gap-2">
                 <select
                   name="Thumbnail Icon"
-                  className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                  className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                   value={config.selectedIcon}
                   onChange={(e) =>
                     setConfig({
@@ -192,15 +192,15 @@ export default function SessionSettingsPage({
                   onChange={(e) =>
                     setConfig({ ...config, icon_url: e.target.value })
                   }
-                  className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full"
+                  className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 dark:bg-neutral-800"
                 />
               )}
             </div>
           </div>
           <hr className="border-neutral-800" />
-          <div className="flex flex-row gap-2 items-center justify-center">
+          <div className="flex flex-row items-center justify-center gap-2">
             <button
-              className="text-red-600 flex items-center gap-1 cursor-pointer text-sm hover:underline self-start"
+              className="flex cursor-pointer items-center gap-1 self-start text-sm text-red-600 hover:underline"
               onClick={() => {
                 setShowDeleteConfirm(true);
               }}
@@ -208,9 +208,9 @@ export default function SessionSettingsPage({
               <Trash2 className="h-4 w-4" />
               <span>Delete Session</span>
             </button>
-            <div className="border-l border-neutral-500 h-6 self-center mx-2" />
+            <div className="mx-2 h-6 self-center border-l border-neutral-500" />
             <button
-              className="flex items-center gap-1 cursor-pointer text-sm hover:underline self-start"
+              className="flex cursor-pointer items-center gap-1 self-start text-sm hover:underline"
               onClick={() => {
                 DuplicateThisSession();
               }}
@@ -222,7 +222,7 @@ export default function SessionSettingsPage({
           <hr className="border-neutral-800" />
           <button
             onClick={handleSave}
-            className="w-full bg-neutral-300 text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition cursor-pointer"
+            className="w-full cursor-pointer rounded-lg bg-neutral-300 py-3 font-bold text-black transition hover:bg-neutral-200"
           >
             Save Settings
           </button>

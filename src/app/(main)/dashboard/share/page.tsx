@@ -6,7 +6,7 @@ async function fetchSession(shortCode: string): Promise<TySession | null> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SITE_URL}/api/short?${shortCode}`,
-      { cache: "no-store" }
+      { cache: "no-store" },
     );
 
     if (!res.ok) return null;

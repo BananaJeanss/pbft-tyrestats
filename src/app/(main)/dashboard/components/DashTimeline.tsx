@@ -65,16 +65,16 @@ export default function DashTimeline({
   readOnly = false,
 }: DashTimelineProps) {
   return (
-    <div className="w-full bg-zinc-200 dark:bg-neutral-900 p-4 rounded-lg flex flex-col relative gap-2">
-      <div className="w-full flex flex-row justify-between items-center">
+    <div className="relative flex w-full flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+      <div className="flex w-full flex-row items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-bold flex items-center gap-1.5 ">
+          <h3 className="flex items-center gap-1.5 text-lg font-bold">
             Timeline
           </h3>
           {!readOnly && (
-            <div className="flex items-center gap-1 bg-transparent p-1 rounded-lg border border-neutral-700">
+            <div className="flex items-center gap-1 rounded-lg border border-neutral-700 bg-transparent p-1">
               <span
-                className={`text-xs font-bold px-2 cursor-pointer transition ${
+                className={`cursor-pointer px-2 text-xs font-bold transition ${
                   !isManualMode
                     ? "text-black dark:text-white"
                     : "text-neutral-700 dark:text-neutral-500"
@@ -85,7 +85,7 @@ export default function DashTimeline({
               </span>
               |
               <span
-                className={`text-xs font-bold px-2 cursor-pointer transition ${
+                className={`cursor-pointer px-2 text-xs font-bold transition ${
                   isManualMode
                     ? "text-black dark:text-white"
                     : "text-neutral-700 dark:text-neutral-500"
@@ -105,7 +105,7 @@ export default function DashTimeline({
                 <>
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
                   <span
-                    className=" cursor-help"
+                    className="cursor-help"
                     title="Timeline uses two or more different tyre compounds."
                   >
                     FIT Valid
@@ -115,7 +115,7 @@ export default function DashTimeline({
                 <>
                   <XCircle className="h-4 w-4 text-red-500" />
                   <span
-                    className=" cursor-help"
+                    className="cursor-help"
                     title="Timeline must have two or more different tyre compounds."
                   >
                     FIT Invalid
@@ -128,7 +128,7 @@ export default function DashTimeline({
           {!readOnly && (
             <>
               <button
-                className="cursor-pointer  hover: transition"
+                className="hover: cursor-pointer transition"
                 onClick={() => {
                   setRaceSettingsVis(true);
                 }}
@@ -181,8 +181,8 @@ export default function DashTimeline({
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="h-20 w-full flex items-center justify-center border border-dashed border-neutral-800 rounded">
-          <p className=" text-sm">
+        <div className="flex h-20 w-full items-center justify-center rounded border border-dashed border-neutral-800">
+          <p className="text-sm">
             {isManualMode
               ? "No manual stints configured. Click Settings to add stints."
               : "Timeline not generated. Check race settings and tyre data."}
@@ -190,7 +190,7 @@ export default function DashTimeline({
         </div>
       )}
 
-      <div className="flex justify-between text-xs  px-1">
+      <div className="flex justify-between px-1 text-xs">
         <span>Start</span>
         <span>Finish ({raceConfig?.RaceLaps || 0} Laps)</span>
       </div>

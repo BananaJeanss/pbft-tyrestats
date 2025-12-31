@@ -59,11 +59,11 @@ export default function NewSession({ onClose }: NewSessionProps) {
   };
 
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold ">New Session</h2>
-          <button onClick={onClose} className=" cursor-pointer">
+    <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold">New Session</h2>
+          <button onClick={onClose} className="cursor-pointer">
             <X />
           </button>
         </div>
@@ -79,14 +79,14 @@ export default function NewSession({ onClose }: NewSessionProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. FT1 Kubica Island Autodrome"
-                className="h-10 w-full bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded px-2 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="h-10 w-full rounded border border-neutral-700 bg-zinc-200 px-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               />
 
               <select
                 name="Folder"
                 value={folder}
                 onChange={(e) => setFolder(e.target.value)}
-                className="bg-none appearance-none w-20 bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded focus:outline-none focus:ring-2 focus:ring-neutral-600 text-center"
+                className="w-20 appearance-none rounded border border-neutral-700 bg-zinc-200 bg-none text-center focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               >
                 <option value="">—</option>
                 {folders.map((folder) => (
@@ -98,34 +98,34 @@ export default function NewSession({ onClose }: NewSessionProps) {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">Date</label>
+            <label className="text-sm font-semibold">Date</label>
             <div className="flex items-center gap-2">
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">Race Laps</label>
+            <label className="text-sm font-semibold">Race Laps</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
                 value={laps}
                 onChange={(e) => setLaps(e.target.value)}
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-32 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="w-32 rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               />
-              <span className=" text-sm">laps</span>
+              <span className="text-sm">laps</span>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">Thumbnail Icon</label>
+            <label className="text-sm font-semibold">Thumbnail Icon</label>
             <div className="flex items-center gap-2">
               <select
                 name="Thumbnail Icon"
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                 value={icon}
                 onChange={(e) => setIcon(e.target.value)}
               >
@@ -145,7 +145,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
                 onChange={(e) => {
                   setIconUrl(e.target.value);
                 }}
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-full"
+                className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 dark:bg-neutral-800"
               />
             )}
           </div>
@@ -153,7 +153,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
 
         <button
           onClick={handleCreate}
-          className="w-full bg-neutral-300 text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition mt-2 cursor-pointer"
+          className="mt-2 w-full cursor-pointer rounded-lg bg-neutral-300 py-3 font-bold text-black transition hover:bg-neutral-200"
         >
           Create Session
         </button>

@@ -16,13 +16,13 @@ interface DeleteScreenProps {
 
 function DeleteScreen({ onClose, onDelete }: DeleteScreenProps) {
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-100">
-      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
-        <div className="flex justify-between items-center">
+    <div className="absolute top-0 left-0 z-100 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+        <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Delete Folder</h2>
           <button
             onClick={onClose}
-            className="cursor-pointer hover:text-neutral-500 transition-colors"
+            className="cursor-pointer transition-colors hover:text-neutral-500"
           >
             <X />
           </button>
@@ -35,16 +35,16 @@ function DeleteScreen({ onClose, onDelete }: DeleteScreenProps) {
           undone.
         </p>
 
-        <div className="flex flex-row gap-4 justify-end">
+        <div className="flex flex-row justify-end gap-4">
           <button
             onClick={onClose}
-            className="bg-neutral-300 text-black font-bold py-2 px-4 rounded-lg hover:bg-neutral-200 transition cursor-pointer"
+            className="cursor-pointer rounded-lg bg-neutral-300 px-4 py-2 font-bold text-black transition hover:bg-neutral-200"
           >
             Cancel
           </button>
           <button
             onClick={onDelete}
-            className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition cursor-pointer"
+            className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 font-bold text-white transition hover:bg-red-700"
           >
             Delete
           </button>
@@ -128,13 +128,13 @@ export default function EditFolder({ onClose, folderId }: EditFolderProps) {
           }}
         />
       )}
-      <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-        <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
-          <div className="flex justify-between items-center">
+      <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+        <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+          <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Edit Folder</h2>
             <button
               onClick={onClose}
-              className="cursor-pointer hover:text-neutral-500 transition-colors"
+              className="cursor-pointer transition-colors hover:text-neutral-500"
             >
               <X />
             </button>
@@ -152,42 +152,42 @@ export default function EditFolder({ onClose, folderId }: EditFolderProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. FT1 Season 9 2025"
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2 w-full focus:outline-none focus:ring-2 focus:ring-neutral-600 transition-all"
+                className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 transition-all focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               />
             </div>
 
-            <div className="flex gap-4 max-w-full">
-              <div className="flex-1 flex flex-col gap-2 min-w-0">
+            <div className="flex max-w-full gap-4">
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">
                   Icon
                 </label>
                 <IconSelector value={icon} onChange={setIcon} />
               </div>
 
-              <div className="flex flex-col gap-2 shrink-0 max-w-full">
+              <div className="flex max-w-full shrink-0 flex-col gap-2">
                 <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400">
                   Color
                 </label>
                 <div
-                  className="h-[42px] w-[60px] rounded border border-neutral-700 overflow-hidden relative cursor-pointer hover:border-neutral-500 transition-colors"
+                  className="relative h-[42px] w-[60px] cursor-pointer overflow-hidden rounded border border-neutral-700 transition-colors hover:border-neutral-500"
                   style={{ backgroundColor: color }}
                 >
                   <input
                     type="color"
                     value={color}
                     onChange={(e) => setColor(e.target.value)}
-                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     title="Choose folder color"
                   />
                 </div>
               </div>
             </div>
-            <div className="flex flex-row gap-2 items-center cursor-pointer self-start mt-2 justify-center">
+            <div className="mt-2 flex cursor-pointer flex-row items-center justify-center gap-2 self-start">
               <span
-                className="text-sm font-bold text-neutral-500 text-red-600 flex flex-row items-center"
+                className="flex flex-row items-center text-sm font-bold text-neutral-500 text-red-600"
                 onClick={() => setDeleteOpen(true)}
               >
-                <Trash className="inline h-4 w-4 mr-1" />
+                <Trash className="mr-1 inline h-4 w-4" />
                 Delete Folder
               </span>
             </div>
@@ -195,7 +195,7 @@ export default function EditFolder({ onClose, folderId }: EditFolderProps) {
 
           <button
             onClick={HandleEdit}
-            className="w-full bg-neutral-300 text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition mt-2 cursor-pointer"
+            className="mt-2 w-full cursor-pointer rounded-lg bg-neutral-300 py-3 font-bold text-black transition hover:bg-neutral-200"
           >
             Save Changes
           </button>

@@ -64,26 +64,26 @@ export default function ImportMyData({ onClose }: ImportMyDataProps) {
   };
 
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-150">
-      <div className="w-full max-w-2xl bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-4 border border-neutral-800 shadow-2xl">
+    <div className="absolute top-0 left-0 z-150 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="flex w-full max-w-2xl flex-col gap-4 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold ">Import Data</h2>
-            <X onClick={onClose} className=" cursor-pointer" />
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Import Data</h2>
+            <X onClick={onClose} className="cursor-pointer" />
           </div>
-          <span className="text-yellow-500 flex flex-row items-center text-sm gap-2">
+          <span className="flex flex-row items-center gap-2 text-sm text-yellow-500">
             <TriangleAlert />
             This will overwrite ALL data you have saved. Proceed with caution.
           </span>
         </div>
         <textarea
-          className="w-full max-w-3xl h-96 bg-zinc-200 dark:bg-neutral-900  p-4 rounded-lg border border-neutral-800 resize-none"
+          className="h-96 w-full max-w-3xl resize-none rounded-lg border border-neutral-800 bg-zinc-200 p-4 dark:bg-neutral-900"
           value={importData}
           onChange={(e) => setImportData(e.target.value)}
           placeholder="Paste your exported data here..."
         />
         <button
-          className="border border-orange-500 flex flex-row p-2 items-center bg-transparent text-orange-500 rounded-lg hover:bg-orange-800 hover: transition w-fit gap-2 text-md font-semibold cursor-pointer"
+          className="hover: text-md flex w-fit cursor-pointer flex-row items-center gap-2 rounded-lg border border-orange-500 bg-transparent p-2 font-semibold text-orange-500 transition hover:bg-orange-800"
           onClick={ImportThisData}
         >
           <ImportIcon />

@@ -21,7 +21,7 @@ function SharedSessionContent() {
   // Initialize state based on shortCode to avoid synchronous updates in useEffect
   const [loading, setLoading] = useState(!!shortCode);
   const [error, setError] = useState<string | null>(
-    !shortCode ? "Invalid link" : null
+    !shortCode ? "Invalid link" : null,
   );
 
   const [isManualMode, setIsManualMode] = useState(false);
@@ -137,7 +137,7 @@ function SharedSessionContent() {
         key: `manual_${index}_${stint.tyre}`,
         color: colors[stint.tyre],
         label: `${labels[stint.tyre]} (${stint.laps}L)`,
-      })
+      }),
     );
   }, [sessionData]);
 
@@ -160,11 +160,11 @@ function SharedSessionContent() {
 
       // Save to LocalStorage
       const existing = JSON.parse(
-        localStorage.getItem("tyrestats_sessions") || "[]"
+        localStorage.getItem("tyrestats_sessions") || "[]",
       );
       localStorage.setItem(
         "tyrestats_sessions",
-        JSON.stringify([...existing, newSession])
+        JSON.stringify([...existing, newSession]),
       );
 
       // Dispatch event so other tabs/components update if needed
@@ -180,7 +180,7 @@ function SharedSessionContent() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex flex-col items-center justify-center bg-zinc-100 dark:bg-neutral-950 text-neutral-500 gap-2">
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-2 bg-zinc-100 text-neutral-500 dark:bg-neutral-950">
         <Loader2 className="animate-spin" size={32} />
         <p>Loading shared session...</p>
       </div>
@@ -189,12 +189,12 @@ function SharedSessionContent() {
 
   if (error || !sessionData) {
     return (
-      <div className="w-full h-screen flex flex-col items-center justify-center bg-zinc-100 dark:bg-neutral-950 text-red-500 gap-2">
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-2 bg-zinc-100 text-red-500 dark:bg-neutral-950">
         <AlertCircle size={32} />
         <p>{error || "Session not found"}</p>
         <button
           onClick={() => router.push("/")}
-          className="mt-4 px-4 py-2 bg-neutral-200 dark:bg-neutral-800 rounded text-neutral-900 dark:text-neutral-100"
+          className="mt-4 rounded bg-neutral-200 px-4 py-2 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100"
         >
           Go Home
         </button>
@@ -203,8 +203,8 @@ function SharedSessionContent() {
   }
 
   return (
-    <div className="h-[calc(100vh-5rem)] bg-zinc-100 dark:bg-neutral-950 p-8">
-      <div className="h-full w-full bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4">
+    <div className="h-[calc(100vh-5rem)] bg-zinc-100 p-8 dark:bg-neutral-950">
+      <div className="h-full w-full rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <DashboardView
           sessionName={sessionData.meta.name}
           readOnly={true}
@@ -252,7 +252,7 @@ export default function SharedSessionPage() {
   return (
     <Suspense
       fallback={
-        <div className="w-full h-screen flex flex-col items-center justify-center bg-zinc-100 dark:bg-neutral-950 text-neutral-500 gap-2">
+        <div className="flex h-screen w-full flex-col items-center justify-center gap-2 bg-zinc-100 text-neutral-500 dark:bg-neutral-950">
           <Loader2 className="animate-spin" size={32} />
           <p>Loading shared session...</p>
         </div>

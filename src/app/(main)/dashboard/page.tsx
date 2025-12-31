@@ -323,8 +323,8 @@ export default function Dashboard() {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-5rem)] p-8 bg-zinc-200 dark:bg-neutral-800">
-        <p className=" text-lg font-extralight text-center">
+      <div className="flex h-[calc(100vh-5rem)] flex-col items-center justify-center bg-zinc-200 p-8 dark:bg-neutral-800">
+        <p className="text-center text-lg font-extralight">
           TyreStats is desktop-only for now.
           <br />
           Please use a PC or laptop.
@@ -463,15 +463,15 @@ export default function Dashboard() {
         />
       )}
 
-      <div className="overflow-hidden h-[calc(100vh-5rem)] p-8">
-        <div className="bg-zinc-200 dark:bg-neutral-900 rounded-xl h-full p-4 flex flex-row gap-4">
+      <div className="h-[calc(100vh-5rem)] overflow-hidden p-8">
+        <div className="flex h-full flex-row gap-4 rounded-xl bg-zinc-200 p-4 dark:bg-neutral-900">
           <DashSidebar
             currentSessionId={currentSessionId ?? ""}
             onSelectSession={loadSession}
           />
 
           {currentSessionId ? (
-            <div className="w-3/4 h-full">
+            <div className="h-full w-3/4">
               <DashboardView
                 sessionName={
                   sessionSettings["current"]?.name || "Session/Race Name"
@@ -513,7 +513,7 @@ export default function Dashboard() {
               />
             </div>
           ) : (
-            <div className="w-3/4 h-full pl-4 bg-zinc-200 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2 items-center justify-center">
+            <div className="flex h-full w-3/4 flex-col items-center justify-center gap-2 rounded-lg bg-zinc-200 p-4 pl-4 dark:bg-neutral-800">
               <p className="text-lg font-extralight">
                 No session selected. Please select a session from the sidebar.
               </p>

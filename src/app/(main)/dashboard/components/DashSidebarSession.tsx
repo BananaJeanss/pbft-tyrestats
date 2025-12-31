@@ -31,10 +31,10 @@ export default function DashSidebarSession({
   return (
     <button
       onClick={onClick}
-      className={`w-full h-24 rounded-md p-2 flex flex-row gap-4 cursor-pointer transition-colors text-left border ${
+      className={`flex h-24 w-full cursor-pointer flex-row gap-4 rounded-md border p-2 text-left transition-colors ${
         isActive
-          ? "bg-blue-100 border-blue-500 dark:bg-blue-950/30 dark:border-blue-700/80"
-          : "bg-white hover:bg-zinc-200 border-transparent dark:bg-neutral-900 dark:hover:bg-neutral-950 dark:border-transparent"
+          ? "border-blue-500 bg-blue-100 dark:border-blue-700/80 dark:bg-blue-950/30"
+          : "border-transparent bg-white hover:bg-zinc-200 dark:border-transparent dark:bg-neutral-900 dark:hover:bg-neutral-950"
       }`}
     >
       {iconUrl && icon === "custom" ? (
@@ -42,7 +42,7 @@ export default function DashSidebarSession({
         <img
           src={iconUrl}
           alt="Track Logo"
-          className="w-20 aspect-square min-w-20 shrink-0 rounded-md object-cover bg-zinc-100 dark:bg-neutral-800"
+          className="aspect-square w-20 min-w-20 shrink-0 rounded-md bg-zinc-100 object-cover dark:bg-neutral-800"
         />
       ) : (
         <Image
@@ -50,20 +50,20 @@ export default function DashSidebarSession({
           alt="Track Logo"
           width={256}
           height={256}
-          className="w-20 aspect-square min-w-20 shrink-0 rounded-md object-cover bg-zinc-100 dark:bg-neutral-800"
+          className="aspect-square w-20 min-w-20 shrink-0 rounded-md bg-zinc-100 object-cover dark:bg-neutral-800"
         />
       )}
 
-      <div className="flex flex-col justify-center w-full overflow-hidden">
-        <h2 className="  text-md font-semibold truncate w-full">{name}</h2>
-        <hr className="my-1 border-gray-200 dark:border-neutral-700 w-full" />
+      <div className="flex w-full flex-col justify-center overflow-hidden">
+        <h2 className="text-md w-full truncate font-semibold">{name}</h2>
+        <hr className="my-1 w-full border-gray-200 dark:border-neutral-700" />
         <span className="flex flex-col gap-1">
-          <div className="flex flex-row items-center text-zinc-500  text-xs">
-            <Calendar className="inline h-3 w-3 mr-1" />
+          <div className="flex flex-row items-center text-xs text-zinc-500">
+            <Calendar className="mr-1 inline h-3 w-3" />
             {date}
           </div>
-          <div className="flex flex-row items-center text-zinc-500  text-xs">
-            <Clock className="inline h-3 w-3 mr-1" />
+          <div className="flex flex-row items-center text-xs text-zinc-500">
+            <Clock className="mr-1 inline h-3 w-3" />
             {lastModified.split("T")[0]}
           </div>
         </span>

@@ -35,7 +35,7 @@ export default function AIStrategySuggestion({
       temperature: 0.7,
       top_p: 1,
       useExperimentalPrompt: false,
-    }
+    },
   );
 
   const [FullscreenReaderOpen, setFullscreenReaderOpen] = useState(false);
@@ -64,7 +64,7 @@ export default function AIStrategySuggestion({
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`
+            : `Server responded with status: ${response.status}`,
         );
       }
 
@@ -84,7 +84,7 @@ export default function AIStrategySuggestion({
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
+        error instanceof Error ? error.message : "An unknown error occurred",
       );
     } finally {
       setIsLoading(false);
@@ -118,18 +118,18 @@ export default function AIStrategySuggestion({
           content={generatedSuggestion || "No suggestion generated yet."}
         />
       )}
-      <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-5/7 h-full flex flex-col gap-2">
-        <div className="flex flex-row items-center gap-2 justify-between">
+      <div className="flex h-full w-5/7 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+        <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center gap-2">
             <h3 className="text-lg font-bold">AI Strategy Overview</h3>
             {!isLoading ? (
               <div
-                className={`${readOnly ? "hidden" : "flex flex-row gap-2 items-center"}`}
+                className={`${readOnly ? "hidden" : "flex flex-row items-center gap-2"}`}
               >
                 <p>|</p>
                 <button
                   disabled={readOnly}
-                  className={`font-light rounded ${
+                  className={`rounded font-light ${
                     readOnly ? "hidden" : "cursor-pointer underline"
                   }`}
                   onClick={clientcallHCAI}
@@ -141,7 +141,7 @@ export default function AIStrategySuggestion({
                 </button>
               </div>
             ) : (
-              <button className=" font-light cursor-not-allowed" disabled>
+              <button className="cursor-not-allowed font-light" disabled>
                 Generating...
               </button>
             )}
@@ -164,16 +164,16 @@ export default function AIStrategySuggestion({
         <hr className="border-neutral-700" />
 
         {isLoading && (
-          <p className=" font-extralight ">Generating suggestion...</p>
+          <p className="font-extralight">Generating suggestion...</p>
         )}
         {error && !isLoading && (
-          <p className="text-red-400 font-light text-sm">{error}</p>
+          <p className="text-sm font-light text-red-400">{error}</p>
         )}
         {!generatedSuggestion && !isLoading && !error && (
-          <p className=" font-extralight ">No suggestion generated yet.</p>
+          <p className="font-extralight">No suggestion generated yet.</p>
         )}
         {generatedSuggestion && !isLoading && (
-          <div className=" leading-relaxed overflow-y-auto flex-1 text-sm wrap-break-words pr-2">
+          <div className="wrap-break-words flex-1 overflow-y-auto pr-2 text-sm leading-relaxed">
             <BetterReactMD content={generatedSuggestion} />
           </div>
         )}

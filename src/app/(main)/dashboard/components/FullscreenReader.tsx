@@ -17,9 +17,9 @@ export default function FullscreenReader({
   onInputChange,
 }: FullscreenReaderProps) {
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-      <div className="h-full w-full max-w-[90vw] bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
-        <div className="flex justify-between items-center">
+    <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="flex h-full w-full max-w-[90vw] flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+        <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">{title}</h2>
           <button onClick={onClose} className="cursor-pointer">
             <X />
@@ -32,7 +32,7 @@ export default function FullscreenReader({
           ) : (
             // else, render as input
             <textarea
-              className={`w-full h-full bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 resize-none focus:outline-none focus:border focus:border-neutral-600`}
+              className={`h-full w-full resize-none rounded-md bg-zinc-300 p-2 focus:border focus:border-neutral-600 focus:outline-none dark:bg-neutral-800`}
               placeholder={"Add your notes here..."}
               value={content}
               onChange={(e) => onInputChange?.(e.target.value)}

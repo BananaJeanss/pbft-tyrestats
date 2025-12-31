@@ -27,11 +27,11 @@ export default function TyreSettings({
   };
 
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-50">
-      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-neutral-800 shadow-2xl">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold ">Tyre Settings</h2>
-          <button onClick={onClose} className=" cursor-pointer">
+    <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-neutral-800 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold">Tyre Settings</h2>
+          <button onClick={onClose} className="cursor-pointer">
             <X />
           </button>
         </div>
@@ -41,7 +41,7 @@ export default function TyreSettings({
         <div className="flex flex-col gap-6">
           {/* Switchover Point */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold ">
+            <label className="text-sm font-semibold">
               Preferred Switchover Point (%)
             </label>
             <div className="flex items-center gap-2">
@@ -54,27 +54,25 @@ export default function TyreSettings({
                     preferredSwitchoverPoint: parseFloat(e.target.value) || 0,
                   })
                 }
-                className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-24 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                className="w-24 rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               />
-              <span className=" text-sm">Tyre life remaining</span>
+              <span className="text-sm">Tyre life remaining</span>
             </div>
-            <p className="text-xs ">
-              Used to calculate recommended lap counts.
-            </p>
+            <p className="text-xs">Used to calculate recommended lap counts.</p>
           </div>
 
           <hr className="border-neutral-800" />
 
           {/* Estimation Ratios */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-md font-bold ">Life Estimation Ratios</h3>
+            <h3 className="text-md font-bold">Life Estimation Ratios</h3>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold ">
+              <label className="text-sm font-semibold">
                 Soft to Medium Ratio
               </label>
               <div className="flex items-center gap-2">
-                <span className=" text-sm">1 Soft Lap = </span>
+                <span className="text-sm">1 Soft Lap = </span>
                 <input
                   type="number"
                   step="0.1"
@@ -85,18 +83,18 @@ export default function TyreSettings({
                       softToMediumRatio: parseFloat(e.target.value) || 1,
                     })
                   }
-                  className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-20 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                  className="w-20 rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                 />
-                <span className=" text-sm">Medium Laps</span>
+                <span className="text-sm">Medium Laps</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-semibold ">
+              <label className="text-sm font-semibold">
                 Medium to Hard Ratio
               </label>
               <div className="flex items-center gap-2">
-                <span className=" text-sm">1 Medium Lap = </span>
+                <span className="text-sm">1 Medium Lap = </span>
                 <input
                   type="number"
                   step="0.1"
@@ -107,12 +105,12 @@ export default function TyreSettings({
                       mediumToHardRatio: parseFloat(e.target.value) || 1,
                     })
                   }
-                  className="bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2  w-20 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                  className="w-20 rounded border border-neutral-700 bg-zinc-200 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                 />
-                <span className=" text-sm">Hard Laps</span>
+                <span className="text-sm">Hard Laps</span>
               </div>
             </div>
-            <p className="text-xs ">
+            <p className="text-xs">
               Used to estimate tyre life when data is missing.
             </p>
           </div>
@@ -120,7 +118,7 @@ export default function TyreSettings({
 
         <button
           onClick={handleSave}
-          className="w-full bg-neutral-300 text-black font-bold py-3 rounded-lg hover:bg-neutral-200 transition mt-2 cursor-pointer"
+          className="mt-2 w-full cursor-pointer rounded-lg bg-neutral-300 py-3 font-bold text-black transition hover:bg-neutral-200"
         >
           Save Settings
         </button>

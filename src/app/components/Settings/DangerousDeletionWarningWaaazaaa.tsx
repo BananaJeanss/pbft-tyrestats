@@ -18,29 +18,29 @@ export default function DangerousDeletionWarningWaaazaaa({
     }
   };
   return (
-    <div className="w-full h-full absolute top-0 left-0 bg-neutral-950/95 flex flex-col items-center justify-center p-8 gap-2 z-150">
-      <div className="w-full max-w-md bg-zinc-100 dark:bg-neutral-900 rounded-xl p-6 flex flex-col gap-6 border border-red-500 border-2 shadow-2xl">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold ">Confirm Data Clearance</h2>
-          <button onClick={onClose} className=" cursor-pointer">
+    <div className="absolute top-0 left-0 z-150 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-2 border-red-500 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold">Confirm Data Clearance</h2>
+          <button onClick={onClose} className="cursor-pointer">
             <X />
           </button>
         </div>
         <hr className="border-neutral-800" />
-        <p className="text-red-500 font-light">
+        <p className="font-light text-red-500">
           This action will permanently delete all your data. This cannot be
           undone. Are you sure you want to proceed?
         </p>
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="bg-zinc-300 dark:bg-neutral-700  font-semibold py-2 px-4 rounded-lg hover:bg-zinc-400 dark:hover:bg-neutral-600 transition cursor-pointer"
+            className="cursor-pointer rounded-lg bg-zinc-300 px-4 py-2 font-semibold transition hover:bg-zinc-400 dark:bg-neutral-700 dark:hover:bg-neutral-600"
           >
             Cancel
           </button>
           <button
             onClick={handleClearData}
-            className="bg-red-600 font-semibold py-2 px-4 rounded-lg hover:bg-red-500 transition cursor-pointer"
+            className="cursor-pointer rounded-lg bg-red-600 px-4 py-2 font-semibold transition hover:bg-red-500"
           >
             Confirm Delete
           </button>

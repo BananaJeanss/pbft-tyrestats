@@ -27,14 +27,14 @@ export default function DashNotes({
           }}
         />
       )}
-      <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-2/7 max-h-2/5 grow flex flex-col gap-2">
+      <div className="flex max-h-2/5 w-2/7 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row items-center">
           <h3 className="font-semibold">
             Notes
             {!readOnly && (
               <span className="relative inline-block">
-                <Info className="inline-block ml-2 h-4 w-4 cursor-pointer peer" />
-                <span className="absolute left-8 top-1/2 -translate-y-1/2 bg-zinc-700 text-white text-xs rounded px-2 py-1 opacity-0 peer-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                <Info className="peer ml-2 inline-block h-4 w-4 cursor-pointer" />
+                <span className="pointer-events-none absolute top-1/2 left-8 z-10 -translate-y-1/2 rounded bg-zinc-700 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity peer-hover:opacity-100">
                   Notes are included in the AI Strategy input.
                 </span>
               </span>
@@ -48,7 +48,7 @@ export default function DashNotes({
           />
         </div>
         <textarea
-          className={`w-full h-full bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 resize-none focus:outline-none focus:ring-2 focus:ring-neutral-600 ${
+          className={`h-full w-full resize-none rounded-md bg-zinc-300 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800 ${
             readOnly ? "cursor-not-allowed opacity-70" : ""
           }`}
           placeholder={readOnly ? "No notes added." : "Add your notes here..."}

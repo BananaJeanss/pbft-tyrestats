@@ -81,16 +81,16 @@ export default function IconSelector({
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2 focus:outline-none focus:ring-2 focus:ring-neutral-600 transition-colors"
+        className="flex w-full items-center justify-between rounded border border-neutral-700 bg-zinc-200 p-2 transition-colors focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
         type="button"
       >
-        <div className="flex items-center gap-2 overflow-hidden min-w-0">
+        <div className="flex min-w-0 items-center gap-2 overflow-hidden">
           {value ? (
             <>
               <div className="shrink-0">
                 <DynamicIcon name={value as IconName} size={20} />
               </div>
-              <span className="capitalize truncate min-w-0">
+              <span className="min-w-0 truncate capitalize">
                 {selectedIconDisplay}
               </span>
             </>
@@ -105,10 +105,10 @@ export default function IconSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 left-0 w-[280px] sm:w-[320px] bg-zinc-100 dark:bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl p-2 flex flex-col gap-2">
+        <div className="absolute left-0 z-50 mt-1 flex w-[280px] flex-col gap-2 rounded-xl border border-neutral-700 bg-zinc-100 p-2 shadow-2xl sm:w-[320px] dark:bg-neutral-900">
           {/* Search */}
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
               <Search size={16} />
             </div>
             <input
@@ -116,15 +116,15 @@ export default function IconSelector({
               placeholder={placeholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-zinc-200 dark:bg-neutral-800 border border-neutral-700 rounded p-2 pl-9 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-600"
+              className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 pl-9 text-sm focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               autoFocus
             />
           </div>
 
           {/* Icons Grid */}
-          <div className="grid grid-cols-5 md:grid-cols-8 gap-1 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+          <div className="custom-scrollbar grid max-h-[300px] grid-cols-5 gap-1 overflow-y-auto pr-1 md:grid-cols-8">
             {filteredIcons.length === 0 ? (
-              <div className="col-span-full text-center text-neutral-500 py-4 text-sm">
+              <div className="col-span-full py-4 text-center text-sm text-neutral-500">
                 No icons found
               </div>
             ) : (
@@ -133,9 +133,9 @@ export default function IconSelector({
                   key={iconName}
                   onClick={() => handleSelect(iconName)}
                   title={iconName.replace(/-/g, " ")}
-                  className={`aspect-square flex items-center justify-center rounded transition-colors hover:bg-zinc-300 dark:hover:bg-neutral-700 ${
+                  className={`flex aspect-square items-center justify-center rounded transition-colors hover:bg-zinc-300 dark:hover:bg-neutral-700 ${
                     value === iconName
-                      ? "bg-neutral-300 dark:bg-neutral-700 text-black dark:text-white"
+                      ? "bg-neutral-300 text-black dark:bg-neutral-700 dark:text-white"
                       : "text-neutral-600 dark:text-neutral-400"
                   }`}
                   type="button"

@@ -94,9 +94,9 @@ export default function DashboardView({
   onCopySession,
 }: DashboardViewProps) {
   return (
-    <div className="w-full h-full bg-zinc-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col gap-2">
-      <div className="flex flex-row justify-between items-center">
-        <h2 className="font-semibold text-2xl flex flex-row gap-2 items-center">
+    <div className="flex h-full w-full flex-col gap-2 rounded-lg bg-zinc-100 p-4 dark:bg-neutral-800">
+      <div className="flex flex-row items-center justify-between">
+        <h2 className="flex flex-row items-center gap-2 text-2xl font-semibold">
           {sessionName}
           {!readOnly && onEditSessionSettings && (
             <button className="cursor-pointer" onClick={onEditSessionSettings}>
@@ -104,7 +104,7 @@ export default function DashboardView({
             </button>
           )}
           {readOnly && (
-            <span className="text-sm font-normal text-neutral-500 px-2 py-0.5 bg-neutral-200 dark:bg-neutral-900 rounded-full">
+            <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-sm font-normal text-neutral-500 dark:bg-neutral-900">
               Read Only
             </span>
           )}
@@ -112,7 +112,7 @@ export default function DashboardView({
         {readOnly && onCopySession && (
           <button
             onClick={onCopySession}
-            className="flex items-center gap-2 border border-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90 px-4 py-2 rounded-lg font-semibold cursor-pointer text-sm"
+            className="flex cursor-pointer items-center gap-2 rounded-lg border border-(--tyrestats-blue) px-4 py-2 text-sm font-semibold hover:bg-(--tyrestats-blue)/90"
           >
             <Copy size={16} />
             Copy Session & Edit
@@ -140,7 +140,7 @@ export default function DashboardView({
       />
 
       {/* top tiles section - tyres and ai */}
-      <div className="w-full flex flex-col md:flex-row h-full md:h-2/5 gap-2 min-h-75">
+      <div className="flex h-full min-h-75 w-full flex-col gap-2 md:h-2/5 md:flex-row">
         {/* tyressssssss */}
         <TyresView
           tyreData={tyreData}

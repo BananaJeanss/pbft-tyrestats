@@ -47,8 +47,8 @@ export default function TyresView({
           onSave={setTyrePreferences}
         />
       )}
-      <div className="bg-zinc-200 dark:bg-neutral-900 rounded-lg p-4 w-2/7 h-full flex flex-col gap-2">
-        <div className="flex flex-row gap-2 justify-between">
+      <div className="flex h-full w-2/7 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+        <div className="flex flex-row justify-between gap-2">
           <p className="text-md font-bold">Tyres</p>
           {!readOnly && (
             <button
@@ -59,7 +59,7 @@ export default function TyresView({
             </button>
           )}
         </div>
-        <div className="flex flex-col grow gap-2 justify-evenly overflow-y-auto">
+        <div className="flex grow flex-col justify-evenly gap-2 overflow-y-auto">
           {TYRE_TYPES.map((tyre) => {
             const effectiveData = getEffectiveTyreData(
               tyre.id,
@@ -69,7 +69,7 @@ export default function TyresView({
             return (
               <div
                 key={tyre.id}
-                className="@container bg-zinc-300 dark:bg-neutral-800 rounded-md p-2 px-4 w-full max-h-1/4 flex flex-row grow shrink items-center gap-4"
+                className="@container flex max-h-1/4 w-full shrink grow flex-row items-center gap-4 rounded-md bg-zinc-300 p-2 px-4 dark:bg-neutral-800"
               >
                 <button
                   disabled={readOnly}
@@ -80,22 +80,22 @@ export default function TyresView({
                   className={readOnly ? "cursor-default" : ""}
                 >
                   <h3
-                    className={`${tyre.color} text-xl border-3 font-extrabold rounded-full px-2 ${
+                    className={`${tyre.color} rounded-full border-3 px-2 text-xl font-extrabold ${
                       !readOnly ? "cursor-pointer" : ""
                     }`}
                   >
                     {tyre.label}
                   </h3>
                 </button>
-                <div className="flex flex-col justify-center flex-1 min-w-0">
+                <div className="flex min-w-0 flex-1 flex-col justify-center">
                   {effectiveData ? (
                     <>
-                      <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
+                      <p className="text-[clamp(8px,0.65vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
                         {effectiveData.isEstimated ? "Est. " : ""}
                         Average wear per lap:{" "}
                         {effectiveData.wearPerLap.toFixed(2)}%
                       </p>
-                      <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
+                      <p className="text-[clamp(8px,0.65vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
                         Recommended Lap Count:{" "}
                         {calcRecommendedLapCount(effectiveData.wearPerLap)} (
                         {(
@@ -107,7 +107,7 @@ export default function TyresView({
                       </p>
                     </>
                   ) : (
-                    <p className="text-zinc-800 dark:text-neutral-400 text-[clamp(8px,0.65vw,24px)] leading-tight">
+                    <p className="text-[clamp(8px,0.65vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
                       No Data Yet{" "}
                       {readOnly ? "" : "(Click on the tyre to add data)"}
                     </p>
