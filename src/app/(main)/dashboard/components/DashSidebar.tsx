@@ -137,11 +137,7 @@ export default function DashSidebar({
                       .map((session) => (
                         <DashSidebarSession
                           key={session.id}
-                          name={session.meta.name}
-                          date={session.meta.date}
-                          lastModified={session.meta.lastModified}
-                          icon={session.meta.selectedIcon}
-                          iconUrl={session.meta.icon_url || ""}
+                          sessionData={session}
                           isActive={currentSessionId === session.id}
                           onClick={() => onSelectSession(session)}
                         />
@@ -155,11 +151,7 @@ export default function DashSidebar({
                 !session.folder && (
                   <DashSidebarSession
                     key={session.id}
-                    name={session.meta.name}
-                    date={session.meta.date}
-                    lastModified={session.meta.lastModified}
-                    icon={session.meta.selectedIcon}
-                    iconUrl={session.meta.icon_url || ""}
+                    sessionData={session}
                     isActive={currentSessionId === session.id}
                     onClick={() => onSelectSession(session)}
                   />
