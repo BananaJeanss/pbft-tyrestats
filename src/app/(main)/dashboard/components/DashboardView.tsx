@@ -2,12 +2,13 @@
 
 import { Pencil, Copy } from "lucide-react";
 import {
-  RaceConfiguration,
+
   TyrePreferences,
-  TyreWearData,
-  ManualStint,
   TimelineData,
   Stint,
+  WeatherEntry,
+  MiscStats,
+  TySession,
 } from "@/app/types/TyTypes";
 import DashTimeline from "./DashTimeline";
 import TyresView from "./TyresView";
@@ -21,18 +22,7 @@ interface DashboardViewProps {
   readOnly?: boolean;
 
   // Data
-  tyreData: Record<string, TyreWearData>;
-  raceConfig: RaceConfiguration;
-  tyrePreferences: TyrePreferences;
-  manualStints: ManualStint[];
-  currentNotes: string;
-  currentSuggestion: string;
-  aiConfigSettings: {
-    model: string;
-    temperature: number;
-    top_p: number;
-    useExperimentalPrompt: boolean;
-  };
+  SessionData: TySession;
 
   // Timeline Data
   timelineGenerated: boolean;
@@ -59,6 +49,8 @@ interface DashboardViewProps {
   setCurrentNotes: (notes: string) => void;
   setCurrentSuggestion: (suggestion: string) => void;
   setAIConfigSettings: (config: AIStrategySettingsS) => void;
+  setWeather: (weather: WeatherEntry[]) => void;
+  setMiscStats: (miscStats: MiscStats) => void;
   setIsManualMode: (mode: boolean) => void;
   openDashShare?: () => void;
 
@@ -69,13 +61,7 @@ interface DashboardViewProps {
 export default function DashboardView({
   sessionName,
   readOnly = false,
-  tyreData,
-  raceConfig,
-  tyrePreferences,
-  manualStints,
-  currentNotes,
-  currentSuggestion,
-  aiConfigSettings,
+  SessionData,
   timelineGenerated,
   autoTimelineData,
   autoTimelineStints,
@@ -90,6 +76,8 @@ export default function DashboardView({
   setCurrentNotes,
   setCurrentSuggestion,
   setAIConfigSettings,
+  setWeather,
+  setMiscStats,
   setIsManualMode,
   openDashShare,
   onCopySession,
@@ -125,15 +113,15 @@ export default function DashboardView({
       {/* Timeline Section */}
       <DashTimeline
         timelineGenerated={
-          isManualMode ? manualStints.length > 0 : timelineGenerated
+          isManualMode ? SessionData.manualStints.length > 0 : timelineGenerated
         }
         timelineData={isManualMode ? manualTimelineData : autoTimelineData}
         timelineStints={
           isManualMode ? manualTimelineStintsDef : autoTimelineStints
         }
-        tyreData={tyreData}
+        tyreData={SessionData.tyreData}
         setRaceSettingsVis={setRaceSettingsVis}
-        raceConfig={raceConfig}
+        raceConfig={SessionData.raceConfig}
         isManualMode={isManualMode}
         setIsManualMode={setIsManualMode}
         openDashShare={openDashShare || (() => {})}
@@ -144,8 +132,8 @@ export default function DashboardView({
       <div className="flex h-full min-h-75 w-full flex-col gap-2 md:h-2/5 md:flex-row">
         {/* tyressssssss */}
         <TyresView
-          tyreData={tyreData}
-          tyrePreferences={tyrePreferences}
+          tyreData={SessionData.tyreData}
+          tyrePreferences={SessionData.tyrePreferences}
           setTyrePreferences={setTyrePreferences}
           settyremanVis={settyremanVis}
           setSelectedTyre={setSelectedTyre}
@@ -154,14 +142,12 @@ export default function DashboardView({
 
         {/* AI strategy overview */}
         <AIStrategySuggestion
-          tyreData={tyreData}
-          raceConfig={raceConfig}
-          tyrePreferences={tyrePreferences}
-          notes={currentNotes}
-          existingSuggestion={currentSuggestion}
+          tyreData={SessionData.tyreData}
+          raceConfig={SessionData}   
+          notes={SessionData.currentNotes}
+          existingSuggestion={SessionData.currentSuggestion || ""}
           onSave={setCurrentSuggestion}
           onSaveConfig={setAIConfigSettings}
-          aiConfig={aiConfigSettings}
           readOnly={readOnly}
         />
       </div>
@@ -169,12 +155,23 @@ export default function DashboardView({
       {/* Notes section*/}
       <div className="flex flex-row gap-2 h-full">
         <DashNotes
-          notes={currentNotes}
+          notes={SessionData.currentNotes}
           onChange={setCurrentNotes}
           readOnly={readOnly}
         />
         {/* Weather and Misc stats */}
-        <WeatherMisc readOnly={readOnly} />
+        <WeatherMisc
+          readOnly={readOnly}
+          weather={SessionData.weather || []}
+          setWeather={setWeather}
+          miscStats={SessionData.miscStats || {
+            avgLapTime: "",
+            gridPosition: 0,
+            totalGridDrivers: 0,
+            raceStartTime: "",
+          }}
+          setMiscStats={setMiscStats}
+        />
       </div>
     </div>
   );

@@ -25,6 +25,21 @@ export interface TySession {
   shortUrl?: string;
   manualStints: ManualStint[];
   aiConfigSettings: AIStrategySettingsS;
+  weather?: WeatherEntry[];
+  miscStats?: MiscStats;
+}
+
+export interface WeatherEntry {
+  time: string;
+  condition: string;
+  icon: string;
+}
+
+export interface MiscStats {
+  avgLapTime: string;
+  gridPosition: number;
+  totalGridDrivers: number;
+  raceStartTime: string;
 }
 
 export interface TyreWearData {

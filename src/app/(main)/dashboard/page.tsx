@@ -6,6 +6,8 @@ import {
   TimelineData,
   TyrePreferences,
   TyreWearData,
+  WeatherEntry,
+  MiscStats,
 } from "@/app/types/TyTypes";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import RaceSettings, {
@@ -85,6 +87,14 @@ export default function Dashboard() {
     useExperimentalPrompt: false,
   });
 
+  const [weather, setWeather] = useState<WeatherEntry[]>([]);
+  const [miscStats, setMiscStats] = useState<MiscStats>(() => ({
+    avgLapTime: "",
+    gridPosition: 0,
+    totalGridDrivers: 0,
+    raceStartTime: "",
+  }));
+
   // Helper to convert Manual Stints (Array) to Recharts Data Format
   const manualTimelineData = useMemo(() => {
     if (manualStints.length === 0)
@@ -134,6 +144,8 @@ export default function Dashboard() {
     manualStints,
     sessionSettings,
     aiConfigSettings,
+    weather,
+    miscStats,
   });
 
   // keep ref updated
@@ -148,6 +160,8 @@ export default function Dashboard() {
       manualStints,
       sessionSettings,
       aiConfigSettings,
+      weather,
+      miscStats,
     };
   }, [
     tyreData,
@@ -159,6 +173,8 @@ export default function Dashboard() {
     manualStints,
     sessionSettings,
     aiConfigSettings,
+    weather,
+    miscStats,
   ]);
 
   // save function for either autosave or manual save
@@ -181,6 +197,8 @@ export default function Dashboard() {
               shortUrl: currentData.shortUrl,
               manualStints: currentData.manualStints,
               aiConfigSettings: currentData.aiConfigSettings,
+              weather: currentData.weather,
+              miscStats: currentData.miscStats,
               folder:
                 currentData.sessionSettings["current"]?.folder || s.folder,
               meta: {
@@ -215,6 +233,8 @@ export default function Dashboard() {
     currentSuggestion,
     manualStints,
     aiConfigSettings,
+    weather,
+    miscStats,
     shortUrl,
   ]);
 
@@ -286,6 +306,13 @@ export default function Dashboard() {
       useExperimentalPrompt:
         (session.aiConfigSettings as AIStrategySettingsS)
           ?.useExperimentalPrompt ?? false,
+    });
+    setWeather(session.weather || []);
+    setMiscStats(session.miscStats || {
+      avgLapTime: "",
+      gridPosition: 0,
+      totalGridDrivers: 0,
+      raceStartTime: "",
     });
 
     setManualStints(session.manualStints || []);
@@ -421,6 +448,15 @@ export default function Dashboard() {
                       duplicatedSession.aiConfigSettings
                         ?.useExperimentalPrompt || false,
                   });
+                  setWeather(duplicatedSession.weather || []);
+                  setMiscStats(
+                    duplicatedSession.miscStats || {
+                      avgLapTime: "",
+                      gridPosition: 0,
+                      totalGridDrivers: 0,
+                      raceStartTime: "",
+                    },
+                  );
                   setManualStints(duplicatedSession.manualStints || []);
                   return [...prev, duplicatedSession];
                 });
@@ -458,6 +494,8 @@ export default function Dashboard() {
               shortUrl,
               manualStints,
               aiConfigSettings,
+              weather,
+              miscStats,
             } as TySession
           }
         />
@@ -477,13 +515,29 @@ export default function Dashboard() {
                   sessionSettings["current"]?.name || "Session/Race Name"
                 }
                 onEditSessionSettings={() => setSessionSettingsVis(true)}
-                tyreData={tyreData}
-                raceConfig={raceConfig}
-                tyrePreferences={tyrePreferences}
-                manualStints={manualStints}
-                currentNotes={currentNotes}
-                currentSuggestion={currentSuggestion}
-                aiConfigSettings={aiConfigSettings}
+                SessionData={{
+                  id: currentSessionId,
+                  folder: null, // in DashboardView we don't include folder info
+                  meta: {
+                    name: sessionSettings["current"]?.name || "Unnamed Session",
+                    date: sessionSettings["current"]?.date || "",
+                    lastModified:
+                      sessionSettings["current"]?.lastModified || new Date().toISOString(),
+                    selectedIcon:
+                      sessionSettings["current"]?.selectedIcon || "default",
+                    icon_url: sessionSettings["current"]?.icon_url,
+                  },
+                  raceConfig,
+                  tyrePreferences,
+                  tyreData,
+                  currentNotes,
+                  currentSuggestion,
+                  shortUrl,
+                  manualStints,
+                  aiConfigSettings,
+                  weather,
+                  miscStats,
+                }}
                 timelineGenerated={timelineGenerated}
                 autoTimelineData={autoTimelineData}
                 autoTimelineStints={autoTimelineStints}
@@ -508,6 +562,8 @@ export default function Dashboard() {
                 setCurrentNotes={setCurrentNotes}
                 setCurrentSuggestion={setCurrentSuggestion}
                 setAIConfigSettings={setAIConfigSettings}
+                setWeather={setWeather}
+                setMiscStats={setMiscStats}
                 setIsManualMode={setIsManualMode}
                 openDashShare={() => setDashShareOpen(true)}
               />

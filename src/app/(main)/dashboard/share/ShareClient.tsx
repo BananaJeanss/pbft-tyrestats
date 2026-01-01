@@ -208,20 +208,7 @@ function SharedSessionContent() {
         <DashboardView
           sessionName={sessionData.meta.name}
           readOnly={true}
-          tyreData={sessionData.tyreData}
-          raceConfig={sessionData.raceConfig}
-          tyrePreferences={sessionData.tyrePreferences}
-          manualStints={sessionData.manualStints}
-          currentNotes={sessionData.currentNotes || ""}
-          currentSuggestion={sessionData.currentSuggestion || ""}
-          aiConfigSettings={
-            sessionData.aiConfigSettings || {
-              model: "qwen/qwen3-32b",
-              temperature: 0.7,
-              top_p: 1,
-              useExperimentalPrompt: false,
-            }
-          }
+          SessionData={sessionData}
           timelineGenerated={
             isManualMode
               ? (sessionData.manualStints?.length ?? 0) > 0
@@ -240,6 +227,8 @@ function SharedSessionContent() {
           setCurrentNotes={() => {}}
           setCurrentSuggestion={() => {}}
           setAIConfigSettings={() => {}}
+          setWeather={() => {}}
+          setMiscStats={() => {}}
           setIsManualMode={setIsManualMode}
           onCopySession={handleCopySession}
         />
