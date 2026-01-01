@@ -70,7 +70,7 @@ export default function WebhooksTab() {
           Save & configure your Discord webhooks for sharing sessions.
         </p>
         <hr className="border-neutral-800" />
-        <div className="flex flex-col gap-2 overflow-y-auto grow max-h-[33.5vh]">
+        <div className="flex max-h-[33.5vh] grow flex-col gap-2 overflow-y-auto">
           <button
             className="w-full cursor-pointer rounded border-2 border-dashed px-4 py-2 text-sm"
             onClick={createNewWebhook}

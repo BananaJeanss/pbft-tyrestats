@@ -1,4 +1,11 @@
-import { Home, LucideIcon, Save, TriangleAlert, Webhook, X } from "lucide-react";
+import {
+  Home,
+  LucideIcon,
+  Save,
+  TriangleAlert,
+  Webhook,
+  X,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import GeneralTab from "./tabs/GeneralTab";
 import AutoSaveTab from "./tabs/AutoSaveTab";
@@ -21,7 +28,12 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
   const [nextBuildId, setNextBuildId] = useState("dev");
 
   const settingsTabs: SettingsTab[] = [
-    { id: "general", label: "General", lucideIcon: Home, Component: GeneralTab },
+    {
+      id: "general",
+      label: "General",
+      lucideIcon: Home,
+      Component: GeneralTab,
+    },
     {
       id: "autosave",
       label: "Auto-Save",
@@ -91,7 +103,7 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
           {/* very awesome and cool vertical divider */}
           <div className="w-px bg-neutral-800" />
           {/* Tab Contents */}
-          <div className="w-3/4 p-2 overflow-y-auto">
+          <div className="w-3/4 overflow-y-auto p-2">
             <ActiveTab />
           </div>
         </div>

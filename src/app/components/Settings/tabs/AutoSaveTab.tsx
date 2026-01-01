@@ -27,9 +27,7 @@ export default function AutoSaveTab() {
         </label>
       </div>
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">
-          Auto-Save Interval
-        </label>
+        <label className="text-sm font-medium">Auto-Save Interval</label>
         <input
           type="number"
           min="0.1"

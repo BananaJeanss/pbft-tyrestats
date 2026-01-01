@@ -2,9 +2,7 @@ import { useState } from "react";
 import DangerousDeletionWarningWaaazaaa from "../DangerousDeletionWarningWaaazaaa";
 import ExportMyData from "../ExportMyData";
 import ImportMyData from "../ImportMyData";
-import { Download,
-Trash2,
-Upload } from "lucide-react";
+import { Download, Trash2, Upload } from "lucide-react";
 
 export default function DangerTab() {
   const [isWarningOpen, setIsWarningOpen] = useState(false);
@@ -32,21 +30,21 @@ export default function DangerTab() {
           onClick={() => setIsExportOpen(true)}
           className="cursor-pointer rounded-md bg-neutral-200 p-2 text-sm font-medium transition-colors hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700"
         >
-          <Upload className="inline-block mr-2 h-4 w-4" />
+          <Upload className="mr-2 inline-block h-4 w-4" />
           Export My Data
         </button>
         <button
           onClick={() => setIsImportOpen(true)}
           className="cursor-pointer rounded-md bg-neutral-200 p-2 text-sm font-medium transition-colors hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700"
         >
-          <Download className="inline-block mr-2 h-4 w-4" />
+          <Download className="mr-2 inline-block h-4 w-4" />
           Import My Data
         </button>
         <button
           onClick={() => setIsWarningOpen(true)}
           className="cursor-pointer rounded-md bg-red-600 p-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
         >
-          <Trash2 className="inline-block mr-2 h-4 w-4" />
+          <Trash2 className="mr-2 inline-block h-4 w-4" />
           Delete All Data
         </button>
       </div>

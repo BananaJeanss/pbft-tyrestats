@@ -26,18 +26,12 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
             <h2 className="mt-6 mb-3 text-xl font-bold" {...props} />
           ),
           h3: (props) => (
-            <h3
-              className="mt-4 mb-2 text-lg font-semibold"
-              {...props}
-            />
+            <h3 className="mt-4 mb-2 text-lg font-semibold" {...props} />
           ),
           h4: (props) => (
-            <h4
-              className="mt-4 mb-2 text-base font-semibold "
-              {...props}
-            />
+            <h4 className="mt-4 mb-2 text-base font-semibold" {...props} />
           ),
-          p: (props) => <div className="mb-4 last:mb-0" {...props} />, 
+          p: (props) => <div className="mb-4 last:mb-0" {...props} />,
           ul: (props) => (
             <ul
               className="mb-4 ml-5 list-inside list-disc space-y-1 marker:text-neutral-500"
@@ -50,11 +44,9 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
               {...props}
             />
           ),
-          li: (props) => <li className="pl-1" {...props} />, 
-          hr: (props) => <hr className="my-6 border-neutral-800" {...props} />, 
-          strong: (props) => (
-            <strong className="font-bold" {...props} />
-          ),
+          li: (props) => <li className="pl-1" {...props} />,
+          hr: (props) => <hr className="my-6 border-neutral-800" {...props} />,
+          strong: (props) => <strong className="font-bold" {...props} />,
           a: (props) => (
             <a
               className="font-medium text-(--tyrestats-blue) transition-colors hover:text-blue-400 hover:underline"
@@ -77,17 +69,14 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
               />
             </div>
           ),
-          code: (props) => <code {...props} />, 
+          code: (props) => <code {...props} />,
           table: (props) => (
             <div className="my-6 w-full overflow-x-auto rounded-lg border border-neutral-800">
               <table className="w-full text-left text-sm" {...props} />
             </div>
           ),
           thead: (props) => (
-            <thead
-              className="bg-neutral-800 font-semibold"
-              {...props}
-            />
+            <thead className="bg-neutral-800 font-semibold" {...props} />
           ),
           tbody: (props) => (
             <tbody
@@ -104,7 +93,7 @@ export default function BetterReactMD({ content }: BetterReactMDProps) {
           th: (props) => (
             <th className="px-4 py-3 whitespace-nowrap text-white" {...props} />
           ),
-          td: (props) => <td className="px-4 py-3 align-top" {...props} />, 
+          td: (props) => <td className="px-4 py-3 align-top" {...props} />,
           img: (props) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img
