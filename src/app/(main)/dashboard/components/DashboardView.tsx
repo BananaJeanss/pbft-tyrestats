@@ -14,6 +14,7 @@ import TyresView from "./TyresView";
 import AIStrategySuggestion from "./AIStrategySuggestion";
 import DashNotes from "./DashNotes";
 import { AIStrategySettingsS } from "./AIStrategySettings";
+import WeatherMisc from "./WeatherMisc";
 
 interface DashboardViewProps {
   sessionName: string;
@@ -166,11 +167,15 @@ export default function DashboardView({
       </div>
 
       {/* Notes section*/}
-      <DashNotes
-        notes={currentNotes}
-        onChange={setCurrentNotes}
-        readOnly={readOnly}
-      />
+      <div className="flex flex-row gap-2 h-full">
+        <DashNotes
+          notes={currentNotes}
+          onChange={setCurrentNotes}
+          readOnly={readOnly}
+        />
+        {/* Weather and Misc stats */}
+        <WeatherMisc readOnly={readOnly} />
+      </div>
     </div>
   );
 }

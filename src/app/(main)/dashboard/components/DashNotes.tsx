@@ -27,7 +27,7 @@ export default function DashNotes({
           }}
         />
       )}
-      <div className="flex max-h-2/5 w-2/7 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+      <div className="flex w-2/7 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row items-center">
           <h3 className="font-semibold">
             Notes
