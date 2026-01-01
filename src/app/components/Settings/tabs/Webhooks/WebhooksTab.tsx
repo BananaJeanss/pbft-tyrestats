@@ -70,7 +70,7 @@ export default function WebhooksTab() {
           Save & configure your Discord webhooks for sharing sessions.
         </p>
         <hr className="border-neutral-800" />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 overflow-y-auto grow max-h-[33.5vh]">
           <button
             className="w-full cursor-pointer rounded border-2 border-dashed px-4 py-2 text-sm"
             onClick={createNewWebhook}
@@ -117,7 +117,7 @@ export default function WebhooksTab() {
                           <span className="text-xs opacity-70">• Default</span>
                         )}
                       </div>
-                      <span className="truncate text-xs opacity-70">
+                      <span className="max-w-xs truncate text-xs opacity-70">
                         {webhook.url || "No Webhook URL set!"}
                       </span>
                     </div>

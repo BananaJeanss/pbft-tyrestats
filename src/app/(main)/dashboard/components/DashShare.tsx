@@ -9,9 +9,11 @@ import {
   Loader2,
   Info,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getEffectiveTyreData } from "../TyreMath";
 import { DEFAULT_PREFERENCES } from "./TyreSettings";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { WebhookEntry } from "@/app/components/Settings/tabs/Webhooks/WebhooksTab";
 
 export interface DashShareProps {
   onClose: () => void;
@@ -35,13 +37,31 @@ export default function DashShare({
   onShortUrlUpdate,
 }: DashShareProps) {
   const [copiedType, setCopiedType] = useState<"static" | "short" | null>(null);
-  const [webhookUrl, setWebhookUrl] = useState("");
+  const [selectedWebhookId, setSelectedWebhookId] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">(
     "idle",
   );
   const [shortUrl, setShortUrl] = useState<string>(SessionData.shortUrl || "");
   const [includeShortLink, setIncludeShortLink] = useState<boolean>(false);
+
+  const [webhooks, _setWebhooks] = useLocalStorage<string[]>(
+    "tyrestats_discord_webhooks",
+    [],
+  );
+
+  useEffect(() => {
+    if (webhooks.length > 0 && !selectedWebhookId) {
+      const parsedWebhooks = webhooks.map(
+        (webhookStr) => JSON.parse(webhookStr) as WebhookEntry,
+      );
+      const defaultWebhook =
+        parsedWebhooks.find((w) => w.isDefault) || parsedWebhooks[0];
+      if (defaultWebhook) {
+        setSelectedWebhookId(defaultWebhook.id);
+      }
+    }
+  }, [webhooks, selectedWebhookId]);
 
   const handleCopy = (text: string, type: "static" | "short") => {
     if (!text) return;
@@ -50,9 +70,14 @@ export default function DashShare({
     setTimeout(() => setCopiedType(null), 2000);
   };
 
-  // 3. SEND TO DISCORD (Formatted like TyresView)
   const handleSendToDiscord = async () => {
-    if (!webhookUrl) return;
+    // Find the selected webhook to get its data
+    const selectedWebhook = webhooks
+      .map((webhookStr) => JSON.parse(webhookStr) as WebhookEntry)
+      .find((w) => w.id === selectedWebhookId);
+
+    if (!selectedWebhook || !selectedWebhook.url) return;
+
     setIsSending(true);
     setSendStatus("idle");
 
@@ -120,8 +145,9 @@ export default function DashShare({
       }
 
       const payload = {
-        username: "TyreStats",
+        username: selectedWebhook?.displayName || "TyreStats",
         avatar_url:
+          selectedWebhook?.iconUrl ||
           "https://github.com/BananaJeanss/pbft-tyrestats/blob/main/public/tslogow.png?raw=true",
         embeds: [
           {
@@ -135,7 +161,7 @@ export default function DashShare({
         ],
       };
 
-      const response = await fetch(webhookUrl, {
+      const response = await fetch(selectedWebhook.url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -143,7 +169,6 @@ export default function DashShare({
 
       if (response.ok || response.status === 204) {
         setSendStatus("success");
-        setWebhookUrl("");
         setTimeout(() => setSendStatus("idle"), 3000);
       } else {
         const errText = await response.text();
@@ -304,21 +329,47 @@ export default function DashShare({
             )}
           </label>
           <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="https://discord.com/api/webhooks/..."
-              value={webhookUrl}
-              onChange={(e) => {
-                setWebhookUrl(e.target.value);
-                setSendStatus("idle");
-              }}
-              className="grow rounded-lg border border-neutral-300 bg-zinc-50 p-2.5 text-sm text-neutral-900 focus:ring-2 focus:ring-[#5865F2] focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
-            />
+            <select
+              value={selectedWebhookId}
+              onChange={(e) => setSelectedWebhookId(e.target.value)}
+              className="grow rounded-lg border border-neutral-300 bg-zinc-50 p-2.5 text-sm text-neutral-600 focus:ring-2 focus:ring-neutral-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+            >
+              {webhooks.length === 0 && (
+                <option value="" disabled>
+                  No webhooks saved (add in Settings)
+                </option>
+              )}
+              {webhooks
+                .map((webhookStr) => JSON.parse(webhookStr) as WebhookEntry)
+                .sort((a, b) => (b.isDefault ? 1 : 0) - (a.isDefault ? 1 : 0))
+                .map((webhook) => (
+                  <option key={webhook.id} value={webhook.id}>
+                    {webhook.name}
+                    {webhook.isDefault ? " • Default" : ""}
+                  </option>
+                ))}
+            </select>
             <button
-              disabled={isSending || !webhookUrl}
+              disabled={
+                isSending ||
+                !selectedWebhookId ||
+                (() => {
+                  const selectedWebhook = webhooks
+                    .map((webhookStr) => JSON.parse(webhookStr) as WebhookEntry)
+                    .find((w) => w.id === selectedWebhookId);
+                  return !(selectedWebhook && selectedWebhook.url);
+                })()
+              }
               onClick={handleSendToDiscord}
               className={`flex h-10.5 min-w-25 items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium text-white ${
-                isSending || !webhookUrl
+                isSending ||
+                !selectedWebhookId ||
+                (() => {
+                  const selectedWebhook = webhooks
+                    .map((webhookStr) => JSON.parse(webhookStr) as WebhookEntry)
+                    .find((w) => w.id === selectedWebhookId);
+                  return !(selectedWebhook && selectedWebhook.url);
+                })()
                   ? "cursor-not-allowed bg-neutral-400 opacity-70 dark:bg-neutral-700"
                   : "cursor-pointer bg-(--tyrestats-blue) hover:bg-(--tyrestats-blue)/90"
               } `}
@@ -333,9 +384,24 @@ export default function DashShare({
               )}
             </button>
           </div>
-          <p className="pl-1 text-[10px] text-neutral-500">
+          {/* Show warning if selected webhook has no URL */}
+          {(() => {
+            const selectedWebhook = webhooks
+              .map((webhookStr) => JSON.parse(webhookStr) as WebhookEntry)
+              .find((w) => w.id === selectedWebhookId);
+            if (selectedWebhook && !selectedWebhook.url) {
+              return (
+                <div className="flex items-center gap-1 pl-1 text-xs text-red-500">
+                  <AlertCircle size={12} />
+                  <span>Selected webhook has no URL configured.</span>
+                </div>
+              );
+            }
+            return null;
+          })()}
+          <p className="pl-1 text-xs text-neutral-500">
             Posts a summary of tyre wear and race strategy to your Discord
-            channel.
+            channel. Add webhooks in the Settings & Webhooks tab.
           </p>
           <label className="flex cursor-pointer items-center gap-2 pl-1">
             <input
