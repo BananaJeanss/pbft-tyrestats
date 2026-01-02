@@ -55,6 +55,7 @@ interface DashboardViewProps {
 
   // Share specific
   onCopySession?: () => void;
+  onClearTyreData: () => void;
 }
 
 export default function DashboardView({
@@ -80,6 +81,7 @@ export default function DashboardView({
   setIsManualMode,
   openDashShare,
   onCopySession,
+  onClearTyreData,
 }: DashboardViewProps) {
   return (
     <div className="flex h-full w-full flex-col gap-2 rounded-lg bg-zinc-100 p-4 dark:bg-neutral-800">
@@ -137,6 +139,7 @@ export default function DashboardView({
           settyremanVis={settyremanVis}
           setSelectedTyre={setSelectedTyre}
           readOnly={readOnly}
+          onClearTyreData={onClearTyreData}
         />
 
         {/* AI strategy overview */}

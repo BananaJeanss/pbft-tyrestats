@@ -19,7 +19,15 @@ export default function DashSidebar({
   onSelectSession,
 }: DashSidebarProps) {
   const [newSessionOpen, setNewSessionOpen] = useState(false);
-  const [sessions] = useLocalStorage<TySession[]>("tyrestats_sessions", []);
+  const [rawSessions] = useLocalStorage<
+    TySession[] | Record<string, TySession>
+  >("tyrestats_sessions", []);
+  const sessions: TySession[] = Array.isArray(rawSessions)
+    ? rawSessions
+    : typeof rawSessions === "object" && rawSessions
+      ? Object.values(rawSessions)
+      : [];
+
   const mounted = useMounted();
   const [newFolderOpen, setNewFolderOpen] = useState(false);
   const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);

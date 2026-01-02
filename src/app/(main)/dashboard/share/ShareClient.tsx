@@ -231,6 +231,7 @@ function SharedSessionContent() {
           setMiscStats={() => {}}
           setIsManualMode={setIsManualMode}
           onCopySession={handleCopySession}
+          onClearTyreData={() => {}}
         />
       </div>
     </div>

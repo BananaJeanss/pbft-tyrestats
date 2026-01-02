@@ -11,6 +11,7 @@ export interface TyresViewProps {
   settyremanVis: (vis: boolean) => void;
   setSelectedTyre: (tyreId: string) => void;
   readOnly?: boolean;
+  onClearTyreData: () => void;
 }
 
 const TYRE_TYPES = [
@@ -27,6 +28,7 @@ export default function TyresView({
   settyremanVis,
   setSelectedTyre,
   readOnly = false,
+  onClearTyreData,
 }: TyresViewProps) {
   const [tyresettingsVis, settyresettingsVis] = useState<boolean>(false);
 
@@ -43,6 +45,8 @@ export default function TyresView({
       {tyresettingsVis && (
         <TyreSettings
           currentPreferences={tyrePreferences}
+          isThereTyreData={Object.keys(tyreData).length > 0}
+          ClearAllTyreData={onClearTyreData}
           onClose={() => settyresettingsVis(false)}
           onSave={setTyrePreferences}
         />

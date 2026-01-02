@@ -352,6 +352,62 @@ export default function Dashboard() {
   }
   const isMobile = useIsMobile();
 
+  const ClearThisTyreData = () => {
+    if (selectedTyre) {
+      setTyreData((prev) => {
+        const updated = { ...prev };
+        delete updated[selectedTyre];
+        return updated;
+      });
+    }
+  };
+
+  const clearAllTyreData = () => {
+    setTyreData({});
+    
+    // Update ref immediately to prevent stale data in race conditions
+    if (stateRef.current) {
+      stateRef.current.tyreData = {};
+    }
+
+    if (!currentSessionId) return;
+
+    try {
+      // Read fresh from localStorage to avoid stale state issues
+      const lsItem = window.localStorage.getItem("tyrestats_sessions");
+      let currentSessions: TySession[] = lsItem ? JSON.parse(lsItem) : [];
+      
+      // Safety check for data corruption (if it's an object instead of array)
+      if (!Array.isArray(currentSessions) && typeof currentSessions === "object" && currentSessions !== null) {
+        currentSessions = Object.values(currentSessions);
+      }
+      
+      if (!Array.isArray(currentSessions)) {
+        currentSessions = [];
+      }
+
+      const updatedSessions = currentSessions.map((s) =>
+        s.id === currentSessionId
+          ? {
+              ...s,
+              tyreData: {},
+              meta: {
+                ...s.meta,
+                lastModified: new Date().toISOString(),
+              },
+            }
+          : s
+      );
+
+      // Update using direct value to ensure hook state is synced with what we just calculated
+      setSessions(updatedSessions);
+      toast.success("All tyre data cleared");
+    } catch (error) {
+      console.error("Failed to clear tyre data:", error);
+      toast.error("Failed to clear tyre data");
+    }
+  };
+
   if (isMobile) {
     return (
       <div className="flex h-[calc(100vh-5rem)] flex-col items-center justify-center bg-zinc-200 p-8 dark:bg-neutral-800">
@@ -389,6 +445,8 @@ export default function Dashboard() {
           {tyremanVis && selectedTyre && (
             <TyreWearManager
               tyreType={selectedTyre}
+              ClearTyreData={ClearThisTyreData}
+              doesAlreadyHaveData={!!tyreData[selectedTyre]}
               onClose={() => settyremanVis(false)}
               onSave={handleSaveTyreData}
             />
@@ -572,6 +630,7 @@ export default function Dashboard() {
                 setMiscStats={setMiscStats}
                 setIsManualMode={setIsManualMode}
                 openDashShare={() => setDashShareOpen(true)}
+                onClearTyreData={clearAllTyreData}
               />
             </div>
           ) : (
