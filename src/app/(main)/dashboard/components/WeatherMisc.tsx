@@ -110,11 +110,11 @@ function WeatherMiscSettings({
 
         <div className="flex grow flex-col gap-6 overflow-y-auto pr-2">
           {/* Misc Stats Section */}
-          <section className="flex flex-col gap-4">
-            <h3 className="font-semibold text-neutral-500">
+          <section className="flex flex-col gap-2">
+            <h3 className="font-semibold opacity-90">
               Miscellaneous Stats
             </h3>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-neutral-500 uppercase">
                   Avg Lap Time
@@ -141,6 +141,27 @@ function WeatherMiscSettings({
                     />
                   );
                 })()}
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-semibold text-neutral-500 uppercase">
+                  Pit Loss Time (s)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={120}
+                  step={0.1}
+                  value={miscStats.pitLossTime}
+                  onChange={(e) => {
+                    let val = parseFloat(e.target.value);
+                    if (isNaN(val)) val = 0;
+                    if (val > 120) val = 120;
+                    if (val < 0) val = 0;
+                    updateMisc("pitLossTime", parseFloat  (val.toFixed(1)));
+                  }}
+                  className="rounded border border-neutral-700 bg-zinc-200 p-2 dark:bg-neutral-800"
+                  placeholder="20.0"
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-neutral-500 uppercase">
@@ -195,7 +216,7 @@ function WeatherMiscSettings({
           {/* Weather Section */}
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-neutral-500">
+              <h3 className="font-semibold opacity-90">
                 Weather Forecast
               </h3>
               {weather.length <= 20 && (
@@ -373,6 +394,14 @@ export default function WeatherMisc({
             Average Lap Time
             <span className="block font-normal">
               {miscStats?.avgLapTime || "-"}
+            </span>
+          </span>
+          <span className="cursor-help font-bold" title="Time lost on a pit-stop">
+            Pit Loss Time
+            <span className="block font-normal">
+              {miscStats?.pitLossTime !== undefined
+                ? `${miscStats.pitLossTime.toFixed(1)}s`
+                : "-"}
             </span>
           </span>
           <span

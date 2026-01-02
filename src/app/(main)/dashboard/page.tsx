@@ -93,6 +93,7 @@ export default function Dashboard() {
     gridPosition: 0,
     totalGridDrivers: 0,
     raceStartTime: "",
+    pitLossTime: 0,
   }));
 
   // Helper to convert Manual Stints (Array) to Recharts Data Format
@@ -313,6 +314,7 @@ export default function Dashboard() {
       gridPosition: 0,
       totalGridDrivers: 0,
       raceStartTime: "",
+      pitLossTime: 0,
     });
 
     setManualStints(session.manualStints || []);
@@ -455,6 +457,7 @@ export default function Dashboard() {
                       gridPosition: 0,
                       totalGridDrivers: 0,
                       raceStartTime: "",
+                      pitLossTime: 0,
                     },
                   );
                   setManualStints(duplicatedSession.manualStints || []);

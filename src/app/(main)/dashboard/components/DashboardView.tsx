@@ -169,6 +169,7 @@ export default function DashboardView({
             gridPosition: 0,
             totalGridDrivers: 0,
             raceStartTime: "",
+            pitLossTime: 0,
           }}
           setMiscStats={setMiscStats}
         />

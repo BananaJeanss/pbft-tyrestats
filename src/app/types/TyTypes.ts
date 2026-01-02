@@ -40,6 +40,7 @@ export interface MiscStats {
   gridPosition: number;
   totalGridDrivers: number;
   raceStartTime: string;
+  pitLossTime: number;
 }
 
 export interface TyreWearData {
