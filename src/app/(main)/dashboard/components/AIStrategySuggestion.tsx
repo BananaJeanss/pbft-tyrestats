@@ -1,4 +1,4 @@
-import { ExpectedRequest } from "@/app/api/ai/route";
+import { ExpectedRequest } from "@/app/types/AIRequest";
 import { FullscreenIcon, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import AIStrategySettings from "./AIStrategySettings";
@@ -14,6 +14,8 @@ export interface AIStrategySuggestionProps {
   readOnly?: boolean;
 }
 
+interface CombinedProps extends ExpectedRequest, AIStrategySuggestionProps {}
+
 export default function AIStrategySuggestion({
   tyreData,
   raceConfig,
@@ -24,7 +26,7 @@ export default function AIStrategySuggestion({
   onSaveConfig,
   aiConfig,
   readOnly = false,
-}: ExpectedRequest & AIStrategySuggestionProps) {
+}: CombinedProps) {
   const [ratelimitCount, setRatelimitCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 

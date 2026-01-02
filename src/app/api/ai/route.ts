@@ -1,4 +1,4 @@
-import { TyreWearData } from "@/app/types/TyTypes";
+import { ExpectedRequest } from "@/app/types/AIRequest";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { createClient } from "redis";
@@ -44,26 +44,6 @@ function CallHCAI(
   });
 
   return response;
-}
-
-// expected request because we only want to allow tyre stats, no free ai for you
-export interface ExpectedRequest {
-  tyreData: Record<string, TyreWearData>;
-  raceConfig: {
-    RaceLaps: number;
-  };
-  tyrePreferences: {
-    preferredSwitchoverPoint: number;
-    softToMediumRatio: number;
-    mediumToHardRatio: number;
-  };
-  notes?: string;
-  aiConfig: {
-    model: string;
-    temperature: number;
-    top_p: number;
-    useExperimentalPrompt: boolean;
-  };
 }
 
 async function checkRateLimit() {
