@@ -25,7 +25,6 @@ export default function AIStrategySuggestion({
   onSaveConfig,
   readOnly = false,
 }: CombinedProps) {
-  const tyrePreferences = raceConfig.tyrePreferences;
   const aiConfig = raceConfig.aiConfigSettings;
 
   const [ratelimitCount, setRatelimitCount] = useState<number | null>(null);
