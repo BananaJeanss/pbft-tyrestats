@@ -59,7 +59,7 @@ export default function TyresView({
             </button>
           )}
         </div>
-        <div className="flex grow h-full flex-col justify-evenly gap-2 overflow-hidden">
+        <div className="flex h-full grow flex-col justify-evenly gap-2 overflow-hidden">
           {TYRE_TYPES.map((tyre) => {
             const effectiveData = getEffectiveTyreData(
               tyre.id,
@@ -69,7 +69,7 @@ export default function TyresView({
             return (
               <div
                 key={tyre.id}
-                className="@container flex min-h-0 max-h-1/4 w-full shrink grow flex-row items-center gap-4 rounded-md bg-zinc-300 p-2 px-4 dark:bg-neutral-800"
+                className="@container flex max-h-1/4 min-h-0 w-full shrink grow flex-row items-center gap-4 rounded-md bg-zinc-300 p-2 px-4 dark:bg-neutral-800"
               >
                 <button
                   disabled={readOnly}

@@ -309,13 +309,15 @@ export default function Dashboard() {
           ?.useExperimentalPrompt ?? false,
     });
     setWeather(session.weather || []);
-    setMiscStats(session.miscStats || {
-      avgLapTime: "",
-      gridPosition: 0,
-      totalGridDrivers: 0,
-      raceStartTime: "",
-      pitLossTime: 0,
-    });
+    setMiscStats(
+      session.miscStats || {
+        avgLapTime: "",
+        gridPosition: 0,
+        totalGridDrivers: 0,
+        raceStartTime: "",
+        pitLossTime: 0,
+      },
+    );
 
     setManualStints(session.manualStints || []);
 
@@ -525,7 +527,8 @@ export default function Dashboard() {
                     name: sessionSettings["current"]?.name || "Unnamed Session",
                     date: sessionSettings["current"]?.date || "",
                     lastModified:
-                      sessionSettings["current"]?.lastModified || new Date().toISOString(),
+                      sessionSettings["current"]?.lastModified ||
+                      new Date().toISOString(),
                     selectedIcon:
                       sessionSettings["current"]?.selectedIcon || "default",
                     icon_url: sessionSettings["current"]?.icon_url,

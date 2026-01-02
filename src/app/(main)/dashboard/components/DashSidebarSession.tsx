@@ -30,7 +30,8 @@ export default function DashSidebarSession({
           : "border-transparent bg-white hover:bg-zinc-200 dark:border-transparent dark:bg-neutral-900 dark:hover:bg-neutral-950"
       }`}
     >
-      {sessionData.meta.icon_url && sessionData.meta.selectedIcon === "custom" ? (
+      {sessionData.meta.icon_url &&
+      sessionData.meta.selectedIcon === "custom" ? (
         /* eslint-disable-next-line @next/next/no-img-element*/
         <img
           src={sessionData.meta.icon_url}
@@ -48,7 +49,9 @@ export default function DashSidebarSession({
       )}
 
       <div className="flex w-full flex-col justify-center overflow-hidden">
-        <h2 className="text-md w-full truncate font-semibold">{sessionData.meta.name}</h2>
+        <h2 className="text-md w-full truncate font-semibold">
+          {sessionData.meta.name}
+        </h2>
         <hr className="my-1 w-full border-gray-200 dark:border-neutral-700" />
         <span className="flex flex-col gap-1">
           <div className="flex flex-row items-center text-xs text-zinc-500">
@@ -60,7 +63,7 @@ export default function DashSidebarSession({
             })}
           </div>
           <div className="flex flex-row items-center text-xs text-zinc-500">
-          <Goal className="mr-1 inline h-3 w-3" />
+            <Goal className="mr-1 inline h-3 w-3" />
             Laps: {sessionData.raceConfig.RaceLaps || "N/A"}
           </div>
         </span>

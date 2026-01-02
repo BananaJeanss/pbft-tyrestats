@@ -111,9 +111,7 @@ function WeatherMiscSettings({
         <div className="flex grow flex-col gap-6 overflow-y-auto pr-2">
           {/* Misc Stats Section */}
           <section className="flex flex-col gap-2">
-            <h3 className="font-semibold opacity-90">
-              Miscellaneous Stats
-            </h3>
+            <h3 className="font-semibold opacity-90">Miscellaneous Stats</h3>
             <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-neutral-500 uppercase">
@@ -121,9 +119,15 @@ function WeatherMiscSettings({
                 </label>
                 {(() => {
                   const avgLapTime = miscStats.avgLapTime;
-                  const valid = /^\d{1,2}:\d{2}(\.[0-9]{1,3})?$/.test(avgLapTime);
-                  const typingProgress = /^\d{0,2}$|^\d{1,2}:?$|^\d{1,2}:\d{0,2}$|^\d{1,2}:\d{2}(\.[0-9]{0,3})?$/.test(avgLapTime);
-                  const showInvalid = avgLapTime !== "" && !valid && !typingProgress;
+                  const valid = /^\d{1,2}:\d{2}(\.[0-9]{1,3})?$/.test(
+                    avgLapTime,
+                  );
+                  const typingProgress =
+                    /^\d{0,2}$|^\d{1,2}:?$|^\d{1,2}:\d{0,2}$|^\d{1,2}:\d{2}(\.[0-9]{0,3})?$/.test(
+                      avgLapTime,
+                    );
+                  const showInvalid =
+                    avgLapTime !== "" && !valid && !typingProgress;
                   return (
                     <input
                       type="text"
@@ -132,11 +136,15 @@ function WeatherMiscSettings({
                       onChange={(e) => {
                         const v = e.target.value;
                         // Only save if valid or making progress toward valid input
-                        if (/^\d{0,2}$|^\d{1,2}:?$|^\d{1,2}:\d{0,2}$|^\d{1,2}:\d{2}(\.[0-9]{0,3})?$/.test(v)) {
+                        if (
+                          /^\d{0,2}$|^\d{1,2}:?$|^\d{1,2}:\d{0,2}$|^\d{1,2}:\d{2}(\.[0-9]{0,3})?$/.test(
+                            v,
+                          )
+                        ) {
                           updateMisc("avgLapTime", v);
                         }
                       }}
-                      className={`rounded border p-2 bg-zinc-200 dark:bg-neutral-800 ${showInvalid ? "border-red-500" : "border-neutral-700"}`}
+                      className={`rounded border bg-zinc-200 p-2 dark:bg-neutral-800 ${showInvalid ? "border-red-500" : "border-neutral-700"}`}
                       placeholder="1:30.000"
                     />
                   );
@@ -157,7 +165,7 @@ function WeatherMiscSettings({
                     if (isNaN(val)) val = 0;
                     if (val > 120) val = 120;
                     if (val < 0) val = 0;
-                    updateMisc("pitLossTime", parseFloat  (val.toFixed(1)));
+                    updateMisc("pitLossTime", parseFloat(val.toFixed(1)));
                   }}
                   className="rounded border border-neutral-700 bg-zinc-200 p-2 dark:bg-neutral-800"
                   placeholder="20.0"
@@ -216,15 +224,13 @@ function WeatherMiscSettings({
           {/* Weather Section */}
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold opacity-90">
-                Weather Forecast
-              </h3>
+              <h3 className="font-semibold opacity-90">Weather Forecast</h3>
               {weather.length <= 20 && (
                 <button
-                    onClick={handleAddWeather}
-                    className="flex cursor-pointer items-center gap-1 rounded bg-blue-600 px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-blue-700"
+                  onClick={handleAddWeather}
+                  className="flex cursor-pointer items-center gap-1 rounded bg-blue-600 px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-blue-700"
                 >
-                    <Plus size={14} /> Add Slot
+                  <Plus size={14} /> Add Slot
                 </button>
               )}
             </div>
@@ -249,8 +255,12 @@ function WeatherMiscSettings({
                       // Accepts partial input for typing, but only nn:nn or xx:xx is valid
                       const timeVal = entry.time;
                       const valid = /^[\dx]{2}:[\dx]{2}$/i.test(timeVal);
-                      const typingProgress = /^[\dx]{0,2}$|^[\dx]{2}:?$|^[\dx]{2}:[\dx]{0,2}$/i.test(timeVal);
-                      const showInvalid = !valid && timeVal !== "" && typingProgress;
+                      const typingProgress =
+                        /^[\dx]{0,2}$|^[\dx]{2}:?$|^[\dx]{2}:[\dx]{0,2}$/i.test(
+                          timeVal,
+                        );
+                      const showInvalid =
+                        !valid && timeVal !== "" && typingProgress;
                       return (
                         <input
                           type="text"
@@ -265,7 +275,7 @@ function WeatherMiscSettings({
                               updateWeather(idx, "time", "");
                             }
                           }}
-                          className={`w-full rounded border p-2 bg-transparent px-2 py-1 text-sm ${showInvalid ? "border-red-500" : "border-neutral-600"}`}
+                          className={`w-full rounded border bg-transparent p-2 px-2 py-1 text-sm ${showInvalid ? "border-red-500" : "border-neutral-600"}`}
                           placeholder="hh:mm"
                         />
                       );
@@ -386,7 +396,7 @@ export default function WeatherMisc({
         </div>
         <hr className="border-neutral-700" />
         {/* misc stats place */}
-        <div className="flex w-full grow shrink-0 flex-row items-center justify-between gap-4 text-center px-4">
+        <div className="flex w-full shrink-0 grow flex-row items-center justify-between gap-4 px-4 text-center">
           <span
             className="cursor-help font-bold"
             title="Expected average lap time, used for strategy calculations."
@@ -396,7 +406,10 @@ export default function WeatherMisc({
               {miscStats?.avgLapTime || "-"}
             </span>
           </span>
-          <span className="cursor-help font-bold" title="Time lost on a pit-stop">
+          <span
+            className="cursor-help font-bold"
+            title="Time lost on a pit-stop"
+          >
             Pit Loss Time
             <span className="block font-normal">
               {miscStats?.pitLossTime !== undefined

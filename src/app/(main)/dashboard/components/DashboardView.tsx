@@ -2,7 +2,6 @@
 
 import { Pencil, Copy } from "lucide-react";
 import {
-
   TyrePreferences,
   TimelineData,
   Stint,
@@ -143,7 +142,7 @@ export default function DashboardView({
         {/* AI strategy overview */}
         <AIStrategySuggestion
           tyreData={SessionData.tyreData}
-          raceConfig={SessionData}   
+          raceConfig={SessionData}
           notes={SessionData.currentNotes}
           existingSuggestion={SessionData.currentSuggestion || ""}
           onSave={setCurrentSuggestion}
@@ -153,7 +152,7 @@ export default function DashboardView({
       </div>
 
       {/* Notes section*/}
-      <div className="flex flex-row gap-2 grow">
+      <div className="flex grow flex-row gap-2">
         <DashNotes
           notes={SessionData.currentNotes}
           onChange={setCurrentNotes}
@@ -164,13 +163,15 @@ export default function DashboardView({
           readOnly={readOnly}
           weather={SessionData.weather || []}
           setWeather={setWeather}
-          miscStats={SessionData.miscStats || {
-            avgLapTime: "",
-            gridPosition: 0,
-            totalGridDrivers: 0,
-            raceStartTime: "",
-            pitLossTime: 0,
-          }}
+          miscStats={
+            SessionData.miscStats || {
+              avgLapTime: "",
+              gridPosition: 0,
+              totalGridDrivers: 0,
+              raceStartTime: "",
+              pitLossTime: 0,
+            }
+          }
           setMiscStats={setMiscStats}
         />
       </div>

@@ -51,7 +51,6 @@ function CallHCAI(
   return response;
 }
 
-
 async function checkRateLimit() {
   const headersList = headers();
   const ip = (await headersList).get("x-forwarded-for") || "unknown";

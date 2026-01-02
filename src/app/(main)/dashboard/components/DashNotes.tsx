@@ -48,7 +48,7 @@ export default function DashNotes({
           />
         </div>
         <textarea
-          className={`h-full w-full min-h-0 resize-none rounded-md bg-zinc-300 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800 ${
+          className={`h-full min-h-0 w-full resize-none rounded-md bg-zinc-300 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800 ${
             readOnly ? "cursor-not-allowed opacity-70" : ""
           }`}
           placeholder={readOnly ? "No notes added." : "Add your notes here..."}
