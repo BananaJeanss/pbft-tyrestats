@@ -47,7 +47,7 @@ export default function TyresView({
           onSave={setTyrePreferences}
         />
       )}
-      <div className="flex h-full w-2/7 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+      <div className="flex h-full w-1/4 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row justify-between gap-2">
           <p className="text-md font-bold">Tyres</p>
           {!readOnly && (

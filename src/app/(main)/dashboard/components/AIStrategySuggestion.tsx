@@ -121,7 +121,7 @@ export default function AIStrategySuggestion({
           content={generatedSuggestion || "No suggestion generated yet."}
         />
       )}
-      <div className="flex h-full w-5/7 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+      <div className="flex h-full w-3/4 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center gap-2">
             <h3 className="text-lg font-bold">AI Strategy Overview</h3>

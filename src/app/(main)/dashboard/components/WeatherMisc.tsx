@@ -309,14 +309,14 @@ export default function WeatherMisc({
           setMiscStats={setMiscStats}
         />
       )}
-      <div className="flex w-5/7 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+      <div className="flex w-3/4 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center gap-1">
             <h3 className="text-lg font-bold">Weather & Miscellaneous Stats</h3>
             {!readOnly && (
               <span className="relative inline-block">
                 <Info className="peer ml-2 inline-block h-4 w-4 cursor-pointer" />
-                <span className="pointer-events-none absolute top-1/2 left-8 z-10 w-87.5 -translate-y-1/2 rounded bg-zinc-700 px-2 py-1 text-xs text-wrap text-white opacity-0 transition-opacity peer-hover:opacity-100">
+                <span className="pointer-events-none absolute top-1/2 left-8 z-10 w-64 -translate-y-1/2 rounded bg-zinc-700 px-2 py-1 text-xs text-wrap text-white opacity-0 transition-opacity peer-hover:opacity-100">
                   Weather data and miscellaneous info may be used for timeline
                   generation and in AI strategy input.
                 </span>
@@ -334,7 +334,7 @@ export default function WeatherMisc({
         </div>
         <hr className="border-neutral-700" />
         <div
-          className="flex h-24 flex-row items-center justify-start gap-1 overflow-x-scroll"
+          className="flex h-24 shrink-0 flex-row items-center justify-start gap-1 overflow-x-scroll"
           style={{
             scrollbarColor: "#a3a3a3 transparent",
             scrollbarWidth: "thin",
@@ -365,7 +365,7 @@ export default function WeatherMisc({
         </div>
         <hr className="border-neutral-700" />
         {/* misc stats place */}
-        <div className="flex w-full grow flex-row items-center justify-between gap-8 text-center px-16">
+        <div className="flex w-full grow shrink-0 flex-row items-center justify-between gap-4 text-center px-4 pb-3">
           <span
             className="cursor-help font-bold"
             title="Expected average lap time, used for strategy calculations."

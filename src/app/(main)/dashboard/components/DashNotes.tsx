@@ -27,7 +27,7 @@ export default function DashNotes({
           }}
         />
       )}
-      <div className="flex w-2/7 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
+      <div className="flex w-1/4 grow flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row items-center">
           <h3 className="font-semibold">
             Notes
@@ -40,7 +40,7 @@ export default function DashNotes({
               </span>
             )}
           </h3>
-          {/* seperator */}
+          {/* separator */}
           <div className="grow"></div>
           <FullscreenIcon
             className="cursor-pointer"
@@ -48,7 +48,7 @@ export default function DashNotes({
           />
         </div>
         <textarea
-          className={`h-full w-full resize-none rounded-md bg-zinc-300 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800 ${
+          className={`h-full w-full min-h-0 resize-none rounded-md bg-zinc-300 p-2 focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800 ${
             readOnly ? "cursor-not-allowed opacity-70" : ""
           }`}
           placeholder={readOnly ? "No notes added." : "Add your notes here..."}
