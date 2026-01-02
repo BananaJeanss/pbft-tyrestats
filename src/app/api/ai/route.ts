@@ -1,4 +1,4 @@
-import { TyreWearData, TySession } from "@/app/types/TyTypes";
+import { ExpectedRequest } from "@/app/types/AIRequest";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { createClient } from "redis";
@@ -51,11 +51,6 @@ function CallHCAI(
   return response;
 }
 
-// expected request because we only want to allow tyre stats, no free ai for you
-export interface ExpectedRequest {
-  tyreData: Record<string, TyreWearData>;
-  raceConfig: TySession;
-}
 
 async function checkRateLimit() {
   const headersList = headers();
