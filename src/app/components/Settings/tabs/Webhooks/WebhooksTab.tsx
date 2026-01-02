@@ -93,7 +93,7 @@ export default function WebhooksTab() {
                 .map((webhook) => (
                   <div
                     key={webhook.id}
-                    className="flex w-full flex-row items-center gap-4 rounded border border-neutral-800 bg-neutral-900 px-4 py-4 text-sm"
+                    className="flex w-full flex-row items-center gap-4 rounded border bg-zinc-200 border-zinc-300 dark:border-neutral-800 dark:bg-neutral-900 px-4 py-4 text-sm"
                   >
                     {/* ignore cause custom url in img */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}

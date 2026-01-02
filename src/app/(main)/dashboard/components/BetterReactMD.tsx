@@ -11,7 +11,7 @@ export interface BetterReactMDProps {
 
 export default function BetterReactMD({ content }: BetterReactMDProps) {
   return (
-    <div className="text-sm leading-relaxed [&_code]:rounded [&_code]:border [&_code]:border-neutral-700/50 [&_code]:bg-neutral-800 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit">
+    <div className="text-sm leading-relaxed [&_code]:rounded [&_code]:border [&_code]:border-neutral-700/50 [&_code]:bg-neutral-800 [&_code]:text-white [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs [&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-inherit">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}

@@ -365,7 +365,7 @@ export default function WeatherMisc({
         </div>
         <hr className="border-neutral-700" />
         {/* misc stats place */}
-        <div className="flex w-full grow shrink-0 flex-row items-center justify-between gap-4 text-center px-4 pb-3">
+        <div className="flex w-full grow shrink-0 flex-row items-center justify-between gap-4 text-center px-4">
           <span
             className="cursor-help font-bold"
             title="Expected average lap time, used for strategy calculations."

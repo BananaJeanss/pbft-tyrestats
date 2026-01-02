@@ -59,7 +59,7 @@ export default function TyresView({
             </button>
           )}
         </div>
-        <div className="flex grow flex-col justify-evenly gap-2 overflow-y-auto">
+        <div className="flex grow h-full flex-col justify-evenly gap-2 overflow-hidden">
           {TYRE_TYPES.map((tyre) => {
             const effectiveData = getEffectiveTyreData(
               tyre.id,
@@ -69,7 +69,7 @@ export default function TyresView({
             return (
               <div
                 key={tyre.id}
-                className="@container flex max-h-1/4 w-full shrink grow flex-row items-center gap-4 rounded-md bg-zinc-300 p-2 px-4 dark:bg-neutral-800"
+                className="@container flex min-h-0 max-h-1/4 w-full shrink grow flex-row items-center gap-4 rounded-md bg-zinc-300 p-2 px-4 dark:bg-neutral-800"
               >
                 <button
                   disabled={readOnly}
@@ -90,12 +90,12 @@ export default function TyresView({
                 <div className="flex min-w-0 flex-1 flex-col justify-center">
                   {effectiveData ? (
                     <>
-                      <p className="text-[clamp(8px,0.65vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
+                      <p className="text-[clamp(8px,0.5vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
                         {effectiveData.isEstimated ? "Est. " : ""}
                         Average wear per lap:{" "}
                         {effectiveData.wearPerLap.toFixed(2)}%
                       </p>
-                      <p className="text-[clamp(8px,0.65vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
+                      <p className="text-[clamp(8px,0.5vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
                         Recommended Lap Count:{" "}
                         {calcRecommendedLapCount(effectiveData.wearPerLap)} (
                         {(
@@ -107,7 +107,7 @@ export default function TyresView({
                       </p>
                     </>
                   ) : (
-                    <p className="text-[clamp(8px,0.65vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
+                    <p className="text-[clamp(8px,0.5vw,24px)] leading-tight text-zinc-800 dark:text-neutral-400">
                       No Data Yet{" "}
                       {readOnly ? "" : "(Click on the tyre to add data)"}
                     </p>

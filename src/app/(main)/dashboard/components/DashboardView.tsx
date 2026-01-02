@@ -129,7 +129,7 @@ export default function DashboardView({
       />
 
       {/* top tiles section - tyres and ai */}
-      <div className="flex h-full min-h-60 w-full flex-col gap-2 md:h-2/5 md:flex-row">
+      <div className="flex h-full min-h-60 w-full flex-col gap-2 md:h-3/5 md:flex-row">
         {/* tyressssssss */}
         <TyresView
           tyreData={SessionData.tyreData}
@@ -153,7 +153,7 @@ export default function DashboardView({
       </div>
 
       {/* Notes section*/}
-      <div className="flex flex-row gap-2 grow min-h-0">
+      <div className="flex flex-row gap-2 grow">
         <DashNotes
           notes={SessionData.currentNotes}
           onChange={setCurrentNotes}
