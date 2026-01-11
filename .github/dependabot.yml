@@ -1,17 +1,16 @@
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 version: 2
 updates:
   - package-ecosystem: "bun"
-		directory: "/"
-		schedule:
+    directory: "/"
+    schedule:
       interval: "weekly"
       time: "17:00"
       timezone: "Europe/Tallinn"
-		open-pull-requests-limit: 10
-		groups:
-			dependencies:
-				patterns:
-					- "*"
-				update-types:
-					- "minor"
-					- "patch"
+    open-pull-requests-limit: 10
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
