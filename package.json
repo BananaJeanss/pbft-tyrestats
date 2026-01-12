@@ -10,13 +10,18 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prettier": "prettier --check .",
-    "prettier:fix": "prettier --write ."
+    "prettier:fix": "prettier --write .",
+    "prisma:generate": "bun --bun prisma generate",
+    "prisma:migrate": "bun --bun prisma migrate dev"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
     "@types/pg": "^8.16.0",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "@vercel/analytics": "^1.6.1",
+    "better-auth": "^1.4.11",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
@@ -47,6 +52,7 @@
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "prisma": "^7.2.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.52.0"

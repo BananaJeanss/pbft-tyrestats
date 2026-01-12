@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import postgresPool from "@/app/db/postgresClient";
 import redisClient from "@/app/db/redisClient";
 import { TySession } from "@/app/types/TyTypes";
+import { prisma } from "../../../../db";
 
 const restrictedFields = ["id", "folder"];
 const IsDevvingRatelimits = process.env.ENABLE_RDISPSTGRS_INDEV === "true";
@@ -45,27 +45,24 @@ export async function GET(req: Request) {
     }
   }
 
-  const client = await postgresPool.connect();
   try {
-    const res = await client.query(
-      "SELECT session_data FROM shared_sessions WHERE short_url = $1",
-      [shortUrl],
-    );
+    const res = await prisma.shared_sessions.findUnique({
+      where: { short_url: shortUrl },
+      select: { session_data: true },
+    });
 
-    if (res.rows.length === 0) {
+    if (!res) {
       return NextResponse.json(
         { error: "Short URL not found" },
         { status: 404 },
       );
     }
 
-    const sessionData = res.rows[0].session_data;
+    const sessionData = res.session_data;
     return NextResponse.json({ sessionData });
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json({ error: "Database error" }, { status: 500 });
-  } finally {
-    client.release();
   }
 }
 
@@ -134,17 +131,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const client = await postgresPool.connect();
   try {
-    await client.query(`
-            CREATE TABLE IF NOT EXISTS shared_sessions (
-                short_url VARCHAR(10) PRIMARY KEY,
-                session_data JSONB NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                hashcheck VARCHAR(64) NOT NULL
-            );
-        `); // hashcheck to prevent duplicate entries
-
     const hashcheck = crypto.subtle.digest(
       "SHA-256",
       new TextEncoder().encode(JSON.stringify(sessionData)),
@@ -154,31 +141,33 @@ export async function POST(req: Request) {
       .join("");
 
     // Check for existing entry
-    const existingRes = await client.query(
-      "SELECT short_url FROM shared_sessions WHERE hashcheck = $1",
-      [hashHex],
-    );
+    const existingRes = await prisma.shared_sessions.findUnique({
+      where: { hashcheck: hashHex },
+    });
 
     let shortUrl: string = "";
-    if (existingRes.rows.length > 0) {
-      shortUrl = existingRes.rows[0].short_url;
+    if (existingRes) {
+      shortUrl = existingRes.short_url;
     } else {
       // Create a new short URL, and make sure already doesnt exist
       let exists = false;
       while (!shortUrl || exists) {
         shortUrl = crypto.randomUUID().split("-")[0]; // simple short URL
-        const checkRes = await client.query(
-          "SELECT 1 FROM shared_sessions WHERE short_url = $1",
-          [shortUrl],
-        );
-        exists = checkRes.rows.length > 0;
+        const checkRes = await prisma.shared_sessions.findMany({
+          where: { short_url: shortUrl },
+          select: { short_url: true },
+        });
+        exists = checkRes.length > 0;
       }
 
       // Insert new entry
-      await client.query(
-        "INSERT INTO shared_sessions (short_url, session_data, hashcheck) VALUES ($1, $2, $3)",
-        [shortUrl, sessionData, hashHex],
-      );
+      await prisma.shared_sessions.create({
+        data: {
+          short_url: shortUrl,
+          session_data: JSON.parse(JSON.stringify(sessionData)),
+          hashcheck: hashHex,
+        },
+      });
     }
 
     const url = new URL(req.url);
@@ -187,7 +176,5 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json({ error: "Database error" }, { status: 500 });
-  } finally {
-    client.release();
   }
 }

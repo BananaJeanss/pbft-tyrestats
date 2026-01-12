@@ -1,5 +1,5 @@
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { CircleQuestionMark, Info } from "lucide-react";
+import { Info } from "lucide-react";
 
 export default function AutoSaveTab() {
   const [isAutosaveEnabled, setIsAutosaveEnabled] = useLocalStorage<boolean>(
