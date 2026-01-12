@@ -124,30 +124,26 @@ export default function AIStrategySuggestion({
       <div className="flex h-full w-3/4 flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
         <div className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center gap-2">
-            <h3 className="text-lg font-bold">AI Strategy Overview</h3>
-            {!isLoading ? (
-              <div
-                className={`${readOnly ? "hidden" : "flex flex-row items-center gap-2"}`}
-              >
-                <p>|</p>
+            <h3 className="text-lg font-bold">AI Strategy</h3>
+            <div
+              className={`${readOnly ? "hidden" : "flex flex-row items-center gap-2"}`}
+            >
+              <div className="h-5 w-px bg-neutral-700" />
+              <>
                 <button
-                  disabled={readOnly}
-                  className={`rounded font-light ${
-                    readOnly ? "hidden" : "cursor-pointer underline"
-                  }`}
+                  disabled={readOnly || isLoading}
+                  className={`rounded border border-blue-800 p-1 px-2 text-xs ${
+                    readOnly ? "hidden" : ""
+                  } ${readOnly || isLoading ? "cursor-not-allowed" : "cursor-pointer"} ${isLoading ? "opacity-50" : ""} `}
                   onClick={clientcallHCAI}
                 >
-                  Generate Analysis{" "}
+                  {isLoading ? "Generating..." : "Generate Analysis"}
                   {ratelimitCount !== null
                     ? `(${ratelimitCount}/5 requests (24 hours))`
                     : ""}
                 </button>
-              </div>
-            ) : (
-              <button className="cursor-not-allowed font-light" disabled>
-                Generating...
-              </button>
-            )}
+              </>
+            </div>
           </div>
           <div className="flex flex-row items-center gap-4">
             <FullscreenIcon

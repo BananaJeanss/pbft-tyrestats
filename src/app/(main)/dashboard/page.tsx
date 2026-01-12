@@ -58,6 +58,11 @@ export default function Dashboard() {
 
   // notes & AI
   const [currentNotes, setCurrentNotes] = useState("");
+  const currentNotesRef = useRef("");
+    // keep currentNotesRef updated
+    useEffect(() => {
+      currentNotesRef.current = currentNotes;
+    }, [currentNotes]);
   const [currentSuggestion, setCurrentSuggestion] = useState("");
   const [shortUrl, setShortUrl] = useState<string>("");
 
@@ -218,8 +223,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
       return;
-    const timeoutId = setTimeout(() => saveSession(), autoSaveInterval * 1000);
-    return () => clearTimeout(timeoutId);
+    saveSession(); // this used to have an interval but now just saves on change, except for notes
     // not dealing with this fuckass warning
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -229,7 +233,6 @@ export default function Dashboard() {
     tyreData,
     raceConfig,
     tyrePreferences,
-    currentNotes,
     sessionSettings,
     currentSuggestion,
     manualStints,
@@ -239,8 +242,74 @@ export default function Dashboard() {
     shortUrl,
   ]);
 
-  // please boss im tired of this fuckass god component
-  // im truly the best programmer to ever live
+  // autosave except for notes
+  useEffect(() => {
+    if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
+      return;
+    // Save everything except notes
+    const currentData = { ...stateRef.current, currentNotes: undefined };
+    setSessions((prevSessions) =>
+      prevSessions.map((s) =>
+        s.id === currentSessionId
+          ? {
+              ...s,
+              tyreData: currentData.tyreData,
+              raceConfig: currentData.raceConfig,
+              tyrePreferences: currentData.tyrePreferences,
+              currentSuggestion: currentData.currentSuggestion,
+              shortUrl: currentData.shortUrl,
+              manualStints: currentData.manualStints,
+              aiConfigSettings: currentData.aiConfigSettings,
+              weather: currentData.weather,
+              miscStats: currentData.miscStats,
+              folder:
+                currentData.sessionSettings["current"]?.folder || s.folder,
+              meta: {
+                ...(currentData.sessionSettings["current"] || s.meta),
+                lastModified: new Date().toISOString(),
+              },
+            }
+          : s,
+      ),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isAutosaveEnabled,
+    autoSaveInterval,
+    currentSessionId,
+    tyreData,
+    raceConfig,
+    tyrePreferences,
+    sessionSettings,
+    currentSuggestion,
+    manualStints,
+    aiConfigSettings,
+    weather,
+    miscStats,
+    shortUrl,
+  ]);
+
+  // Debounced autosave for notes: only save after user stops typing for autoSaveInterval seconds
+  useEffect(() => {
+    if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
+      return;
+    const handler = setTimeout(() => {
+      setSessions((prevSessions) =>
+        prevSessions.map((s) =>
+          s.id === currentSessionId ? { ...s, currentNotes: currentNotesRef.current } : s,
+        ),
+      );
+      toast.success("Notes autosaved");
+    }, autoSaveInterval * 1000);
+    return () => clearTimeout(handler);
+    // exhaustive deps cause otherwise it gets stuck in a loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    currentNotes,
+    isAutosaveEnabled,
+    autoSaveInterval,
+    currentSessionId,
+  ]);
 
   // ctrl+s
   useEffect(() => {
@@ -364,7 +433,7 @@ export default function Dashboard() {
 
   const clearAllTyreData = () => {
     setTyreData({});
-    
+
     // Update ref immediately to prevent stale data in race conditions
     if (stateRef.current) {
       stateRef.current.tyreData = {};
@@ -376,12 +445,16 @@ export default function Dashboard() {
       // Read fresh from localStorage to avoid stale state issues
       const lsItem = window.localStorage.getItem("tyrestats_sessions");
       let currentSessions: TySession[] = lsItem ? JSON.parse(lsItem) : [];
-      
+
       // Safety check for data corruption (if it's an object instead of array)
-      if (!Array.isArray(currentSessions) && typeof currentSessions === "object" && currentSessions !== null) {
+      if (
+        !Array.isArray(currentSessions) &&
+        typeof currentSessions === "object" &&
+        currentSessions !== null
+      ) {
         currentSessions = Object.values(currentSessions);
       }
-      
+
       if (!Array.isArray(currentSessions)) {
         currentSessions = [];
       }
@@ -396,7 +469,7 @@ export default function Dashboard() {
                 lastModified: new Date().toISOString(),
               },
             }
-          : s
+          : s,
       );
 
       // Update using direct value to ensure hook state is synced with what we just calculated
