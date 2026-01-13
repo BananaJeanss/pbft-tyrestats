@@ -1,10 +1,12 @@
 "use client";
 
-import { Database, Github } from "lucide-react";
+import { Database } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import RobloxTilt from "./components/roblox-logos";
+import { authClient } from "@/lib/auth-client";
 
 const loginButtonStyles =
   "border p-2 m-2 rounded-4xl transition hover:bg-gray-300 dark:hover:bg-gray-900 flex flex-row gap-2";
@@ -33,18 +35,26 @@ export default function Home() {
       <hr className="my-4 w-1/2 border-zinc-300" />
       <div className="flex w-full flex-row items-center justify-center">
         <button
-          className={`cursor-not-allowed ${loginButtonStyles} relative`}
-          disabled
-          style={{ opacity: 0.5 }}
+          className={`cursor-pointer ${loginButtonStyles}`}
+          onClick={async () => {
+            await authClient.signIn
+              .social({
+                provider: "roblox",
+                callbackURL: "/dashboard",
+              })
+              .catch((err) => {
+                console.error("Roblox Login Failed:", err);
+              });
+          }}
         >
-          <Github />
-          Login with GitHub (not implemented yet)
+          <RobloxTilt />
+          Login with Roblox
         </button>
         <div className="mx-2 h-12 w-px bg-zinc-300" />
         <Link href="/dashboard" passHref>
           <button className={`cursor-pointer ${loginButtonStyles}`}>
             <Database />
-            LocalStorage (No Login)
+            Use LocalStorage
           </button>
         </Link>
       </div>
