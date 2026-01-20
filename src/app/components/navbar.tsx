@@ -1,12 +1,13 @@
 "use client";
 
-import { Settings } from "lucide-react";
+import { Database, Settings } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import SettingsPage from "./Settings/SettingsMenu";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
@@ -23,6 +24,8 @@ export default function Navbar() {
   const logoSrc = resolvedTheme === "light" ? "/tslogo.png" : "/tslogow.png";
 
   const isOnDashboard = pathname === "/dashboard" || pathname === "/dashboard/";
+
+  const { data: session, isPending, error, refetch } = authClient.useSession();
 
   if (!mounted) return null;
 
@@ -48,6 +51,30 @@ export default function Navbar() {
           )}
         </div>
         <div className="flex flex-row items-center justify-end gap-4 text-2xl font-bold">
+          {isPending ? (
+            <div className="h-10 w-24 animate-pulse rounded bg-neutral-300 dark:bg-neutral-800" />
+          ) : session ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={session?.user?.image || "/default-avatar.png"}
+                alt={session?.user?.name || "User Avatar"}
+                className="h-10 w-10 rounded-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+              <p className="text-sm font-light opacity-70">
+                {session?.user?.name}
+              </p>
+            </>
+          ) : (
+            <>
+              <Database />
+              <p className="text-sm font-light opacity-70">LocalStorage</p>
+            </>
+          )}
+
+          <div className="h-8 w-px bg-neutral-700 dark:bg-neutral-200" />
+
           <button
             className="cursor-pointer transition hover:opacity-80"
             onClick={() => setSettingsMenuOpen(true)}
