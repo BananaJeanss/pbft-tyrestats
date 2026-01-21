@@ -25,7 +25,7 @@ export default function Navbar() {
 
   const isOnDashboard = pathname === "/dashboard" || pathname === "/dashboard/";
 
-  const { data: session, isPending, error, refetch } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   if (!mounted) return null;
 

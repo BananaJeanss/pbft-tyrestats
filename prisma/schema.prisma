@@ -14,7 +14,7 @@ model shared_sessions {
   hashcheck    String    @unique @db.VarChar(64)
 }
 
-model User {
+model User { // the user
   id            String        @id
   name          String
   email         String
@@ -30,7 +30,7 @@ model User {
   @@map("user")
 }
 
-model Session {
+model Session { // user session
   id        String   @id
   expiresAt DateTime
   token     String
@@ -46,7 +46,7 @@ model Session {
   @@map("session")
 }
 
-model Account {
+model Account { // user account from oauth provider
   id                    String    @id
   accountId             String
   providerId            String
@@ -66,7 +66,7 @@ model Account {
   @@map("account")
 }
 
-model Verification {
+model Verification { // verification tokens
   id         String   @id
   identifier String
   value      String
@@ -78,7 +78,7 @@ model Verification {
   @@map("verification")
 }
 
-model RaceSession {
+model RaceSession { // race session but cloud
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -86,4 +86,14 @@ model RaceSession {
   folderId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// actual ai ratelimits are handled via redis
+model AiAnalytics { // just for analytics cause data is cool
+  id        String   @id @default(cuid())
+  ipAddress String?  // ip address of the requester
+  userId    String?  // user id if logged in
+  promptTokens Int      @default(0) // number of prompt tokens used
+  completionTokens Int  @default(0) // number of completion tokens used
+  createdAt DateTime @default(now())
 }

@@ -1,13 +1,15 @@
+import redisClient from "@/app/db/redisClient";
 import { ExpectedRequest } from "@/app/types/AIRequest";
+import { auth } from "../../../../auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { createClient } from "redis";
+import { prisma } from "../../../../db";
 
-const redis = await createClient({ url: process.env.REDIS_URL }).connect();
-
-const CurrentModel = process.env.HC_AI_MODEL;
-const hcurl = process.env.HC_AI_URL;
+const CurrentModel = "https://ai.hackclub.com/proxy/v1/models";
+const hcurl = "https://ai.hackclub.com/proxy/v1/chat/completions";
 const apikey = process.env.HC_AI_API_KEY;
+
+const RATE_LIMIT_DEV_OVERRIDE = process.env.ENABLE_RDISPSTGRS_INDEV === "true";
 
 function CallHCAI(
   prompt: string,
@@ -51,42 +53,76 @@ function CallHCAI(
   return response;
 }
 
-async function checkRateLimit() {
-  const headersList = headers();
-  const ip = (await headersList).get("x-forwarded-for") || "unknown";
-  const rateLimitKey = `rate_limit_v2:${ip}`;
-  const limit = 5;
-  const window = 60 * 60 * 24; // 5 request per 24 hours
+async function checkTokenLimit(
+  userId: string,
+  ip: string,
+  isLoggedIn: boolean,
+) {
+  const tokenLimitKey = `token_limit_v1:${userId + ip}`;
 
-  let currentCount;
+  // Token limits
+  const anonLimit = parseInt(process.env.HC_AI_ANON_LIMIT || "20000");
+  const loggedInLimit = parseInt(process.env.HC_AI_ACCOUNT_LIMIT || "40000");
+
+  // allow double rate limit on weekends cause racing
+  const weekendDuplicator = [0, 6].includes(new Date().getDay()) ? 2 : 1;
+
+  let currentUsage = 0;
   try {
-    currentCount = await redis.get(rateLimitKey);
+    const usageStr = await redisClient.get(tokenLimitKey);
+    currentUsage = usageStr ? parseInt(usageStr) : 0;
   } catch (error) {
     console.error("Redis error:", error);
     return -1;
   }
 
-  if (currentCount && parseInt(currentCount) >= limit) {
+  const maxLimit = (isLoggedIn ? loggedInLimit : anonLimit) * weekendDuplicator;
+
+  if (currentUsage >= maxLimit) {
     return -1;
-  } else {
-    const newCount = await redis.incr(rateLimitKey);
-    if (newCount === 1) {
-      await redis.expire(rateLimitKey, window);
+  }
+
+  return currentUsage;
+}
+
+async function incrementTokenUsage(userId: string, ip: string, tokens: number) {
+  const tokenLimitKey = `token_limit_v1:${userId + ip}`;
+  const window = 60 * 60 * 24; // per 24 hours
+
+  try {
+    const newCount = await redisClient.incrBy(tokenLimitKey, tokens);
+    const ttl = await redisClient.ttl(tokenLimitKey);
+    if (ttl === -1) {
+      await redisClient.expire(tokenLimitKey, window);
     }
     return newCount;
+  } catch (e) {
+    console.error("Failed to increment token usage:", e);
+    return 0;
   }
 }
 
 export async function POST(request: Request) {
-  let userRatelimitCount = 0;
+  let currentTokenUsage = 0;
 
-  if (process.env.NODE_ENV != "development") {
-    // no rate limiting in dev
+  // Get session and IP
+  const headersList = await headers();
+  const session = await auth.api.getSession({
+    headers: headersList,
+  });
+  const ip = headersList.get("x-forwarded-for") || "unknown";
+  const userId = session?.user?.id || "anon";
+  const isLoggedIn = !!session?.user;
+
+  const shouldRateLimit =
+    process.env.NODE_ENV !== "development" || RATE_LIMIT_DEV_OVERRIDE;
+
+  if (shouldRateLimit) {
     try {
-      userRatelimitCount = await checkRateLimit();
-      if (userRatelimitCount <= -1) {
+      currentTokenUsage = await checkTokenLimit(userId, ip, isLoggedIn);
+      if (currentTokenUsage <= -1) {
         return NextResponse.json(
-          { error: "Rate limit exceeded" },
+          { error: "Rate limit exceeded (Token limit reached)" },
           { status: 429 },
         );
       }
@@ -346,9 +382,31 @@ export async function POST(request: Request) {
     const suggestion =
       aiData.choices?.[0]?.message?.content || "No suggestion generated.";
 
+    // Update token usage
+    if (aiData.usage && shouldRateLimit) {
+      const totalTokens = aiData.usage.total_tokens || 0;
+      await incrementTokenUsage(userId, ip, totalTokens);
+      // We could add to currentTokenUsage for display, although it's "old usage" + "new usage"
+      currentTokenUsage += totalTokens;
+    }
+
+    // add entry for AI analytics, no await cause blocking
+    prisma.aiAnalytics
+      .create({
+        data: {
+          ipAddress: ip,
+          userId: userId,
+          promptTokens: aiData.usage?.prompt_tokens || 0,
+          completionTokens: aiData.usage?.completion_tokens || 0,
+        },
+      })
+      .catch((err) => {
+        console.error("Failed to log AI analytics:", err);
+      });
+
     return NextResponse.json({
       suggestion: suggestion,
-      ratelimitCount: userRatelimitCount,
+      tokenUsage: currentTokenUsage,
     });
   } catch (error) {
     console.error("Error processing AI request:", error);

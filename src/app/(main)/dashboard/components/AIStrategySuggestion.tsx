@@ -5,6 +5,7 @@ import AIStrategySettings from "./AIStrategySettings";
 import { AIStrategySettingsS } from "./AIStrategySettings";
 import FullscreenReader from "./FullscreenReader";
 import BetterReactMD from "./BetterReactMD";
+import { authClient } from "@/lib/auth-client";
 
 export interface AIStrategySuggestionProps {
   onSave: (suggestion: string) => void;
@@ -42,6 +43,35 @@ export default function AIStrategySuggestion({
 
   const [FullscreenReaderOpen, setFullscreenReaderOpen] = useState(false);
 
+  const { data: session } = authClient.useSession();
+
+  type AILimits = {
+    anon: number;
+    account: number;
+  };
+
+  const [AIlimits, setAIlimits] = useState<AILimits | null>(null);
+
+  useEffect(() => {
+    // Fetch AI rate limits
+    const fetchAILimits = async () => {
+      try {
+        const response = await fetch("/api/ai/limits");
+        if (response.ok) {
+          const data = await response.json();
+          setAIlimits({
+            anon: data.anon,
+            account: data.account,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch AI limits:", err);
+      }
+    };
+
+    fetchAILimits();
+  }, []);
+
   const clientcallHCAI = async () => {
     if (readOnly) return;
     setIsLoading(true);
@@ -72,7 +102,7 @@ export default function AIStrategySuggestion({
       }
 
       const data = await response.json();
-      setRatelimitCount(data.ratelimitCount);
+      setRatelimitCount(data.tokenUsage);
 
       const cleanSuggestion = data.suggestion
         .replace(/\$\\to\$/g, "→")
@@ -138,10 +168,15 @@ export default function AIStrategySuggestion({
                   onClick={clientcallHCAI}
                 >
                   {isLoading ? "Generating..." : "Generate Analysis"}
-                  {ratelimitCount !== null
-                    ? `(${ratelimitCount}/5 requests (24 hours))`
-                    : ""}
                 </button>
+                {ratelimitCount !== null && AIlimits && (
+                  <p className="text-xs font-light opacity-50 mx-2 cursor-help"
+                  title="AI Token Usage, resets after 24 hours."
+                  >
+                    {ratelimitCount || 0}/
+                    {session?.user.id ? AIlimits.account : AIlimits.anon} tokens
+                  </p>
+                )}
               </>
             </div>
           </div>
