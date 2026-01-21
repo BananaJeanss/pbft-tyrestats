@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "../globals.css";
-import Navbar from "../components/navbar";
+import ClientsMainLayout from "./clientLayout";
 
 export const metadata: Metadata = {
   title: "tyrestats Dashboard",
@@ -12,10 +12,5 @@ export default function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      <Navbar />
-      {children}
-    </>
-  );
+  return <ClientsMainLayout>{children}</ClientsMainLayout>;
 }

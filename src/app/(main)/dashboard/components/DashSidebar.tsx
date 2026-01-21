@@ -4,10 +4,18 @@ import NewSession from "./NewSession";
 import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { useMounted } from "@/hooks/useMounted";
 import { Folder, TySession } from "@/app/types/TyTypes";
-import { FolderPlus, ChevronRight, Database, Pencil } from "lucide-react";
+import {
+  FolderPlus,
+  ChevronRight,
+  Database,
+  Pencil,
+  Loader2,
+  Cloud,
+} from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 import NewFolder from "./NewFolder";
 import EditFolder from "./EditFolder";
+import { authClient } from "@/lib/auth-client";
 
 interface DashSidebarProps {
   currentSessionId: string;
@@ -36,10 +44,15 @@ export default function DashSidebar({
     "",
   ]);
 
+  const {
+    data: session,
+    isPending, // loading state
+  } = authClient.useSession();
+
   if (!mounted) {
     return (
-      <div className="h-full w-1/4 overflow-y-auto rounded-lg bg-zinc-100 p-4 dark:bg-neutral-800">
-        <p className="p-2 text-sm">Loading sessions…</p>
+      <div className="flex h-full w-1/4 items-center justify-center overflow-y-auto rounded-lg bg-zinc-100 p-4 dark:bg-neutral-800">
+        <Loader2 className="animate-spin" />
       </div>
     );
   }
@@ -77,6 +90,30 @@ export default function DashSidebar({
             <FolderPlus size={16} />
           </button>
         </div>
+
+        {/* ts is for the postgres stuff */}
+        {session && (
+          <details className="group/main mb-4">
+            <summary className="flex cursor-pointer list-none items-center gap-2 border-b px-2 py-2 font-semibold transition hover:bg-zinc-200 dark:hover:bg-neutral-700 [&::-webkit-details-marker]:hidden">
+              <ChevronRight
+                size={16}
+                className="shrink-0 transition-transform group-open/main:rotate-90"
+              />
+              <Cloud size={16} /> Sessions
+            </summary>
+            <div className="mt-2 flex flex-col gap-2">
+              {isPending ? (
+                <Loader2 className="mx-auto my-4 animate-spin" />
+              ) : (
+                <p className="p-2 text-sm">
+                  No cloud sessions found. Try creating one!
+                </p>
+              )}
+            </div>
+          </details>
+        )}
+
+        {/* ts is for the localstorage stuff */}
         <details open className="group/main mb-2">
           <summary className="flex cursor-pointer list-none items-center gap-2 border-b px-2 py-2 font-semibold transition hover:bg-zinc-200 dark:hover:bg-neutral-700 [&::-webkit-details-marker]:hidden">
             <ChevronRight

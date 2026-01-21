@@ -1,6 +1,6 @@
 "use client";
 
-import { Database } from "lucide-react";
+import { Database, Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +14,11 @@ const loginButtonStyles =
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
+
+  const {
+    data: session,
+    isPending, //loading state
+  } = authClient.useSession();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -34,29 +39,43 @@ export default function Home() {
       <p>PB Formula Truck raceday statistics dashboard & analyzer</p>
       <hr className="my-4 w-1/2 border-zinc-300" />
       <div className="flex w-full flex-row items-center justify-center">
-        <button
-          className={`cursor-pointer ${loginButtonStyles}`}
-          onClick={async () => {
-            await authClient.signIn
-              .social({
-                provider: "roblox",
-                callbackURL: "/dashboard",
-              })
-              .catch((err) => {
-                console.error("Roblox Login Failed:", err);
-              });
-          }}
-        >
-          <RobloxTilt />
-          Login with Roblox
-        </button>
-        <div className="mx-2 h-12 w-px bg-zinc-300" />
-        <Link href="/dashboard" passHref>
-          <button className={`cursor-pointer ${loginButtonStyles}`}>
-            <Database />
-            Use LocalStorage
-          </button>
-        </Link>
+        {isPending ? (
+          <Loader2 className="my-4 animate-spin" />
+        ) : session ? (
+          <Link
+            className={`cursor-pointer ${loginButtonStyles}`}
+            href="/dashboard"
+          >
+            <RobloxTilt />
+            Continue as {session.user.name}
+          </Link>
+        ) : (
+          <>
+            <button
+              className={`cursor-pointer ${loginButtonStyles}`}
+              onClick={async () => {
+                await authClient.signIn
+                  .social({
+                    provider: "roblox",
+                    callbackURL: "/dashboard",
+                  })
+                  .catch((err) => {
+                    console.error("Roblox Login Failed:", err);
+                  });
+              }}
+            >
+              <RobloxTilt />
+              Login with Roblox
+            </button>
+            <div className="mx-2 h-12 w-px bg-zinc-300" />
+            <Link href="/dashboard" passHref>
+              <button className={`cursor-pointer ${loginButtonStyles}`}>
+                <Database />
+                Use LocalStorage
+              </button>
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );
