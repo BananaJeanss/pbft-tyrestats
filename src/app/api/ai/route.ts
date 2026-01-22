@@ -20,8 +20,8 @@ function CallHCAI(
     top_p: number;
   } = { model: CurrentModel || "qwen/qwen3-32b", temperature: 0.7, top_p: 1 },
 ) {
-  if (!hcurl || !apikey) {
-    throw new Error("AI service configuration is missing.");
+  if (!apikey) {
+    throw new Error("Hack Club AI API key is missing.");
   }
 
   const body = {

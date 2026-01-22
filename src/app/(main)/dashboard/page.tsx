@@ -538,14 +538,14 @@ export default function Dashboard() {
               DuplicateThisSession={() => {
                 if (!currentSessionId || !currentSession) return;
 
-                const newId = `${currentSession.id}_copy_${Date.now()}`;
+                const newId = crypto.randomUUID();
                 const duplicatedSession: TySession = {
                   ...currentSession,
                   id: newId,
                   shortUrl: "",
                   meta: {
                     ...currentSession.meta,
-                    name: `${currentSession.meta.name} (Copy)`,
+                    name: `${currentSession.meta.name.slice(0, 57)} (Copy)`,
                     lastModified: new Date().toISOString(),
                   },
                 };

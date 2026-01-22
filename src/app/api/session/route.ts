@@ -168,18 +168,60 @@ export async function POST(request: Request) {
     } else {
       // Create Session Path
       // We force the DB ID to match the Session Data ID for consistency
-      await prisma.raceSession.create({
-        data: {
-          id: targetId,
-          userId: session.user.id,
-          data: validSessionData,
-        },
-      });
+      try {
+        await prisma.raceSession.create({
+          data: {
+            id: targetId,
+            userId: session.user.id,
+            data: validSessionData,
+          },
+        });
 
-      return new Response(
-        JSON.stringify({ success: true, action: "created", id: targetId }),
-        { status: 201 },
-      );
+        return new Response(
+          JSON.stringify({ success: true, action: "created", id: targetId }),
+          { status: 201 },
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        if (error.code === "P2002") {
+          // Race condition: Session was created between findUnique and create
+          // We must treat this as an update, but verify ownership first.
+          const freshSession = await prisma.raceSession.findUnique({
+            where: { id: targetId },
+            select: { userId: true },
+          });
+
+          if (freshSession) {
+            if (freshSession.userId !== session.user.id) {
+              return new Response(
+                JSON.stringify({
+                  error: "Forbidden: You do not own this session",
+                }),
+                {
+                  status: 403,
+                },
+              );
+            }
+
+            await prisma.raceSession.update({
+              where: { id: targetId },
+              data: {
+                data: validSessionData,
+              },
+            });
+
+            return new Response(
+              JSON.stringify({
+                success: true,
+                action: "updated",
+                id: targetId,
+              }),
+              { status: 200 },
+            );
+          }
+        }
+        throw error;
+      }
     }
   } catch (err) {
     console.error("Save session error:", err);
