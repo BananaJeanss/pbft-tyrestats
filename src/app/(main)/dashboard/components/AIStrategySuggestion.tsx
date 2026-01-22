@@ -2,7 +2,7 @@ import { ExpectedRequest } from "@/app/types/AIRequest";
 import { FullscreenIcon, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import AIStrategySettings from "./AIStrategySettings";
-import { AIStrategySettingsS } from "./AIStrategySettings";
+import { AIStrategySettingsS } from "@/app/types/TyTypes";
 import FullscreenReader from "./FullscreenReader";
 import BetterReactMD from "./BetterReactMD";
 import { authClient } from "@/lib/auth-client";
@@ -92,12 +92,17 @@ export default function AIStrategySuggestion({
         }),
       });
 
+      const CodeResponses = {
+        429: "You have exceeded your rate limit. Please try again later.",
+        400: "Bad request. Please check your input and try again.",
+      }
+
       if (!response.ok) {
         console.error("Error response:", response);
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : `Server responded with status: ${response.status}`,
+            : CodeResponses[String(response.status) as unknown as keyof typeof CodeResponses] || `Server responded with status: ${response.status}`,
         );
       }
 

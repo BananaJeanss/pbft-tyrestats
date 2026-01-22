@@ -16,6 +16,7 @@ import { DynamicIcon } from "lucide-react/dynamic";
 import NewFolder from "./NewFolder";
 import EditFolder from "./EditFolder";
 import { authClient } from "@/lib/auth-client";
+import { useSessionManager } from "@/hooks/useSessionManager";
 
 interface DashSidebarProps {
   currentSessionId: string;
@@ -27,14 +28,7 @@ export default function DashSidebar({
   onSelectSession,
 }: DashSidebarProps) {
   const [newSessionOpen, setNewSessionOpen] = useState(false);
-  const [rawSessions] = useLocalStorage<
-    TySession[] | Record<string, TySession>
-  >("tyrestats_sessions", []);
-  const sessions: TySession[] = Array.isArray(rawSessions)
-    ? rawSessions
-    : typeof rawSessions === "object" && rawSessions
-      ? Object.values(rawSessions)
-      : [];
+  const { sessions } = useSessionManager();
 
   const mounted = useMounted();
   const [newFolderOpen, setNewFolderOpen] = useState(false);
@@ -114,96 +108,109 @@ export default function DashSidebar({
         )}
 
         {/* ts is for the localstorage stuff */}
-        <details open className="group/main mb-2">
-          <summary className="flex cursor-pointer list-none items-center gap-2 border-b px-2 py-2 font-semibold transition hover:bg-zinc-200 dark:hover:bg-neutral-700 [&::-webkit-details-marker]:hidden">
-            <ChevronRight
-              size={16}
-              className="shrink-0 transition-transform group-open/main:rotate-90"
-            />
-            <Database size={16} /> Sessions (LocalStorage)
-          </summary>
-          <div className="mt-2 flex flex-col gap-2">
-            {sessions.length === 0 && (
-              <p className="p-2 text-sm">
-                No sessions found. Maybe create one?
-              </p>
-            )}
-            {/* render folders first, then sessions not in folders */}
-            {folders.map((folder) => (
-              <details key={folder.id} className="group ml-4">
-                <summary
-                  className={`flex cursor-pointer list-none items-center gap-2 border-b px-2 py-2 font-semibold transition hover:bg-zinc-200 dark:hover:bg-neutral-700 [&::-webkit-details-marker]:hidden`}
-                  style={{
-                    borderColor: folder.color,
-                  }}
-                >
-                  <DynamicIcon
-                    name={folder.icon}
-                    size={16}
-                    className="shrink-0"
+        {sessions.some((s) => s.source === "local") && (
+          <details open className="group/main mb-2">
+            <summary className="flex cursor-pointer list-none items-center gap-2 border-b px-2 py-2 font-semibold transition hover:bg-zinc-200 dark:hover:bg-neutral-700 [&::-webkit-details-marker]:hidden">
+              <ChevronRight
+                size={16}
+                className="shrink-0 transition-transform group-open/main:rotate-90"
+              />
+              <Database size={16} /> Sessions (LocalStorage)
+            </summary>
+            <div className="mt-2 flex flex-col gap-2">
+              {sessions.filter((s) => s.source === "local").length === 0 && (
+                <p className="p-2 text-sm">
+                  No sessions found. Maybe create one?
+                </p>
+              )}
+              {/* render folders first, then sessions not in folders */}
+              {folders.map((folder) => (
+                <details key={folder.id} className="group ml-4">
+                  <summary
+                    className={`flex cursor-pointer list-none items-center gap-2 border-b px-2 py-2 font-semibold transition hover:bg-zinc-200 dark:hover:bg-neutral-700 [&::-webkit-details-marker]:hidden`}
                     style={{
-                      color: folder.color,
-                    }}
-                  />
-                  <ChevronRight
-                    size={14}
-                    className="shrink-0 transition-transform group-open:rotate-90"
-                  />
-                  <span className="grow overflow-hidden overflow-ellipsis whitespace-nowrap">
-                    {folder.name}
-                  </span>
-                  <span
-                    className="text-xs font-extralight opacity-50"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEditFolderOpen([true, folder.id]);
+                      borderColor: folder.color,
                     }}
                   >
-                    <Pencil size={14} />
-                  </span>
-                  <span className="text-xs font-extralight opacity-50">
-                    (
-                    {
-                      sessions.filter((session) => session.folder === folder.id)
-                        .length
-                    }
-                    )
-                  </span>
-                </summary>
-                <div className="mt-2 flex flex-col gap-2">
-                  {sessions.filter((session) => session.folder === folder.id)
-                    .length === 0 ? (
-                    <p className="p-2 text-center text-sm font-extralight opacity-50">
-                      No sessions in this folder. Add some!
-                    </p>
-                  ) : (
-                    sessions
-                      .filter((session) => session.folder === folder.id)
-                      .map((session) => (
-                        <DashSidebarSession
-                          key={session.id}
-                          sessionData={session}
-                          isActive={currentSessionId === session.id}
-                          onClick={() => onSelectSession(session)}
-                        />
-                      ))
-                  )}
-                </div>
-              </details>
-            ))}
-            {sessions.map(
-              (session) =>
-                !session.folder && (
+                    <DynamicIcon
+                      name={folder.icon}
+                      size={16}
+                      className="shrink-0"
+                      style={{
+                        color: folder.color,
+                      }}
+                    />
+                    <ChevronRight
+                      size={14}
+                      className="shrink-0 transition-transform group-open:rotate-90"
+                    />
+                    <span className="grow overflow-hidden overflow-ellipsis whitespace-nowrap">
+                      {folder.name}
+                    </span>
+                    <span
+                      className="text-xs font-extralight opacity-50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditFolderOpen([true, folder.id]);
+                      }}
+                    >
+                      <Pencil size={14} />
+                    </span>
+                    <span className="text-xs font-extralight opacity-50">
+                      (
+                      {
+                        sessions.filter(
+                          (session) =>
+                            session.folder === folder.id &&
+                            session.source === "local",
+                        ).length
+                      }
+                      )
+                    </span>
+                  </summary>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {sessions.filter(
+                      (session) =>
+                        session.folder === folder.id &&
+                        session.source === "local",
+                    ).length === 0 ? (
+                      <p className="p-2 text-center text-sm font-extralight opacity-50">
+                        No sessions in this folder. Add some!
+                      </p>
+                    ) : (
+                      sessions
+                        .filter(
+                          (session) =>
+                            session.folder === folder.id &&
+                            session.source === "local",
+                        )
+                        .map((session) => (
+                          <DashSidebarSession
+                            key={session.id}
+                            sessionData={session}
+                            isActive={currentSessionId === session.id}
+                            onClick={() => onSelectSession(session)}
+                          />
+                        ))
+                    )}
+                  </div>
+                </details>
+              ))}
+              {sessions
+                .filter(
+                  (session) => !session.folder && session.source === "local",
+                )
+                .map((session) => (
                   <DashSidebarSession
                     key={session.id}
                     sessionData={session}
                     isActive={currentSessionId === session.id}
                     onClick={() => onSelectSession(session)}
                   />
-                ),
-            )}
-          </div>
-        </details>
+                ))}
+            </div>
+          </details>
+        )}
       </div>
     </>
   );

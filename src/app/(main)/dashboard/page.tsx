@@ -23,10 +23,11 @@ import SessionSettingsPage, {
 import { useLocalStorage } from "../../../hooks/useLocalStorage";
 import { toast } from "react-toastify";
 import { TySession } from "@/app/types/TyTypes";
-import { AIStrategySettingsS } from "./components/AIStrategySettings";
+import { AIStrategySettingsS } from "@/app/types/TyTypes";
 import { DEFAULT_PREFERENCES } from "./components/TyreSettings";
 import DashShare from "./components/DashShare";
 import DashboardView from "./components/DashboardView";
+import { useSessionManager } from "@/hooks/useSessionManager";
 
 export default function Dashboard() {
   const [tyremanVis, settyremanVis] = useState(false);
@@ -77,9 +78,12 @@ export default function Dashboard() {
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const isLoadingSession = useRef(false);
-  const [, setSessions] = useLocalStorage<TySession[]>(
-    "tyrestats_sessions",
-    [],
+  const { sessions, saveSession, deleteSession } = useSessionManager();
+
+  // Helper to get current session and its source
+  const currentSession = useMemo(() => 
+    sessions.find(s => s.id === currentSessionId),
+    [sessions, currentSessionId]
   );
 
   // asdasdfdsfdsf share
@@ -184,46 +188,40 @@ export default function Dashboard() {
   ]);
 
   // save function for either autosave or manual save
-  const saveSession = useCallback(() => {
-    if (!currentSessionId) return;
+  const saveTheSession = useCallback(() => {
+    if (!currentSessionId || !currentSession) return;
 
     // Read values from the ref instead of state directly
     const currentData = stateRef.current;
 
-    setSessions((prevSessions) =>
-      prevSessions.map((s) =>
-        s.id === currentSessionId
-          ? {
-              ...s,
-              tyreData: currentData.tyreData,
-              raceConfig: currentData.raceConfig,
-              tyrePreferences: currentData.tyrePreferences,
-              currentNotes: currentData.currentNotes,
-              currentSuggestion: currentData.currentSuggestion,
-              shortUrl: currentData.shortUrl,
-              manualStints: currentData.manualStints,
-              aiConfigSettings: currentData.aiConfigSettings,
-              weather: currentData.weather,
-              miscStats: currentData.miscStats,
-              folder:
-                currentData.sessionSettings["current"]?.folder || s.folder,
-              meta: {
-                ...(currentData.sessionSettings["current"] || s.meta),
-                lastModified: new Date().toISOString(),
-              },
-            }
-          : s,
-      ),
-    );
+    const updatedSession: TySession = {
+      ...currentSession,
+      tyreData: currentData.tyreData,
+      raceConfig: currentData.raceConfig,
+      tyrePreferences: currentData.tyrePreferences,
+      currentNotes: currentData.currentNotes,
+      currentSuggestion: currentData.currentSuggestion,
+      shortUrl: currentData.shortUrl,
+      manualStints: currentData.manualStints,
+      aiConfigSettings: currentData.aiConfigSettings,
+      weather: currentData.weather,
+      miscStats: currentData.miscStats,
+      folder: currentData.sessionSettings["current"]?.folder || currentSession.folder,
+      meta: {
+        ...(currentData.sessionSettings["current"] || currentSession.meta),
+        lastModified: new Date().toISOString(),
+      },
+    };
 
+    saveSession(updatedSession, currentSession.source);
     toast.success("Session saved");
-  }, [currentSessionId, setSessions]);
+  }, [currentSessionId, currentSession, saveSession]);
 
   // Auto-save after ref changes
   useEffect(() => {
     if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
       return;
-    saveSession(); // this used to have an interval but now just saves on change, except for notes
+    saveTheSession(); // this used to have an interval but now just saves on change, except for notes
     // not dealing with this fuckass warning
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -244,34 +242,30 @@ export default function Dashboard() {
 
   // autosave except for notes
   useEffect(() => {
-    if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
+    if (!isAutosaveEnabled || !currentSessionId || !currentSession || isLoadingSession.current)
       return;
     // Save everything except notes
-    const currentData = { ...stateRef.current, currentNotes: undefined };
-    setSessions((prevSessions) =>
-      prevSessions.map((s) =>
-        s.id === currentSessionId
-          ? {
-              ...s,
-              tyreData: currentData.tyreData,
-              raceConfig: currentData.raceConfig,
-              tyrePreferences: currentData.tyrePreferences,
-              currentSuggestion: currentData.currentSuggestion,
-              shortUrl: currentData.shortUrl,
-              manualStints: currentData.manualStints,
-              aiConfigSettings: currentData.aiConfigSettings,
-              weather: currentData.weather,
-              miscStats: currentData.miscStats,
-              folder:
-                currentData.sessionSettings["current"]?.folder || s.folder,
-              meta: {
-                ...(currentData.sessionSettings["current"] || s.meta),
-                lastModified: new Date().toISOString(),
-              },
-            }
-          : s,
-      ),
-    );
+    const currentData = { ...stateRef.current };
+    
+    const updatedSession: TySession = {
+        ...currentSession,
+        tyreData: currentData.tyreData,
+        raceConfig: currentData.raceConfig,
+        tyrePreferences: currentData.tyrePreferences,
+        currentSuggestion: currentData.currentSuggestion,
+        shortUrl: currentData.shortUrl,
+        manualStints: currentData.manualStints,
+        aiConfigSettings: currentData.aiConfigSettings,
+        weather: currentData.weather,
+        miscStats: currentData.miscStats,
+        folder: currentData.sessionSettings["current"]?.folder || currentSession.folder,
+        meta: {
+          ...(currentData.sessionSettings["current"] || currentSession.meta),
+          lastModified: new Date().toISOString(),
+        },
+      };
+
+    saveSession(updatedSession, currentSession.source);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAutosaveEnabled,
@@ -291,15 +285,19 @@ export default function Dashboard() {
 
   // Debounced autosave for notes: only save after user stops typing for autoSaveInterval seconds
   useEffect(() => {
-    if (!isAutosaveEnabled || !currentSessionId || isLoadingSession.current)
+    if (!isAutosaveEnabled || !currentSessionId || !currentSession || isLoadingSession.current)
       return;
     const handler = setTimeout(() => {
-      setSessions((prevSessions) =>
-        prevSessions.map((s) =>
-          s.id === currentSessionId ? { ...s, currentNotes: currentNotesRef.current } : s,
-        ),
-      );
-      toast.success("Notes autosaved");
+        const updatedSession: TySession = {
+            ...currentSession,
+            currentNotes: currentNotesRef.current,
+            meta: {
+                ...currentSession.meta,
+                lastModified: new Date().toISOString(),
+            }
+        };
+        saveSession(updatedSession, currentSession.source);
+        toast.success("Notes autosaved");
     }, autoSaveInterval * 1000);
     return () => clearTimeout(handler);
     // exhaustive deps cause otherwise it gets stuck in a loop
@@ -316,13 +314,13 @@ export default function Dashboard() {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
-        saveSession();
+        saveTheSession();
       }
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [saveSession]);
+  }, [saveTheSession]);
 
   const handleSaveTyreData = (data: TyreWearData) => {
     if (selectedTyre) {
@@ -439,46 +437,19 @@ export default function Dashboard() {
       stateRef.current.tyreData = {};
     }
 
-    if (!currentSessionId) return;
+    if (!currentSessionId || !currentSession) return;
 
-    try {
-      // Read fresh from localStorage to avoid stale state issues
-      const lsItem = window.localStorage.getItem("tyrestats_sessions");
-      let currentSessions: TySession[] = lsItem ? JSON.parse(lsItem) : [];
+    const updatedSession: TySession = {
+      ...currentSession,
+      tyreData: {},
+      meta: {
+        ...currentSession.meta,
+        lastModified: new Date().toISOString(),
+      },
+    };
 
-      // Safety check for data corruption (if it's an object instead of array)
-      if (
-        !Array.isArray(currentSessions) &&
-        typeof currentSessions === "object" &&
-        currentSessions !== null
-      ) {
-        currentSessions = Object.values(currentSessions);
-      }
-
-      if (!Array.isArray(currentSessions)) {
-        currentSessions = [];
-      }
-
-      const updatedSessions = currentSessions.map((s) =>
-        s.id === currentSessionId
-          ? {
-              ...s,
-              tyreData: {},
-              meta: {
-                ...s.meta,
-                lastModified: new Date().toISOString(),
-              },
-            }
-          : s,
-      );
-
-      // Update using direct value to ensure hook state is synced with what we just calculated
-      setSessions(updatedSessions);
-      toast.success("All tyre data cleared");
-    } catch (error) {
-      console.error("Failed to clear tyre data:", error);
-      toast.error("Failed to clear tyre data");
-    }
+    saveSession(updatedSession, currentSession.source);
+    toast.success("All tyre data cleared");
   };
 
   if (isMobile) {
@@ -532,28 +503,35 @@ export default function Dashboard() {
                 setSessionSettings((prev) => ({ ...prev, current: settings }))
               }
               DeleteThisSession={() => {
-                setSessions((prev) =>
-                  prev.filter((s) => s.id !== currentSessionId),
-                );
-                setCurrentSessionId(null);
+                if (currentSessionId && currentSession) {
+                    deleteSession(currentSessionId, currentSession.source);
+                    setCurrentSessionId(null);
+                }
               }}
               DuplicateThisSession={() => {
-                setSessions((prev) => {
-                  const sessionToDuplicate = prev.find(
-                    (s) => s.id === currentSessionId,
-                  );
-                  if (!sessionToDuplicate) return prev;
-                  const newId = `${sessionToDuplicate.id}_copy_${Date.now()}`;
+                  if (!currentSessionId || !currentSession) return;
+                  
+                  const newId = `${currentSession.id}_copy_${Date.now()}`;
                   const duplicatedSession: TySession = {
-                    ...sessionToDuplicate,
+                    ...currentSession,
                     id: newId,
                     shortUrl: "",
                     meta: {
-                      ...sessionToDuplicate.meta,
-                      name: `${sessionToDuplicate.meta.name} (Copy)`,
+                      ...currentSession.meta,
+                      name: `${currentSession.meta.name} (Copy)`,
                       lastModified: new Date().toISOString(),
                     },
                   };
+
+                  // When duplicating, it follows the "New Session" rule: 
+                  // Cloud if logged in, Local if not.
+                  // createNewSession handles this logic internally if we use it, 
+                  // but we can also just call saveSession with the right source.
+                  
+                  // For now, let's keep it simple: 
+                  // duplicates stay in the same source as the original.
+                  saveSession(duplicatedSession, currentSession.source);
+                  
                   setCurrentSessionId(newId);
                   setSessionSettings({
                     current: {
@@ -594,9 +572,7 @@ export default function Dashboard() {
                     },
                   );
                   setManualStints(duplicatedSession.manualStints || []);
-                  return [...prev, duplicatedSession];
-                });
-                setSessionSettingsVis(false);
+                  setSessionSettingsVis(false);
               }}
             />
           )}

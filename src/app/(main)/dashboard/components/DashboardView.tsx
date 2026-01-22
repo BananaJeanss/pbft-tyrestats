@@ -13,7 +13,7 @@ import DashTimeline from "./DashTimeline";
 import TyresView from "./TyresView";
 import AIStrategySuggestion from "./AIStrategySuggestion";
 import DashNotes from "./DashNotes";
-import { AIStrategySettingsS } from "./AIStrategySettings";
+import { AIStrategySettingsS } from "@/app/types/TyTypes";
 import WeatherMisc from "./WeatherMisc";
 
 interface DashboardViewProps {

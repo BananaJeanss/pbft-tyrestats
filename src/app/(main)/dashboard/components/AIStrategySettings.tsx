@@ -1,17 +1,10 @@
+import { AIStrategySettingsS } from "@/app/types/TyTypes";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface AIStrategySettingsProps {
   onClose: (settings: AIStrategySettingsS) => void;
   currentSettings: AIStrategySettingsS;
-}
-
-// great naming i know i know
-export interface AIStrategySettingsS {
-  model: string;
-  temperature: number;
-  top_p: number;
-  useExperimentalPrompt: boolean;
 }
 
 interface Model {

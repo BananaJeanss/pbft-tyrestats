@@ -1,4 +1,3 @@
-import { AIStrategySettingsS } from "../(main)/dashboard/components/AIStrategySettings";
 import { IconName } from "../components/lucide-selector";
 
 export interface TySession {
@@ -90,4 +89,11 @@ export interface Folder {
   name: string;
   icon: IconName;
   color: string;
+}
+
+export interface AIStrategySettingsS {
+  model: string;
+  temperature: number;
+  top_p: number;
+  useExperimentalPrompt: boolean;
 }
