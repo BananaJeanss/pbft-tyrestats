@@ -27,11 +27,12 @@ TyreStats is a relatively simple to use webapp to generate strategies for PB For
 
 Using it is simple, head to <https://pbft-tyrestats.vercel.app/>, create a session, insert any data & notes, and it'll generate a race strategy for you, along with the optional AI strategy generator.
 
-As of now, it's 99% local (using LocalStorage), and the sessions data, settings, etc are only stored on your machine.
+Don't want to log in? No problem! You have the freedom to choose between logging in via Roblox OAuth2 to store data online, or using LocalStorage, 100% core functionality is available for everyone.
 
 ## Features
 
-- 99% Local, no mandatory login needed
+- 55% Local, no mandatory login needed
+- 45% Cloud, using Roblox OAuth2 to store sessions and more on a database (along with higher limits for logged in users)
 - PWA support
 - Create sessions to store data
 - Insert & extract tyre data via screenshot or manually inserting data.
