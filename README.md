@@ -44,6 +44,7 @@ As of now, it's 99% local (using LocalStorage), and the sessions data, settings,
 ### Requirements
 
 - [Bun](https://bun.sh/) installed
+- [Docker](https://www.docker.com/) installed (for Database & Redis)
 
 ---
 
@@ -51,7 +52,7 @@ As of now, it's 99% local (using LocalStorage), and the sessions data, settings,
 
    ```bash
    git clone https://github.com/BananaJeanss/pbft-tyrestats.git
-    cd pbft-tyrestats
+   cd pbft-tyrestats
    ```
 
 2. Install dependencies
@@ -60,13 +61,25 @@ As of now, it's 99% local (using LocalStorage), and the sessions data, settings,
    bun i
    ```
 
-3. Copy & fill the example environment variables
+3. Setup environment variables
 
    ```bash
    cp .env.example .env
    ```
 
-4. Run the development server
+4. Start the database containers (optional, if using docker for postgres/redis)
+
+   ```bash
+   docker compose up -d
+   ```
+
+5. Run database migrations
+
+   ```bash
+   bun run prisma migrate deploy
+   ```
+
+6. Run the development server
 
    ```bash
    npm run dev
@@ -75,7 +88,7 @@ As of now, it's 99% local (using LocalStorage), and the sessions data, settings,
 > [!NOTE]
 > npm run dev uses `--experimental-https` for PWA support, you may be prompted to generate a self-signed certificate. You can alternatively run `npm run dev-nohttps` for plain http.
 
-5. Open [https://localhost:3000](https://localhost:3000) in your browser to see the app.
+7. Open [https://localhost:3000](https://localhost:3000) in your browser to see the app.
 
 ## Contributing
 

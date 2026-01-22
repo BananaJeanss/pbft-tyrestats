@@ -43,3 +43,6 @@ next-env.d.ts
 
 certificates
 /src/generated/prisma
+
+# docker logs
+*.log
