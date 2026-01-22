@@ -279,6 +279,11 @@ export function useSessionManager() {
     [user, setLocalFolders],
   );
 
+  const clearLocalData = useCallback(() => {
+    setLocalSessions([]);
+    setLocalFolders([]);
+  }, [setLocalSessions, setLocalFolders]);
+
   // Combined Folders for UI
   const folders = [
       ...localFolders.map(f => ({ ...f, source: "local" as const })),
@@ -298,6 +303,7 @@ export function useSessionManager() {
     deleteFolder,
     localFolders,
     cloudFolders,
+    clearLocalData,
     user,
   };
 }

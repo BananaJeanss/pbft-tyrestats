@@ -1,16 +1,17 @@
 import { X } from "lucide-react";
 import { useState } from "react";
-import { useLocalStorage } from "../../../../hooks/useLocalStorage";
 import { DEFAULT_RACECONFIGURATION } from "./RaceSettings";
 import { DEFAULT_PREFERENCES } from "./TyreSettings";
 import { Folder, TySession } from "@/app/types/TyTypes";
+import { authClient } from "@/lib/auth-client";
 
 interface NewSessionProps {
   onClose: () => void;
   onCreate: (session: TySession) => void;
+  folders: Folder[];
 }
 
-export default function NewSession({ onClose, onCreate }: NewSessionProps) {
+export default function NewSession({ onClose, onCreate, folders }: NewSessionProps) {
   // 1. Local state for the form inputs
   const [name, setName] = useState("");
   const [folder, setFolder] = useState("");
@@ -19,8 +20,8 @@ export default function NewSession({ onClose, onCreate }: NewSessionProps) {
   const [icon, setIcon] = useState("default");
   const [iconUrl, setIconUrl] = useState("");
 
-  // 2. Access the global sessions list from LocalStorage
-  const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
   const handleCreate = () => {
     if (!name) return; // Basic validation
@@ -85,11 +86,16 @@ export default function NewSession({ onClose, onCreate }: NewSessionProps) {
                 className="w-20 appearance-none rounded border border-neutral-700 bg-zinc-200 bg-none text-center focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               >
                 <option value="">—</option>
-                {folders.map((folder) => (
+                
+                {folders
+                  .filter((f) =>
+                  user ? f.source === "cloud" : f.source === "local"
+                  )
+                  .map((folder) => (
                   <option key={folder.id} value={folder.id}>
                     {folder.name}
                   </option>
-                ))}
+                  ))}
               </select>
             </div>
           </div>

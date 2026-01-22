@@ -19,7 +19,7 @@ export default function DangerousDeletionWarningWaaazaaa({
   };
   return (
     <div className="absolute top-0 left-0 z-150 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
-      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border border-2 border-red-500 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
+      <div className="flex w-full max-w-md flex-col gap-6 rounded-xl border-2 border-red-500 bg-zinc-100 p-6 shadow-2xl dark:bg-neutral-900">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold">Confirm Data Clearance</h2>
           <button onClick={onClose} className="cursor-pointer">

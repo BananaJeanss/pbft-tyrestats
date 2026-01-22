@@ -8,12 +8,39 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import SettingsPage from "./Settings/SettingsMenu";
 import { authClient } from "@/lib/auth-client";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function Navbar() {
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
+  const [DoesThisPersonNotHateClocks] = useLocalStorage<boolean>(
+    "tyrestats_navbar_clock",
+    false,
+  );
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const [UTCTime, setUTCTime] = useState("");
+  const offsetMinutes = new Date().getTimezoneOffset();
+  const offsetHours = -offsetMinutes / 60;
+  const TimezoneLabel =
+    offsetHours === 0
+      ? `You are in UTC!`
+      : `You are ${Math.abs(offsetHours)} hour${Math.abs(offsetHours) !== 1 ? "s" : ""} ${offsetHours > 0 ? "ahead" : "behind"} of UTC!`;
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const utcHours = now.getUTCHours().toString().padStart(2, "0");
+      const utcMinutes = now.getUTCMinutes().toString().padStart(2, "0");
+      const utcSeconds = now.getUTCSeconds().toString().padStart(2, "0");
+      setUTCTime(`${utcHours}:${utcMinutes}:${utcSeconds} UTC`);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Set mounted on client only to avoid hydration mismatch
   useEffect(() => {
@@ -74,6 +101,18 @@ export default function Navbar() {
           )}
 
           <div className="h-8 w-px bg-neutral-700 dark:bg-neutral-200" />
+
+          {DoesThisPersonNotHateClocks && (
+            <>
+              <p
+                className="cursor-help font-mono text-sm font-extralight opacity-70"
+                title={TimezoneLabel}
+              >
+                {UTCTime}
+              </p>
+              <div className="h-8 w-px bg-neutral-700 dark:bg-neutral-200" />
+            </>
+          )}
 
           <button
             className="cursor-pointer transition hover:opacity-80"

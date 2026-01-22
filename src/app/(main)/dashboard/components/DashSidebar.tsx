@@ -70,6 +70,7 @@ export default function DashSidebar({
         <NewSession
           onClose={() => setNewSessionOpen(false)}
           onCreate={onCreateSession}
+          folders={folders}
         />
       )}
       {newFolderOpen && (

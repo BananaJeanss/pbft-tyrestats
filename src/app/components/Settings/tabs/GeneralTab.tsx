@@ -1,9 +1,15 @@
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { authClient } from "@/lib/auth-client";
 import { LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function GeneralTab() {
   const { theme, setTheme } = useTheme();
+  // clock strikes 12 midnight arrives (navbar toggle)
+  const [iHateClocks, setIHateClocks] = useLocalStorage<boolean>(
+    "tyrestats_navbar_clock",
+    false,
+  );
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
@@ -25,7 +31,22 @@ export default function GeneralTab() {
         </select>
       </div>
       {/* seperator */}
-      <div className="grow" />
+      <hr className="border-neutral-800" />
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row items-center gap-2">
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            checked={iHateClocks}
+            onChange={(e) => setIHateClocks(e.target.checked)}
+          />
+          <span className="text-sm">Enable Navbar UTC Clock</span>
+        </div>
+        <div className="text-sm text-neutral-500">
+          Show/Hide UTC Clock in the Navbar
+        </div>
+      </div>
+      <hr className="border-neutral-800" />
       <div className="flex w-1/4 flex-col gap-2">
         {user && (
           <button

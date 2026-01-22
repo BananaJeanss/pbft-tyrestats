@@ -90,6 +90,7 @@ export interface Folder {
   name: string;
   icon: IconName;
   color: string;
+  source?: "local" | "cloud";
 }
 
 export interface AIStrategySettingsS {
