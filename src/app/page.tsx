@@ -9,7 +9,7 @@ import RobloxTilt from "./components/roblox-logos";
 import { authClient } from "@/lib/auth-client";
 
 const loginButtonStyles =
-  "border p-2 m-2 rounded-4xl transition hover:bg-gray-300 dark:hover:bg-gray-900 flex flex-row gap-2";
+  "border p-2 m-2 rounded-4xl transition hover:bg-neutral-300 dark:hover:bg-neutral-900 flex flex-row gap-2";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);

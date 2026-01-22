@@ -66,7 +66,7 @@ export function useSessionManager() {
     };
 
     fetchCloudSessions();
-  }, [user]);
+  }, [user?.id]);
 
   // Fetch Cloud Folders on Mount/Login
   useEffect(() => {
@@ -92,7 +92,7 @@ export function useSessionManager() {
     };
 
     fetchCloudFolders();
-  }, [user]);
+  }, [user?.id]);
 
   // Combined Sessions for UI
   const sessions: ExtendedSession[] = [
