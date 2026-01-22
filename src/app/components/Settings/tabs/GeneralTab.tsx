@@ -1,8 +1,12 @@
 import { authClient } from "@/lib/auth-client";
+import { LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function GeneralTab() {
   const { theme, setTheme } = useTheme();
+
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -23,20 +27,23 @@ export default function GeneralTab() {
       {/* seperator */}
       <div className="grow" />
       <div className="flex w-1/4 flex-col gap-2">
-        <button
-          className="cursor-pointer rounded-md border border-red-700 p-2 text-sm text-white"
-          onClick={async () => {
-            await authClient.signOut({
-              fetchOptions: {
-                onSuccess: () => {
-                  window.location.reload();
+        {user && (
+          <button
+            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-md border border-red-700 p-2 text-sm text-white"
+            onClick={async () => {
+              await authClient.signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    window.location.href = "/";
+                  },
                 },
-              },
-            });
-          }}
-        >
-          Log Out
-        </button>
+              });
+            }}
+          >
+            <LogOut />
+            Log Out
+          </button>
+        )}
       </div>
     </div>
   );

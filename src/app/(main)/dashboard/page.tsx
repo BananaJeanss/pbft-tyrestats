@@ -8,6 +8,7 @@ import {
   TyreWearData,
   WeatherEntry,
   MiscStats,
+  Folder,
 } from "@/app/types/TyTypes";
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import RaceSettings, {
@@ -78,13 +79,23 @@ export default function Dashboard() {
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const isLoadingSession = useRef(false);
-  const { sessions, saveSession, deleteSession } = useSessionManager();
+  const { sessions, folders, saveSession, deleteSession, isCloudLoading, saveFolder, user } = useSessionManager();
 
   // Helper to get current session and its source
   const currentSession = useMemo(() => 
     sessions.find(s => s.id === currentSessionId),
     [sessions, currentSessionId]
   );
+  
+  const handleCreateSession = (newSession: TySession) => {
+    // Logic moved from NewSession to here
+    saveSession(newSession, user ? "cloud" : "local");
+  };
+
+  const handleCreateFolder = (newFolder: Folder) => {
+    saveFolder(newFolder, user ? "cloud" : "local");
+  };
+
 
   // asdasdfdsfdsf share
   const [dashShareOpen, setDashShareOpen] = useState(false);
@@ -499,6 +510,8 @@ export default function Dashboard() {
             <SessionSettingsPage
               currentConfig={sessionSettings["current"]}
               onClose={() => setSessionSettingsVis(false)}
+              folders={folders}
+              source={currentSession?.source}
               onSave={(settings) =>
                 setSessionSettings((prev) => ({ ...prev, current: settings }))
               }
@@ -523,13 +536,7 @@ export default function Dashboard() {
                     },
                   };
 
-                  // When duplicating, it follows the "New Session" rule: 
-                  // Cloud if logged in, Local if not.
-                  // createNewSession handles this logic internally if we use it, 
-                  // but we can also just call saveSession with the right source.
-                  
-                  // For now, let's keep it simple: 
-                  // duplicates stay in the same source as the original.
+
                   saveSession(duplicatedSession, currentSession.source);
                   
                   setCurrentSessionId(newId);
@@ -618,6 +625,11 @@ export default function Dashboard() {
           <DashSidebar
             currentSessionId={currentSessionId ?? ""}
             onSelectSession={loadSession}
+            sessions={sessions}
+            isCloudLoading={isCloudLoading}
+            onCreateSession={handleCreateSession}
+            folders={folders}
+            onCreateFolder={handleCreateFolder}
           />
 
           {currentSessionId ? (

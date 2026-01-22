@@ -1,47 +1,38 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import IconSelector, { IconName } from "../../../components/lucide-selector";
-
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Folder } from "@/app/types/TyTypes";
+import { useTheme } from "next-themes";
 
 interface NewFolderProps {
   onClose: () => void;
+  onCreate: (folder: Folder) => void;
 }
 
-export default function NewFolder({ onClose }: NewFolderProps) {
+export default function NewFolder({ onClose, onCreate }: NewFolderProps) {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState<IconName>("folder");
+  const { theme } = useTheme();
   const getDefaultColor = () => {
-    if (typeof window !== "undefined" && window.matchMedia) {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "#000000"
-        : "#ffffff";
-    }
-    return "#000000";
+    if (theme === "light") return "#000000";
+    return "#ffffff"; // default for dark mode
   };
   const [color, setColor] = useState<string>(getDefaultColor);
-  const [folders, setFolders] = useLocalStorage<Folder[]>(
-    "tyrestats_folders",
-    [],
-  );
 
   const HandleCreate = () => {
     // validate
     if (!name || name.trim() === "" || !icon || !color) return;
-    const newFolder = {
+    const newFolder: Folder = {
       id: crypto.randomUUID(),
       name: name.trim(),
       icon,
       color,
     };
 
-    // Save to LocalStorage
-    setFolders([...folders, newFolder]);
+    // Pass back to parent
+    onCreate(newFolder);
     onClose();
   };
-
-  // Removed useEffect for setting color
 
   return (
     <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">
@@ -66,7 +57,11 @@ export default function NewFolder({ onClose }: NewFolderProps) {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              maxLength={25}
+              max={25}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
               placeholder="e.g. FT1 Season 9 2025"
               className="w-full rounded border border-neutral-700 bg-zinc-200 p-2 transition-all focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
             />

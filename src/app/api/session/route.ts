@@ -94,6 +94,14 @@ export async function POST(request: Request) {
     });
   }
 
+
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && parseInt(contentLength) > 500 * 1024) {
+      return new Response(JSON.stringify({ error: "Payload too large (Max 500KB)" }), {
+          status: 413,
+      });
+  }
+
   let rawBody: unknown;
   try {
     rawBody = await request.json();

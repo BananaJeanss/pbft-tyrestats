@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { TySession } from "@/app/types/TyTypes";
+import { Folder, TySession } from "@/app/types/TyTypes";
 import { toast } from "react-toastify";
 import { useLocalStorage } from "./useLocalStorage";
 import { authClient } from "@/lib/auth-client";
@@ -16,9 +16,14 @@ export function useSessionManager() {
     "tyrestats_sessions",
     [],
   );
+  const [localFolders, setLocalFolders] = useLocalStorage<Folder[]>(
+    "tyrestats_folders",
+    [],
+  );
 
   // Cloud Storage State
   const [cloudSessions, setCloudSessions] = useState<TySession[]>([]);
+  const [cloudFolders, setCloudFolders] = useState<Folder[]>([]);
   const [isCloudLoading, setIsCloudLoading] = useState(false);
 
   const { data: session } = authClient.useSession();
@@ -63,12 +68,39 @@ export function useSessionManager() {
     fetchCloudSessions();
   }, [user]);
 
+  // Fetch Cloud Folders on Mount/Login
+  useEffect(() => {
+    if (!user) {
+      setCloudFolders([]);
+      return;
+    }
+
+    const fetchCloudFolders = async () => {
+      try {
+        const res = await fetch("/api/folder");
+        if (res.ok) {
+          const data = await res.json();
+          const { folders } = data;
+          if (Array.isArray(folders)) {
+            setCloudFolders(folders);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch cloud folders", error);
+        toast.error("Failed to sync cloud folders");
+      }
+    };
+
+    fetchCloudFolders();
+  }, [user]);
+
   // Combined Sessions for UI
   const sessions: ExtendedSession[] = [
     ...localSessions.map((s) => ({ ...s, source: "local" as const })),
     ...cloudSessions.map((s) => ({ ...s, source: "cloud" as const })),
   ];
 
+  // save session to local or cloud
   const saveSession = useCallback(
     async (sessionData: TySession, source: SessionSource) => {
       if (source === "local") {
@@ -112,6 +144,7 @@ export function useSessionManager() {
     [setLocalSessions],
   );
 
+  // delete session from local or cloud
   const deleteSession = useCallback(
     async (sessionId: string, source: SessionSource) => {
       if (source === "local") {
@@ -124,6 +157,7 @@ export function useSessionManager() {
     [setLocalSessions],
   );
 
+  // move localstorage session to cloud sessions
   const moveToCloud = useCallback(
     async (sessionData: TySession) => {
       if (!user) {
@@ -170,6 +204,56 @@ export function useSessionManager() {
     [user, setLocalSessions],
   );
 
+  // save folder to local or cloud
+  const saveFolder = useCallback(
+    async (folderData: Folder, source: SessionSource) => {
+      if (source === "local") {
+        setLocalFolders((prev) => {
+          const exists = prev.find((f) => f.id === folderData.id);
+          if (exists) {
+            return prev.map((f) => (f.id === folderData.id ? folderData : f));
+          } else {
+            return [...prev, folderData];
+          }
+        });
+      } else {
+        setCloudFolders((prev) => {
+          const exists = prev.find((f) => f.id === folderData.id);
+          if (exists) {
+            return prev.map((f) => (f.id === folderData.id ? folderData : f));
+          } else {
+            return [...prev, folderData];
+          }
+        });
+        try {
+          const res = await fetch("/api/folder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(folderData),
+          });
+
+          if (!res.ok) throw new Error("Cloud folder save failed");
+        } catch (error) {
+          console.error(error);
+          toast.error("Failed to save folder to cloud");
+        }
+      }
+    },
+    [setLocalFolders],
+  );
+
+  // delete folder from local or cloud
+  const deleteFolder = useCallback(
+    async (folderId: string, source: SessionSource) => {
+      if (source === "local") {
+        setLocalFolders((prev) => prev.filter((f) => f.id !== folderId));
+      } else {
+        setCloudFolders((prev) => prev.filter((f) => f.id !== folderId));
+      }
+    },
+    [setLocalFolders],
+  );
+
   const createNewSession = useCallback(
     (initialData: TySession) => {
       // New sessions are Cloud if logged in, Local otherwise.
@@ -184,13 +268,36 @@ export function useSessionManager() {
     [user, setLocalSessions, saveSession],
   );
 
+  const createNewFolder = useCallback(
+    (folderData: Folder) => {
+      if (user) {
+        setCloudFolders((prev) => [...prev, folderData]);
+      } else {
+        setLocalFolders((prev) => [...prev, folderData]);
+      }
+    },
+    [user, setLocalFolders],
+  );
+
+  // Combined Folders for UI
+  const folders = [
+      ...localFolders.map(f => ({ ...f, source: "local" as const })),
+      ...cloudFolders.map(f => ({ ...f, source: "cloud" as const }))
+  ];
+
   return {
     sessions,
+    folders,
     isCloudLoading,
     saveSession,
     deleteSession,
     moveToCloud,
     createNewSession,
+    createNewFolder,
+    saveFolder,
+    deleteFolder,
+    localFolders,
+    cloudFolders,
     user,
   };
 }

@@ -14,7 +14,7 @@ model shared_sessions {
   hashcheck    String    @unique @db.VarChar(64)
 }
 
-model User { // the user
+model User {
   id            String        @id
   name          String
   email         String
@@ -23,6 +23,7 @@ model User { // the user
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   sessions      Session[]
+  folders       RaceFolder[]
   accounts      Account[]
   raceSessions  RaceSession[]
 
@@ -30,7 +31,7 @@ model User { // the user
   @@map("user")
 }
 
-model Session { // user session
+model Session {
   id        String   @id
   expiresAt DateTime
   token     String
@@ -46,7 +47,7 @@ model Session { // user session
   @@map("session")
 }
 
-model Account { // user account from oauth provider
+model Account {
   id                    String    @id
   accountId             String
   providerId            String
@@ -66,7 +67,7 @@ model Account { // user account from oauth provider
   @@map("account")
 }
 
-model Verification { // verification tokens
+model Verification {
   id         String   @id
   identifier String
   value      String
@@ -78,7 +79,8 @@ model Verification { // verification tokens
   @@map("verification")
 }
 
-model RaceSession { // race session but cloud
+// TySession
+model RaceSession {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -88,12 +90,24 @@ model RaceSession { // race session but cloud
   updatedAt DateTime @updatedAt
 }
 
-// actual ai ratelimits are handled via redis
-model AiAnalytics { // just for analytics cause data is cool
+// foldersssssss
+model RaceFolder {
   id        String   @id @default(cuid())
-  ipAddress String?  // ip address of the requester
-  userId    String?  // user id if logged in
-  promptTokens Int      @default(0) // number of prompt tokens used
-  completionTokens Int  @default(0) // number of completion tokens used
+  name      String
+  icon      String
+  color     String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// actual ai ratelimits are handled via redis
+model AiAnalytics {
+  id               String   @id @default(cuid())
+  ipAddress        String? // ip address of the requester
+  userId           String? // user id if logged in
+  promptTokens     Int      @default(0) // number of prompt tokens used
+  completionTokens Int      @default(0) // number of completion tokens used
+  createdAt        DateTime @default(now())
 }

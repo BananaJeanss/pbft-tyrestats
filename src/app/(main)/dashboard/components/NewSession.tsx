@@ -7,9 +7,10 @@ import { Folder, TySession } from "@/app/types/TyTypes";
 
 interface NewSessionProps {
   onClose: () => void;
+  onCreate: (session: TySession) => void;
 }
 
-export default function NewSession({ onClose }: NewSessionProps) {
+export default function NewSession({ onClose, onCreate }: NewSessionProps) {
   // 1. Local state for the form inputs
   const [name, setName] = useState("");
   const [folder, setFolder] = useState("");
@@ -19,10 +20,6 @@ export default function NewSession({ onClose }: NewSessionProps) {
   const [iconUrl, setIconUrl] = useState("");
 
   // 2. Access the global sessions list from LocalStorage
-  const [sessions, setSessions] = useLocalStorage<TySession[]>(
-    "tyrestats_sessions",
-    [],
-  );
   const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);
 
   const handleCreate = () => {
@@ -53,8 +50,7 @@ export default function NewSession({ onClose }: NewSessionProps) {
       },
     };
 
-    // 3. Save to LocalStorage
-    setSessions([...sessions, newSession]);
+    onCreate(newSession);
     onClose();
   };
 

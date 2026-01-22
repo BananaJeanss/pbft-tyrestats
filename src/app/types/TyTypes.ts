@@ -26,6 +26,7 @@ export interface TySession {
   aiConfigSettings: AIStrategySettingsS;
   weather?: WeatherEntry[];
   miscStats?: MiscStats;
+  source?: "local" | "cloud";
 }
 
 export interface WeatherEntry {

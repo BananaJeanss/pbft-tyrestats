@@ -1,7 +1,6 @@
-import { Folder } from "@/app/types/TyTypes";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Copy, Trash2, X } from "lucide-react";
 import { useState } from "react";
+import { Folder } from "@/app/types/TyTypes";
 
 export interface SessionSettings {
   name: string;
@@ -18,6 +17,8 @@ interface SessionSettingsProps {
   onSave: (prefs: SessionSettings) => void;
   DeleteThisSession: () => void;
   DuplicateThisSession: () => void;
+  folders: (Folder & { source?: "local" | "cloud" })[];
+  source?: "local" | "cloud";
 }
 
 function DeleteConfirmationScreen({
@@ -63,6 +64,8 @@ export default function SessionSettingsPage({
   onSave,
   DeleteThisSession,
   DuplicateThisSession,
+  folders,
+  source,
 }: SessionSettingsProps) {
   const [config, setConfig] = useState<SessionSettings>(
     currentConfig || {
@@ -76,7 +79,9 @@ export default function SessionSettingsPage({
   );
 
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [folders] = useLocalStorage<Folder[]>("tyrestats_folders", []);
+
+  // only show folders that match the source of the session
+  const validFolders = folders.filter((f) => !source || !f.source || f.source === source);
 
   const handleSave = () => {
     onSave(config);
@@ -136,7 +141,7 @@ export default function SessionSettingsPage({
                   className="w-20 appearance-none rounded border border-neutral-700 bg-zinc-200 bg-none text-center focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
                 >
                   <option value="">—</option>
-                  {folders.map((folder) => (
+                  {validFolders.map((folder) => (
                     <option key={folder.id} value={folder.id}>
                       {folder.name}
                     </option>
