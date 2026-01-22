@@ -13,7 +13,8 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "prisma:generate": "bun --bun prisma generate",
-    "prisma:migrate": "bun --bun prisma migrate dev"
+    "prisma:migrate": "bun --bun prisma migrate dev",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",
