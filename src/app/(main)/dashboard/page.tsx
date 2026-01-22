@@ -61,10 +61,10 @@ export default function Dashboard() {
   // notes & AI
   const [currentNotes, setCurrentNotes] = useState("");
   const currentNotesRef = useRef("");
-    // keep currentNotesRef updated
-    useEffect(() => {
-      currentNotesRef.current = currentNotes;
-    }, [currentNotes]);
+  // keep currentNotesRef updated
+  useEffect(() => {
+    currentNotesRef.current = currentNotes;
+  }, [currentNotes]);
   const [currentSuggestion, setCurrentSuggestion] = useState("");
   const [shortUrl, setShortUrl] = useState<string>("");
 
@@ -79,14 +79,22 @@ export default function Dashboard() {
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const isLoadingSession = useRef(false);
-  const { sessions, folders, saveSession, deleteSession, isCloudLoading, saveFolder, user } = useSessionManager();
+  const {
+    sessions,
+    folders,
+    saveSession,
+    deleteSession,
+    isCloudLoading,
+    saveFolder,
+    user,
+  } = useSessionManager();
 
   // Helper to get current session and its source
-  const currentSession = useMemo(() => 
-    sessions.find(s => s.id === currentSessionId),
-    [sessions, currentSessionId]
+  const currentSession = useMemo(
+    () => sessions.find((s) => s.id === currentSessionId),
+    [sessions, currentSessionId],
   );
-  
+
   const handleCreateSession = (newSession: TySession) => {
     // Logic moved from NewSession to here
     saveSession(newSession, user ? "cloud" : "local");
@@ -95,7 +103,6 @@ export default function Dashboard() {
   const handleCreateFolder = (newFolder: Folder) => {
     saveFolder(newFolder, user ? "cloud" : "local");
   };
-
 
   // asdasdfdsfdsf share
   const [dashShareOpen, setDashShareOpen] = useState(false);
@@ -217,7 +224,8 @@ export default function Dashboard() {
       aiConfigSettings: currentData.aiConfigSettings,
       weather: currentData.weather,
       miscStats: currentData.miscStats,
-      folder: currentData.sessionSettings["current"]?.folder || currentSession.folder,
+      folder:
+        currentData.sessionSettings["current"]?.folder || currentSession.folder,
       meta: {
         ...(currentData.sessionSettings["current"] || currentSession.meta),
         lastModified: new Date().toISOString(),
@@ -253,28 +261,34 @@ export default function Dashboard() {
 
   // autosave except for notes
   useEffect(() => {
-    if (!isAutosaveEnabled || !currentSessionId || !currentSession || isLoadingSession.current)
+    if (
+      !isAutosaveEnabled ||
+      !currentSessionId ||
+      !currentSession ||
+      isLoadingSession.current
+    )
       return;
     // Save everything except notes
     const currentData = { ...stateRef.current };
-    
+
     const updatedSession: TySession = {
-        ...currentSession,
-        tyreData: currentData.tyreData,
-        raceConfig: currentData.raceConfig,
-        tyrePreferences: currentData.tyrePreferences,
-        currentSuggestion: currentData.currentSuggestion,
-        shortUrl: currentData.shortUrl,
-        manualStints: currentData.manualStints,
-        aiConfigSettings: currentData.aiConfigSettings,
-        weather: currentData.weather,
-        miscStats: currentData.miscStats,
-        folder: currentData.sessionSettings["current"]?.folder || currentSession.folder,
-        meta: {
-          ...(currentData.sessionSettings["current"] || currentSession.meta),
-          lastModified: new Date().toISOString(),
-        },
-      };
+      ...currentSession,
+      tyreData: currentData.tyreData,
+      raceConfig: currentData.raceConfig,
+      tyrePreferences: currentData.tyrePreferences,
+      currentSuggestion: currentData.currentSuggestion,
+      shortUrl: currentData.shortUrl,
+      manualStints: currentData.manualStints,
+      aiConfigSettings: currentData.aiConfigSettings,
+      weather: currentData.weather,
+      miscStats: currentData.miscStats,
+      folder:
+        currentData.sessionSettings["current"]?.folder || currentSession.folder,
+      meta: {
+        ...(currentData.sessionSettings["current"] || currentSession.meta),
+        lastModified: new Date().toISOString(),
+      },
+    };
 
     saveSession(updatedSession, currentSession.source);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -296,29 +310,29 @@ export default function Dashboard() {
 
   // Debounced autosave for notes: only save after user stops typing for autoSaveInterval seconds
   useEffect(() => {
-    if (!isAutosaveEnabled || !currentSessionId || !currentSession || isLoadingSession.current)
+    if (
+      !isAutosaveEnabled ||
+      !currentSessionId ||
+      !currentSession ||
+      isLoadingSession.current
+    )
       return;
     const handler = setTimeout(() => {
-        const updatedSession: TySession = {
-            ...currentSession,
-            currentNotes: currentNotesRef.current,
-            meta: {
-                ...currentSession.meta,
-                lastModified: new Date().toISOString(),
-            }
-        };
-        saveSession(updatedSession, currentSession.source);
-        toast.success("Notes autosaved");
+      const updatedSession: TySession = {
+        ...currentSession,
+        currentNotes: currentNotesRef.current,
+        meta: {
+          ...currentSession.meta,
+          lastModified: new Date().toISOString(),
+        },
+      };
+      saveSession(updatedSession, currentSession.source);
+      toast.success("Notes autosaved");
     }, autoSaveInterval * 1000);
     return () => clearTimeout(handler);
     // exhaustive deps cause otherwise it gets stuck in a loop
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    currentNotes,
-    isAutosaveEnabled,
-    autoSaveInterval,
-    currentSessionId,
-  ]);
+  }, [currentNotes, isAutosaveEnabled, autoSaveInterval, currentSessionId]);
 
   // ctrl+s
   useEffect(() => {
@@ -517,69 +531,66 @@ export default function Dashboard() {
               }
               DeleteThisSession={() => {
                 if (currentSessionId && currentSession) {
-                    deleteSession(currentSessionId, currentSession.source);
-                    setCurrentSessionId(null);
+                  deleteSession(currentSessionId, currentSession.source);
+                  setCurrentSessionId(null);
                 }
               }}
               DuplicateThisSession={() => {
-                  if (!currentSessionId || !currentSession) return;
-                  
-                  const newId = `${currentSession.id}_copy_${Date.now()}`;
-                  const duplicatedSession: TySession = {
-                    ...currentSession,
-                    id: newId,
-                    shortUrl: "",
-                    meta: {
-                      ...currentSession.meta,
-                      name: `${currentSession.meta.name} (Copy)`,
-                      lastModified: new Date().toISOString(),
-                    },
-                  };
+                if (!currentSessionId || !currentSession) return;
 
+                const newId = `${currentSession.id}_copy_${Date.now()}`;
+                const duplicatedSession: TySession = {
+                  ...currentSession,
+                  id: newId,
+                  shortUrl: "",
+                  meta: {
+                    ...currentSession.meta,
+                    name: `${currentSession.meta.name} (Copy)`,
+                    lastModified: new Date().toISOString(),
+                  },
+                };
 
-                  saveSession(duplicatedSession, currentSession.source);
-                  
-                  setCurrentSessionId(newId);
-                  setSessionSettings({
-                    current: {
-                      ...duplicatedSession.meta,
-                      folder: duplicatedSession.folder,
-                    },
-                  });
-                  setTyreData(duplicatedSession.tyreData || {});
-                  setCurrentNotes(duplicatedSession.currentNotes || "");
-                  setRaceConfig(
-                    duplicatedSession.raceConfig || DEFAULT_RACECONFIGURATION,
-                  );
-                  setTyrePreferences(
-                    duplicatedSession.tyrePreferences || DEFAULT_PREFERENCES,
-                  );
-                  setCurrentSuggestion(
-                    duplicatedSession.currentSuggestion || "",
-                  );
-                  setAIConfigSettings({
-                    model:
-                      duplicatedSession.aiConfigSettings?.model ||
-                      "qwen/qwen3-32b",
-                    temperature:
-                      duplicatedSession.aiConfigSettings?.temperature || 0.7,
-                    top_p: duplicatedSession.aiConfigSettings?.top_p || 1,
-                    useExperimentalPrompt:
-                      duplicatedSession.aiConfigSettings
-                        ?.useExperimentalPrompt || false,
-                  });
-                  setWeather(duplicatedSession.weather || []);
-                  setMiscStats(
-                    duplicatedSession.miscStats || {
-                      avgLapTime: "",
-                      gridPosition: 0,
-                      totalGridDrivers: 0,
-                      raceStartTime: "",
-                      pitLossTime: 0,
-                    },
-                  );
-                  setManualStints(duplicatedSession.manualStints || []);
-                  setSessionSettingsVis(false);
+                saveSession(duplicatedSession, currentSession.source);
+
+                setCurrentSessionId(newId);
+                setSessionSettings({
+                  current: {
+                    ...duplicatedSession.meta,
+                    folder: duplicatedSession.folder,
+                  },
+                });
+                setTyreData(duplicatedSession.tyreData || {});
+                setCurrentNotes(duplicatedSession.currentNotes || "");
+                setRaceConfig(
+                  duplicatedSession.raceConfig || DEFAULT_RACECONFIGURATION,
+                );
+                setTyrePreferences(
+                  duplicatedSession.tyrePreferences || DEFAULT_PREFERENCES,
+                );
+                setCurrentSuggestion(duplicatedSession.currentSuggestion || "");
+                setAIConfigSettings({
+                  model:
+                    duplicatedSession.aiConfigSettings?.model ||
+                    "qwen/qwen3-32b",
+                  temperature:
+                    duplicatedSession.aiConfigSettings?.temperature || 0.7,
+                  top_p: duplicatedSession.aiConfigSettings?.top_p || 1,
+                  useExperimentalPrompt:
+                    duplicatedSession.aiConfigSettings?.useExperimentalPrompt ||
+                    false,
+                });
+                setWeather(duplicatedSession.weather || []);
+                setMiscStats(
+                  duplicatedSession.miscStats || {
+                    avgLapTime: "",
+                    gridPosition: 0,
+                    totalGridDrivers: 0,
+                    raceStartTime: "",
+                    pitLossTime: 0,
+                  },
+                );
+                setManualStints(duplicatedSession.manualStints || []);
+                setSessionSettingsVis(false);
               }}
             />
           )}

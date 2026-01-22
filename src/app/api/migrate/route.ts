@@ -33,9 +33,12 @@ export async function POST(request: Request) {
   const result = MigratePayloadSchema.safeParse(rawBody);
 
   if (!result.success) {
-    return new Response(JSON.stringify({ error: "Invalid payload structure" }), {
-      status: 400,
-    });
+    return new Response(
+      JSON.stringify({ error: "Invalid payload structure" }),
+      {
+        status: 400,
+      },
+    );
   }
 
   const { sessions, folders } = result.data;
@@ -43,74 +46,86 @@ export async function POST(request: Request) {
 
   // Limits
   if (sessions.length + folders.length > 500) {
-     return new Response(JSON.stringify({ error: "Too many items to migrate at once (Max 500)" }), {
-      status: 413,
-    });
+    return new Response(
+      JSON.stringify({ error: "Too many items to migrate at once (Max 500)" }),
+      {
+        status: 413,
+      },
+    );
   }
 
   try {
     // 1. Migrate Folders
-    
+
     // Process Folders
     // We strictly take the fields we need.
-    const foldersData = (folders as Folder[]).map(f => ({
-        id: f.id,
-        userId: userId,
-        name: f.name,
-        color: f.color,
-        icon: f.icon
+    const foldersData = (folders as Folder[]).map((f) => ({
+      id: f.id,
+      userId: userId,
+      name: f.name,
+      color: f.color,
+      icon: f.icon,
     }));
 
-    const folderPromises = foldersData.map(f => 
-        prisma.raceFolder.upsert({
-            where: { id: f.id },
-            update: {
-                name: f.name,
-                color: f.color,
-                icon: f.icon
-            },
-            create: f
-        }).catch(err => {
-            console.error(`Failed to migrate folder ${f.id}:`, err);
-            return null;
+    const folderPromises = foldersData.map((f) =>
+      prisma.raceFolder
+        .upsert({
+          where: { id: f.id },
+          update: {
+            name: f.name,
+            color: f.color,
+            icon: f.icon,
+          },
+          create: f,
         })
+        .catch((err) => {
+          console.error(`Failed to migrate folder ${f.id}:`, err);
+          return null;
+        }),
     );
 
     // 2. Migrate Sessions
-    const sessionsData = (sessions as TySession[]).map(s => ({
-        id: s.id,
-        userId: userId,
-        folderId: s.folder, // link to folder if it exists
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data: s as any
+    const sessionsData = (sessions as TySession[]).map((s) => ({
+      id: s.id,
+      userId: userId,
+      folderId: s.folder, // link to folder if it exists
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data: s as any,
     }));
 
-    const sessionPromises = sessionsData.map(s => 
-        prisma.raceSession.upsert({
-            where: { id: s.id },
-            update: {
-                data: s.data,
-                folderId: s.folderId
-            },
-            create: {
-                id: s.id,
-                userId: s.userId,
-                folderId: s.folderId,
-                data: s.data
-            }
-        }).catch(err => {
-            console.error(`Failed to migrate session ${s.id}:`, err);
-            return null;
+    const sessionPromises = sessionsData.map((s) =>
+      prisma.raceSession
+        .upsert({
+          where: { id: s.id },
+          update: {
+            data: s.data,
+            folderId: s.folderId,
+          },
+          create: {
+            id: s.id,
+            userId: s.userId,
+            folderId: s.folderId,
+            data: s.data,
+          },
         })
+        .catch((err) => {
+          console.error(`Failed to migrate session ${s.id}:`, err);
+          return null;
+        }),
     );
 
     // Execute
     await Promise.all([...folderPromises, ...sessionPromises]);
 
-    return new Response(JSON.stringify({ success: true, count: sessions.length + folders.length }), {
-      status: 200,
-    });
-
+    return new Response(
+      JSON.stringify({
+        success: true,
+        count: sessions.length + folders.length,
+      }),
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     console.error("Migration error:", error);
     return new Response(JSON.stringify({ error: "Migration failed" }), {

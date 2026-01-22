@@ -81,7 +81,9 @@ export default function SessionSettingsPage({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // only show folders that match the source of the session
-  const validFolders = folders.filter((f) => !source || !f.source || f.source === source);
+  const validFolders = folders.filter(
+    (f) => !source || !f.source || f.source === source,
+  );
 
   const handleSave = () => {
     onSave(config);

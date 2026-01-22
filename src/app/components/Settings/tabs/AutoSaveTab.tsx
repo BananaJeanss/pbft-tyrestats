@@ -34,8 +34,9 @@ export default function AutoSaveTab() {
           </label>
           <span className="relative inline-block">
             <Info className="peer ml-2 inline-block h-4 w-4 cursor-pointer" />
-            <span className="w-20/2 pointer-events-none absolute top-1/2 left-8 z-10 -translate-y-1/2 rounded bg-zinc-700 px-2 py-1 text-xs text-white opacity-0 transition-opacity peer-hover:opacity-100">
-              Interval in seconds to save notes after the last keypress. Everything else is saved instantly.
+            <span className="pointer-events-none absolute top-1/2 left-8 z-10 w-20/2 -translate-y-1/2 rounded bg-zinc-700 px-2 py-1 text-xs text-white opacity-0 transition-opacity peer-hover:opacity-100">
+              Interval in seconds to save notes after the last keypress.
+              Everything else is saved instantly.
             </span>
           </span>
         </div>

@@ -286,8 +286,8 @@ export function useSessionManager() {
 
   // Combined Folders for UI
   const folders = [
-      ...localFolders.map(f => ({ ...f, source: "local" as const })),
-      ...cloudFolders.map(f => ({ ...f, source: "cloud" as const }))
+    ...localFolders.map((f) => ({ ...f, source: "local" as const })),
+    ...cloudFolders.map((f) => ({ ...f, source: "cloud" as const })),
   ];
 
   return {

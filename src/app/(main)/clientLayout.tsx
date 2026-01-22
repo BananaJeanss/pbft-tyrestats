@@ -4,7 +4,11 @@ import { Loader2 } from "lucide-react";
 import Navbar from "../components/navbar";
 import { useEffect, useState } from "react";
 
-export default function ClientsMainLayout({ children }: { children: React.ReactNode }) {
+export default function ClientsMainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -12,11 +16,12 @@ export default function ClientsMainLayout({ children }: { children: React.ReactN
     setMounted(true);
   }, []);
 
-  if (!mounted) return (
-    <div className="h-screen w-screen flex items-center justify-center">
+  if (!mounted)
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
         <Loader2 className="animate-spin" />
-    </div>
-  )
+      </div>
+    );
 
   return (
     <>

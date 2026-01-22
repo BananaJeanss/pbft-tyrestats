@@ -11,7 +11,11 @@ interface NewSessionProps {
   folders: Folder[];
 }
 
-export default function NewSession({ onClose, onCreate, folders }: NewSessionProps) {
+export default function NewSession({
+  onClose,
+  onCreate,
+  folders,
+}: NewSessionProps) {
   // 1. Local state for the form inputs
   const [name, setName] = useState("");
   const [folder, setFolder] = useState("");
@@ -86,15 +90,15 @@ export default function NewSession({ onClose, onCreate, folders }: NewSessionPro
                 className="w-20 appearance-none rounded border border-neutral-700 bg-zinc-200 bg-none text-center focus:ring-2 focus:ring-neutral-600 focus:outline-none dark:bg-neutral-800"
               >
                 <option value="">—</option>
-                
+
                 {folders
                   .filter((f) =>
-                  user ? f.source === "cloud" : f.source === "local"
+                    user ? f.source === "cloud" : f.source === "local",
                   )
                   .map((folder) => (
-                  <option key={folder.id} value={folder.id}>
-                    {folder.name}
-                  </option>
+                    <option key={folder.id} value={folder.id}>
+                      {folder.name}
+                    </option>
                   ))}
               </select>
             </div>

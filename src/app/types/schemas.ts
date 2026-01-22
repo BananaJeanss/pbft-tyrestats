@@ -35,7 +35,6 @@ const AIStrategySettingsSchema = z.object({
 });
 
 export const FolderSchema = z.object({
-
   id: z.string().max(64),
 
   name: z.string().min(1).max(50),
@@ -43,21 +42,16 @@ export const FolderSchema = z.object({
   icon: z.string().max(50),
 
   color: z.string().regex(/^#([0-9A-F]{3}){1,2}$/i, "Invalid color hex code"),
-
 });
-
-
 
 // 2. Define the main TySession Schema
 
 export const TySessionSchema = z.object({
-
   id: z.string().max(64),
 
   folder: z.string().max(64).nullable(),
 
   meta: z.object({
-
     name: z.string().max(100),
 
     date: z.string().max(30), // ISO date string usually ~24 chars
@@ -67,28 +61,23 @@ export const TySessionSchema = z.object({
     selectedIcon: z.string().max(50),
 
     icon_url: z.string().url().max(500).optional().or(z.literal("")),
-
   }),
 
   raceConfig: z.object({
-
     RaceLaps: z.number().max(10000), // Sanity check
-
   }),
 
   tyrePreferences: z.object({
-
     preferredSwitchoverPoint: z.number(),
 
     softToMediumRatio: z.number(),
 
     mediumToHardRatio: z.number(),
-
   }),
 
   // Record<string, TyreWearData>
 
-  tyreData: z.record(z.string().max(20), TyreWearDataSchema), 
+  tyreData: z.record(z.string().max(20), TyreWearDataSchema),
 
   currentNotes: z.string().max(10000).optional(), // Max 10k chars for notes
 
@@ -98,16 +87,11 @@ export const TySessionSchema = z.object({
 
   manualStints: z.array(ManualStintSchema).max(100), // Prevent 1000s of stints
 
-  
-
   // REPLACE z.any() with actual schema for AIStrategySettingsS if possible
 
   aiConfigSettings: AIStrategySettingsSchema,
 
-  
-
   weather: z.array(WeatherEntrySchema).max(50).optional(),
 
   miscStats: MiscStatsSchema.optional(),
-
 });

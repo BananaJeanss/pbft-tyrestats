@@ -95,14 +95,16 @@ export default function AIStrategySuggestion({
       const CodeResponses = {
         429: "You have exceeded your rate limit. Please try again later.",
         400: "Bad request. Please check your input and try again.",
-      }
+      };
 
       if (!response.ok) {
         console.error("Error response:", response);
         throw new Error(
           response.status === 500
             ? "Service unavailable. Try Again Later"
-            : CodeResponses[String(response.status) as unknown as keyof typeof CodeResponses] || `Server responded with status: ${response.status}`,
+            : CodeResponses[
+                String(response.status) as unknown as keyof typeof CodeResponses
+              ] || `Server responded with status: ${response.status}`,
         );
       }
 
@@ -175,8 +177,9 @@ export default function AIStrategySuggestion({
                   {isLoading ? "Generating..." : "Generate Analysis"}
                 </button>
                 {ratelimitCount !== null && AIlimits && (
-                  <p className="text-xs font-light opacity-50 mx-2 cursor-help"
-                  title="AI Token Usage, resets after 24 hours."
+                  <p
+                    className="mx-2 cursor-help text-xs font-light opacity-50"
+                    title="AI Token Usage, resets after 24 hours."
                   >
                     {ratelimitCount || 0}/
                     {session?.user.id ? AIlimits.account : AIlimits.anon} tokens

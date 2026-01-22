@@ -175,10 +175,10 @@ export default function TyreSettings({
             {isThereTyreData && (
               <>
                 <hr className="border-neutral-800" />
-                <div className="justify-center flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center justify-center gap-1">
                   <button
                     onClick={() => setShowDeleteConfirmation(true)}
-                    className="cursor-pointer text-red-600 text-sm flex items-center gap-2 hover:underline"
+                    className="flex cursor-pointer items-center gap-2 text-sm text-red-600 hover:underline"
                   >
                     <Trash2 className="inline h-5 w-5" /> Clear All Tyre Data
                   </button>

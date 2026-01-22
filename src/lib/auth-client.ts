@@ -7,7 +7,6 @@ export const signIn = async () => {
   const data = await authClient.signIn.social({
     provider: "roblox",
     callbackURL: "/dashboard",
-    
   });
   return data;
 };
