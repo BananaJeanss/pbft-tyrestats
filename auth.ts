@@ -10,7 +10,7 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || "https://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL,
   trustedOrigins: [
     "https://localhost:3000",
     "http://localhost:3000",
