@@ -50,7 +50,7 @@ export default function GeneralTab() {
       <div className="flex w-1/4 flex-col gap-2">
         {user && (
           <button
-            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-md border border-red-700 p-2 text-sm text-white"
+            className="flex cursor-pointer flex-row items-center justify-center gap-2 rounded-md border border-red-700 p-2 text-sm"
             onClick={async () => {
               await authClient.signOut({
                 fetchOptions: {

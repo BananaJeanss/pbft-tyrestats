@@ -3,6 +3,7 @@ import {
   Edit3Icon,
   LucideImage,
   Trash2,
+  Undo2Icon,
   Upload,
   X,
   ZoomIn,
@@ -11,11 +12,12 @@ import {
 import { useState, useEffect } from "react";
 
 interface TyreWearManagerProps {
-  tyreType: "soft" | "medium" | "hard" | "wet";
-  ClearTyreData: () => void;
+  tyreType?: "soft" | "medium" | "hard" | "wet";
+  ClearTyreData?: () => void;
   doesAlreadyHaveData: boolean;
   onClose: () => void;
-  onSave: (data: TyreWearData) => void;
+  onSave?: (data: TyreWearData) => void;
+  calculatorMode?: boolean; // just for quick tools
 }
 
 interface ConfirmClearTyreDataProps {
@@ -58,11 +60,12 @@ function confirmClearTyreData({
 }
 
 export default function TyreWearManager({
-  tyreType,
-  ClearTyreData,
+  tyreType = "soft",
+  ClearTyreData = () => {},
   doesAlreadyHaveData,
   onClose,
-  onSave,
+  onSave = () => {},
+  calculatorMode = false,
 }: TyreWearManagerProps) {
   const [currentPage, setCurrentPage] = useState<
     "options" | "screenshot" | "manual" | "analysis"
@@ -226,7 +229,9 @@ export default function TyreWearManager({
           <div className="flex h-3/4 w-3/5 flex-col gap-2 rounded-xl bg-zinc-100 p-4 dark:bg-neutral-900">
             <div className="flex h-1/20 w-full flex-row items-center">
               <h4 className="grow text-2xl font-semibold">
-                Add Tyre Data for {readableTyreType[tyreType]} Tyres
+                {calculatorMode
+                  ? "Tyre Wear Calculator"
+                  : `Add Tyre Data for ${readableTyreType[tyreType]} Tyres`}
               </h4>
               <button onClick={onClose}>
                 <X className="cursor-pointer" />
@@ -279,6 +284,9 @@ export default function TyreWearManager({
               <button onClick={onClose}>
                 <X className="cursor-pointer" />
               </button>
+              <button onClick={() => setCurrentPage("options")}>
+                <Undo2Icon className="mr-2 cursor-pointer" />
+              </button>
             </div>
             <hr className="border-neutral-700" />
             <label
@@ -314,9 +322,14 @@ export default function TyreWearManager({
                   "Step 3: Click the TOP EDGE of the green zone"}
                 {points.length === 3 && "Step 4: Enter Laps Driven"}
               </h3>
-              <button onClick={onClose}>
-                <X className="cursor-pointer" />
-              </button>
+              <div>
+                <button onClick={() => setCurrentPage("options")}>
+                  <Undo2Icon className="mr-2 cursor-pointer" />
+                </button>
+                <button onClick={onClose}>
+                  <X className="cursor-pointer" />
+                </button>
+              </div>
             </div>
             <hr className="border-neutral-700" />
 
@@ -457,12 +470,14 @@ export default function TyreWearManager({
                         </div>
                       </>
                     )}
-                    <button
-                      onClick={handleSave}
-                      className="mt-4 cursor-pointer rounded bg-zinc-300 py-2 font-bold text-black transition hover:bg-zinc-400 dark:bg-neutral-800 dark:hover:bg-neutral-200"
-                    >
-                      Save Data
-                    </button>
+                    {!calculatorMode && (
+                      <button
+                        onClick={handleSave}
+                        className="mt-4 cursor-pointer rounded bg-zinc-300 py-2 font-bold transition hover:bg-zinc-400 dark:bg-neutral-700 dark:hover:bg-neutral-200 dark:hover:text-black"
+                      >
+                        Save Data
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -475,6 +490,9 @@ export default function TyreWearManager({
           <div className="flex h-3/4 w-3/5 flex-col gap-2 rounded-xl bg-zinc-100 p-4 dark:bg-neutral-900">
             <div className="flex h-1/20 w-full flex-row items-center">
               <h4 className="grow text-2xl font-semibold">Manual Tyre Data</h4>
+              <button onClick={() => setCurrentPage("options")}>
+                <Undo2Icon className="mr-2 cursor-pointer" />
+              </button>
               <button onClick={onClose}>
                 <X className="cursor-pointer" />
               </button>
@@ -571,12 +589,14 @@ export default function TyreWearManager({
               </div>
             )}
             <div className="flex items-center justify-center">
-              <button
-                onClick={handleSave}
-                className="cursor-pointer rounded bg-zinc-300 px-4 py-2 font-bold text-black transition hover:bg-zinc-400 dark:bg-white dark:hover:bg-neutral-200"
-              >
-                Save Data
-              </button>
+              {!calculatorMode && (
+                <button
+                  onClick={handleSave}
+                  className="cursor-pointer rounded bg-zinc-300 px-4 py-2 font-bold text-black transition hover:bg-zinc-400 dark:bg-white dark:hover:bg-neutral-200"
+                >
+                  Save Data
+                </button>
+              )}
             </div>
           </div>
         )}

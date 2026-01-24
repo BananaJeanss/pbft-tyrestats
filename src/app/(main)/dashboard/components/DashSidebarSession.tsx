@@ -1,3 +1,4 @@
+import { PlaceIconsMap } from "@/app/types/PlaceIconsMap";
 import { TySession } from "@/app/types/TyTypes";
 import { Calendar, Goal } from "lucide-react";
 import Image from "next/image";
@@ -7,14 +8,6 @@ export interface DashSidebarSessionThings {
   isActive: boolean;
   onClick: () => void;
 }
-
-const IconsMap: { [key: string]: string } = {
-  default: "/placeholder.png",
-  kubica: "/icons/kubica.webp",
-  petgear: "/icons/petgear.webp",
-  harju: "/icons/harju.webp",
-  panther: "/icons/panther.webp",
-};
 
 export default function DashSidebarSession({
   sessionData,
@@ -40,7 +33,10 @@ export default function DashSidebarSession({
         />
       ) : (
         <Image
-          src={IconsMap[sessionData.meta.selectedIcon] || IconsMap["default"]}
+          src={
+            (PlaceIconsMap[sessionData.meta.selectedIcon]?.path ||
+              PlaceIconsMap["default"].path)
+          }
           alt="Track Logo"
           width={256}
           height={256}

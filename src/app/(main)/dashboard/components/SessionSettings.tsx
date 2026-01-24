@@ -1,6 +1,7 @@
 import { Copy, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { Folder } from "@/app/types/TyTypes";
+import { PlaceIconsMap } from "@/app/types/PlaceIconsMap";
 
 export interface SessionSettings {
   name: string;
@@ -183,12 +184,11 @@ export default function SessionSettingsPage({
                     })
                   }
                 >
-                  <option value="default">Default (Placeholder)</option>
-                  <option value="kubica">Kubica Island Autodrome</option>
-                  <option value="petgear">PET Gear Autodrome</option>
-                  <option value="harju">Harju Superovaal</option>
-                  <option value="panther">Panther Hügel Rennstrecke</option>
-                  <option value="custom">Custom (Image URL)</option>
+                  {Object.entries(PlaceIconsMap).map(([key, { displayName }]) => (
+                    <option key={key} value={key}>
+                      {displayName || key}
+                    </option>
+                  ))}
                 </select>
               </div>
               {config.selectedIcon === "custom" && (

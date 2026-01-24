@@ -105,7 +105,7 @@ export default function IconSelector({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 z-50 mt-1 flex w-[280px] flex-col gap-2 rounded-xl border border-neutral-700 bg-zinc-100 p-2 shadow-2xl sm:w-[320px] dark:bg-neutral-900">
+        <div className="absolute left-0 z-50 mt-1 flex w-70 flex-col gap-2 rounded-xl border border-neutral-700 bg-zinc-100 p-2 shadow-2xl sm:w-[320px] dark:bg-neutral-900">
           {/* Search */}
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
@@ -122,7 +122,7 @@ export default function IconSelector({
           </div>
 
           {/* Icons Grid */}
-          <div className="custom-scrollbar grid max-h-[300px] grid-cols-5 gap-1 overflow-y-auto pr-1 md:grid-cols-8">
+          <div className="custom-scrollbar grid max-h-75 grid-cols-5 gap-1 overflow-y-auto pr-1 md:grid-cols-8">
             {filteredIcons.length === 0 ? (
               <div className="col-span-full py-4 text-center text-sm text-neutral-500">
                 No icons found
