@@ -77,19 +77,25 @@ Don't want to log in? No problem! You have the freedom to choose between logging
 5. Run database migrations
 
    ```bash
-   bun run prisma migrate deploy
+   bun --bun run prisma migrate deploy
    ```
 
-6. Run the development server
+6. Generate Prisma client
 
    ```bash
-   npm run dev
+   bun --bun run prisma:generate
+   ```
+
+7. Run the development server
+
+   ```bash
+   bun run dev
    ```
 
 > [!NOTE]
-> npm run dev uses `--experimental-https` for PWA support, you may be prompted to generate a self-signed certificate. You can alternatively run `npm run dev-nohttps` for plain http.
+> bun run dev uses `--experimental-https` for PWA support, you may be prompted to generate a self-signed certificate. You can alternatively run `bun run dev-nohttps` for plain http.
 
-7. Open [https://localhost:3000](https://localhost:3000) in your browser to see the app.
+8. Open [https://localhost:3000](https://localhost:3000) in your browser to see the app.
 
 ## Contributing
 
@@ -97,7 +103,7 @@ Contributions are always welcome!
 
 Fork the repo, make your changes & commit them, then open a pull request.
 
-Make sure `npm run build` works before submitting a PR.
+Make sure `bun run build` works before submitting a PR.
 
 ## License
 

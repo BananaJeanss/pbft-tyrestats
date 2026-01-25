@@ -29,6 +29,7 @@ export default function Home() {
     mounted && resolvedTheme === "light" ? "/tslogo.png" : "/tslogow.png";
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className="grow" />
       <Image
         src={logoSrc}
         alt="Tyrestats Logo which is very cool and awesome"
@@ -77,6 +78,25 @@ export default function Home() {
           </>
         )}
       </div>
+      <div className="grow" />
+      <footer className="mb-4 text-sm text-neutral-500">
+        <a
+          href="https://github.com/BananaJeanss/pbft-tyrestats"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-(--tyrestats-blue) opacity-50 hover:underline"
+        >
+          GitHub
+        </a>
+        {" | "}
+        <Link href="/privacy" className="hover:text-(--tyrestats-blue) opacity-50 hover:underline">
+          Privacy Policy
+        </Link>{" "}
+        |{" "}
+        <Link href="/terms" className="hover:text-(--tyrestats-blue) opacity-50 hover:underline">
+          Terms of Service
+        </Link>
+      </footer>
     </div>
   );
 }

@@ -109,15 +109,24 @@ export default function SettingsPage({ onClose }: SettingsMenuProps) {
         </div>
 
         <hr className="border-neutral-800" />
-        <span className="text-center text-xs">
-          TyreStats |{" "}
+        <span className="flex flex-row items-center justify-center gap-2 text-xs">
+          TyreStats <div className="h-3 w-px bg-neutral-500" />
           <a
             href="https://github.com/BananaJeanss/pbft-tyrestats"
             className="underline"
           >
-            {"View Source"}
-          </a>{" "}
-          | Build{" "}
+            View Source
+          </a>
+          <div className="h-3 w-px bg-neutral-500" />
+          <a href="/terms" className="underline">
+            Terms
+          </a>
+          <div className="h-3 w-px bg-neutral-500" />
+          <a href="/privacy" className="underline">
+            Privacy
+          </a>
+          <div className="h-3 w-px bg-neutral-500" />
+          Build
           <a
             href={`https://github.com/BananaJeanss/pbft-tyrestats/commit/${nextBuildId}`}
             className="underline"
