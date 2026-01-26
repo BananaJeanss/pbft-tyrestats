@@ -10,6 +10,9 @@ export default function GeneralTab() {
     "tyrestats_navbar_clock",
     false,
   );
+  const [showSearchAnyways, setShowSearchAnyways] = useLocalStorage<
+    "always" | "never" | "auto"
+  >("tyrestats-show-search-anyways", "auto");
 
   const { data: session } = authClient.useSession();
   const user = session?.user;
@@ -45,6 +48,26 @@ export default function GeneralTab() {
         <div className="text-sm text-neutral-500">
           Show/Hide UTC Clock in the Navbar
         </div>
+      </div>
+      <hr className="border-neutral-800" />
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium">Session Search Bar</label>
+        <select
+          value={showSearchAnyways}
+          onChange={(e) =>
+            setShowSearchAnyways(
+              e.target.value as "always" | "never" | "auto",
+            )
+          }
+          className="rounded-md border border-neutral-700 bg-transparent p-2 text-sm"
+        >
+          <option value="auto">Auto</option>
+          <option value="always">Always Show</option>
+          <option value="never">Never Show</option>
+        </select>
+      </div>
+      <div className="text-sm text-neutral-500">
+        Control when the session search bar appears in the dashboard sidebar.
       </div>
       <hr className="border-neutral-800" />
       <div className="flex w-1/4 flex-col gap-2">

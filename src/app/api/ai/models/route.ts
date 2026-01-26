@@ -1,3 +1,5 @@
+import redisClient from "@/app/db/redisClient";
+
 const GetModelsUrl =
   process.env.HC_AI_GET_MODELS_URL || "https://ai.hackclub.com/proxy/v1/models";
 
@@ -26,6 +28,12 @@ interface GetModelsDataType {
 
 export async function GET() {
   try {
+    // first, check if cache hits
+    const cachedModels = await redisClient.get("ai_models");
+    if (cachedModels) {
+      return Response.json({ models: JSON.parse(cachedModels) });
+    }
+
     const response = await fetch(GetModelsUrl, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -44,6 +52,11 @@ export async function GET() {
           model.architecture?.modality != "text+image->text+image",
       )
       .map((model: GetModelsDataType) => ({ id: model.id }));
+
+    // cache the models for future requests
+    await redisClient.set("ai_models", JSON.stringify(filteredModels), {
+      EX: 60 * 60 * 12, // cache for 12 hours
+    });
 
     return Response.json({ models: filteredModels });
   } catch (err) {

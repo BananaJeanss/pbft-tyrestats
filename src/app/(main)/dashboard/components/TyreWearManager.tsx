@@ -240,7 +240,7 @@ export default function TyreWearManager({
             <hr className="border-neutral-700" />
             <div className="flex grow flex-row items-center justify-center gap-4">
               <button
-                className="flex aspect-square max-h-1/2 cursor-pointer flex-col items-center rounded-4xl border border-neutral-700 p-4 px-4 transition hover:bg-zinc-300 dark:hover:bg-neutral-800"
+                className="flex aspect-square max-h-1/2 cursor-pointer flex-col items-center justify-center rounded-4xl border border-neutral-700 p-4 px-4 transition hover:bg-zinc-300 dark:hover:bg-neutral-800"
                 onClick={() => setCurrentPage("screenshot")}
               >
                 <LucideImage className="p-1/4 h-1/2 w-1/2" />
@@ -253,7 +253,7 @@ export default function TyreWearManager({
               </button>
               <p className="text-bold text-xl">or</p>
               <button
-                className="flex aspect-square max-h-1/2 cursor-pointer flex-col items-center rounded-4xl border border-neutral-700 p-4 px-4 transition hover:bg-zinc-300 dark:hover:bg-neutral-800"
+                className="flex aspect-square max-h-1/2 cursor-pointer flex-col items-center justify-center rounded-4xl border border-neutral-700 p-4 px-4 transition hover:bg-zinc-300 dark:hover:bg-neutral-800"
                 onClick={() => setCurrentPage("manual")}
               >
                 <Edit3Icon className="p-1/4 h-1/2 w-1/2" />
