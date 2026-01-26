@@ -20,7 +20,7 @@ import { rainLikelyLaps, redflagLikelyLaps } from "../TyreMath";
 interface DashboardViewProps {
   sessionName: string;
   readOnly?: boolean;
-  whoCreated: {
+  whoCreated?: {
     username: string;
     pfp: string;
   } | null;
