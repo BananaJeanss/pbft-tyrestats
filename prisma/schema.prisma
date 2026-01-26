@@ -11,6 +11,7 @@ model shared_sessions {
   short_url    String    @id @db.VarChar(10)
   session_data Json
   created_at   DateTime? @default(now()) @db.Timestamp(6)
+  whoCreated   String    @default("anon") @db.VarChar(255) // if "anon", anonymous
   hashcheck    String    @unique @db.VarChar(64)
 }
 

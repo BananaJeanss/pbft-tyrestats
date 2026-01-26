@@ -10,6 +10,7 @@ export interface WeatherMiscProps {
   weather: WeatherEntry[];
   setWeather: (w: WeatherEntry[]) => void;
   miscStats: MiscStats;
+  laps: number;
   setMiscStats: (m: MiscStats) => void;
 }
 
@@ -325,9 +326,30 @@ export default function WeatherMisc({
   weather,
   setWeather,
   miscStats,
+  laps,
   setMiscStats,
 }: WeatherMiscProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const calculateDuration = (avgLapTimeStr: string, totalLaps: number) => {
+  // Regex to match M:SS.ms
+  const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
+  if (!match || !totalLaps) return null;
+
+  const minutes = parseInt(match[1]);
+  const seconds = parseFloat(match[2] + (match[3] || ""));
+  
+  const totalSeconds = (minutes * 60 + seconds) * totalLaps;
+
+  // Format back to HH:MM:SS
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = Math.floor(totalSeconds % 60);
+
+  return h > 0 
+    ? `${h}h ${m}m ${s}s` 
+    : `${m}m ${s}s`;
+};
 
   return (
     <>
@@ -398,12 +420,17 @@ export default function WeatherMisc({
         {/* misc stats place */}
         <div className="flex w-full shrink-0 grow flex-row items-center justify-between gap-4 px-4 text-center">
           <span
-            className="cursor-help font-bold"
+            className="cursor-help font-bold flex flex-col gap-0"
             title="Expected average lap time, used for strategy calculations."
           >
             Average Lap Time
             <span className="block font-normal">
               {miscStats?.avgLapTime || "-"}
+            </span>
+            <span className="text-xs font-extralight opacity-70">
+              (Est. Duration:{" "}
+              {calculateDuration(miscStats?.avgLapTime || "", laps) || "-"}
+              )
             </span>
           </span>
           <span

@@ -23,6 +23,10 @@ function SharedSessionContent() {
   const [error, setError] = useState<string | null>(
     !shortCode ? "Invalid link" : null,
   );
+  const [whoGenerated, setWhoGenerated] = useState<{
+    username: string;
+    pfp: string;
+  } | null>(null);
 
   const [isManualMode, setIsManualMode] = useState(false);
 
@@ -59,6 +63,9 @@ function SharedSessionContent() {
             }
           } else {
             setError("No session data found");
+          }
+          if (result.whoGenerated) {
+            setWhoGenerated(result.whoGenerated);
           }
         }
       })
@@ -208,6 +215,7 @@ function SharedSessionContent() {
         <DashboardView
           sessionName={sessionData.meta.name}
           readOnly={true}
+          whoCreated={whoGenerated}
           SessionData={sessionData}
           timelineGenerated={
             isManualMode

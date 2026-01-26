@@ -1,4 +1,9 @@
-import { RaceConfiguration, Stint, TimelineData } from "@/app/types/TyTypes";
+import {
+  RaceConfiguration,
+  Stint,
+  TimelineData,
+  WeatherEntry,
+} from "@/app/types/TyTypes";
 import { TyrePreferences } from "@/app/types/TyTypes";
 import { TyreWearData } from "@/app/types/TyTypes";
 
@@ -211,4 +216,206 @@ export const generateOptimalTimeline = (
   }
 
   return null;
+};
+
+export const rainLikelyLaps = (
+  weather: WeatherEntry[],
+  raceStartTime: string,
+  totalLaps: number,
+  avgLapTimeStr: string = "1:30.000",
+): Array<{ startLap: number; endLap: number }> => {
+  if (!weather || weather.length === 0 || !raceStartTime) return [];
+
+  // 1. Parse Avg Lap Time to Seconds
+  let avgLapSeconds = 90;
+  const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
+  if (match) {
+    const minutes = parseInt(match[1]);
+    const seconds = parseFloat(match[2] + (match[3] || ""));
+    avgLapSeconds = minutes * 60 + seconds;
+  }
+  if (avgLapSeconds <= 0) avgLapSeconds = 90;
+
+  // 2. Parse Times to Minutes
+  const timeToMinutes = (timeStr: string) => {
+    // Handles "HH:MM", "xx:MM", "x1:MM", "x2:MM" as relative to race start hour
+    const parts = timeStr.split(":");
+    if (parts.length !== 2) return -1;
+    const hStr = parts[0];
+    const m = parseInt(parts[1]);
+    const h = parseInt(hStr);
+    if (isNaN(m) || m < 0 || m >= 60) return -1;
+
+    // Handle relative hour codes
+    if (hStr === "xx") {
+      // Parse raceStartTime hour
+      const startParts = raceStartTime.split(":");
+      if (startParts.length !== 2) return -1;
+      const startH = parseInt(startParts[0]);
+      if (isNaN(startH)) return -1;
+
+      let offset = 0;
+      // Handle x[n]:00 as n hours after race start (e.g. x1:00, x2:00)
+      if (
+        hStr.startsWith("x") &&
+        hStr.length === 2 &&
+        !isNaN(Number(hStr[1]))
+      ) {
+        offset = Number(hStr[1]);
+      } else if (hStr.at(1) === "1") offset = 1;
+
+      return (startH + offset) * 60 + m;
+    }
+
+    if (isNaN(h) || h < 0 || h >= 24) return -1;
+    return h * 60 + m;
+  };
+
+  const startMins = timeToMinutes(raceStartTime);
+  if (startMins === -1) return [];
+
+  // 3. Map Weather to Lap Numbers
+  const points = weather
+    .map((w) => {
+      const wMins = timeToMinutes(w.time);
+      if (wMins === -1) return null;
+
+      let diff = wMins - startMins;
+      // Handle simple day rollover (start 23:00, weather 01:00)
+      if (diff < -720) diff += 1440;
+      // Handle pre-race weather defined way before
+      if (diff < -60) return null;
+
+      // If diff is negative but small (e.g. -5 mins), treat as Lap 0
+      const lap = diff < 0 ? 0 : Math.floor((diff * 60) / avgLapSeconds);
+
+      const isRain =
+        ["C1", "C2", "C3"].some(
+          (c) => w.condition.toUpperCase().includes(c), // Check short condition code
+        ) || w.condition.toLowerCase().includes("rain");
+
+      return { lap, isRain };
+    })
+    .filter((p): p is { lap: number; isRain: boolean } => p !== null)
+    .sort((a, b) => a.lap - b.lap);
+
+  if (points.length === 0) return [];
+
+  // 4. Build Intervals
+  const intervals: Array<{ startLap: number; endLap: number }> = [];
+  let currentStart: number | null = null;
+
+  for (let i = 0; i < points.length; i++) {
+    const pt = points[i];
+    const nextPt = points[i + 1]; // undefined if last
+
+    // Determine the end of this weather block
+    // It ends at the next weather update, OR at the end of the race
+    const blockEnd = nextPt ? nextPt.lap : totalLaps;
+
+    if (pt.isRain) {
+      // It is raining in this block.
+      // If we aren't already tracking a rain interval, start one.
+      if (currentStart === null) {
+        currentStart = pt.lap;
+      }
+
+      if (!nextPt || !nextPt.isRain) {
+        // Close it
+        intervals.push({ startLap: currentStart, endLap: blockEnd });
+        currentStart = null;
+      }
+    } else {
+      currentStart = null; // Safety
+    }
+  }
+
+  return intervals;
+};
+
+// same logic as rainLikelyLaps but for red flag conditions (c4)
+export const redflagLikelyLaps = (
+  weather: WeatherEntry[],
+  raceStartTime: string,
+  totalLaps: number,
+  avgLapTimeStr: string = "1:30.000",
+): Array<{ lap: number }> => {
+  if (!weather || weather.length === 0 || !raceStartTime) return [];
+
+  // 1. Parse Avg Lap Time to Seconds
+  let avgLapSeconds = 90;
+  const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
+  if (match) {
+    const minutes = parseInt(match[1]);
+    const seconds = parseFloat(match[2] + (match[3] || ""));
+    avgLapSeconds = minutes * 60 + seconds;
+  }
+  if (avgLapSeconds <= 0) avgLapSeconds = 90;
+
+  // 2. Parse Times to Minutes
+  const timeToMinutes = (timeStr: string) => {
+    const parts = timeStr.split(":");
+    if (parts.length !== 2) return -1;
+    const hStr = parts[0];
+    const m = parseInt(parts[1]);
+    const h = parseInt(hStr);
+    if (isNaN(m) || m < 0 || m >= 60) return -1;
+
+    if (hStr === "xx") {
+      const startParts = raceStartTime.split(":");
+      if (startParts.length !== 2) return -1;
+      const startH = parseInt(startParts[0]);
+      if (isNaN(startH)) return -1;
+
+      let offset = 0;
+      if (
+        hStr.startsWith("x") &&
+        hStr.length === 2 &&
+        !isNaN(Number(hStr[1]))
+      ) {
+        offset = Number(hStr[1]);
+      } else if (hStr.at(1) === "1") offset = 1;
+
+      return (startH + offset) * 60 + m;
+    }
+
+    if (isNaN(h) || h < 0 || h >= 24) return -1;
+    return h * 60 + m;
+  };
+
+  const startMins = timeToMinutes(raceStartTime);
+  if (startMins === -1) return [];
+
+  // 3. Map Weather to Lap Numbers
+  const points = weather
+    .map((w) => {
+      const wMins = timeToMinutes(w.time);
+      if (wMins === -1) return null;
+
+      let diff = wMins - startMins;
+      if (diff < -720) diff += 1440;
+      if (diff < -60) return null;
+
+      const lap = diff < 0 ? 0 : Math.floor((diff * 60) / avgLapSeconds);
+
+      const isRedFlag =
+        w.condition.toUpperCase().includes("C4") ||
+        w.condition.toLowerCase().includes("red flag");
+
+      return { lap, isRedFlag };
+    })
+    .filter((p): p is { lap: number; isRedFlag: boolean } => p !== null)
+    .sort((a, b) => a.lap - b.lap);
+
+  if (points.length === 0) return [];
+
+  // 4. Return lap where red flag happens
+  const redFlagLaps: Array<{ lap: number }> = [];
+  for (const pt of points) {
+    if (pt.isRedFlag) {
+      redFlagLaps.push({ lap: pt.lap });
+    }
+  }
+
+  return redFlagLaps;
 };

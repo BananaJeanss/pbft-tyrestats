@@ -4,6 +4,7 @@ import { CheckCircle2, Settings, Share2Icon, XCircle } from "lucide-react";
 import {
   Bar,
   BarChart,
+  ReferenceArea,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -51,6 +52,8 @@ interface DashTimelineProps {
   setIsManualMode: (mode: boolean) => void;
   openDashShare: () => void;
   readOnly?: boolean;
+  rainIntervals?: { startLap: number; endLap: number }[];
+  redFlagLaps: { lap: number }[];
 }
 
 export default function DashTimeline({
@@ -63,6 +66,8 @@ export default function DashTimeline({
   setIsManualMode,
   openDashShare,
   readOnly = false,
+  rainIntervals = [],
+  redFlagLaps = [],
 }: DashTimelineProps) {
   return (
     <div className="relative flex w-full flex-col gap-2 rounded-lg bg-zinc-200 p-4 dark:bg-neutral-900">
@@ -151,6 +156,36 @@ export default function DashTimeline({
               data={timelineData}
               margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
             >
+              <defs>
+                <pattern
+                  id="bluestripedPattern"
+                  patternUnits="userSpaceOnUse"
+                  width="8"
+                  height="8"
+                  patternTransform="rotate(45)"
+                >
+                  <rect
+                    width="4"
+                    height="8"
+                    transform="translate(0,0)"
+                    fill="#3b82f6"
+                  />
+                </pattern>
+                <pattern
+                  id="redstripedPattern"
+                  patternUnits="userSpaceOnUse"
+                  width="8"
+                  height="8"
+                  patternTransform="rotate(45)"
+                >
+                  <rect
+                    width="4"
+                    height="8"
+                    transform="translate(0,0)"
+                    fill="#ef4444"
+                  />
+                </pattern>
+              </defs>
               <XAxis
                 type="number"
                 domain={[0, raceConfig?.RaceLaps || "auto"]}
@@ -174,7 +209,43 @@ export default function DashTimeline({
                   stackId="a"
                   fill={stint.color}
                   name={stint.label}
-                  isAnimationActive={false} // smoother switching
+                  isAnimationActive={false}
+                  zIndex={1}
+                />
+              ))}
+
+              {rainIntervals.map((interval, index) => (
+                <ReferenceArea
+                  key={`rain-${index}`}
+                  x1={interval.startLap}
+                  x2={interval.endLap}
+                  fill="url(#bluestripedPattern)"
+                  fillOpacity={0.3}
+                  ifOverflow="visible"
+                  label={{
+                    value: `Rain (${interval.startLap} - ${interval.endLap})`,
+                    fill: "#000",
+                    fontSize: 18,
+                    position: "center",
+                  }}
+                  zIndex={10}
+                />
+              ))}
+              {redFlagLaps.map((redFlag, index) => (
+                <ReferenceArea
+                  key={`redflag-${index}`}
+                  x1={redFlag.lap - 0.5}
+                  x2={redFlag.lap + 0.5}
+                  fill="url(#redstripedPattern)"
+                  fillOpacity={0.3}
+                  ifOverflow="visible"
+                  label={{
+                    value: `Red Flag (${redFlag.lap})`,
+                    fill: "#000",
+                    fontSize: 18,
+                    position: "center",
+                  }}
+                  zIndex={10}
                 />
               ))}
             </BarChart>
@@ -192,6 +263,7 @@ export default function DashTimeline({
 
       <div className="flex justify-between px-1 text-xs">
         <span>Start</span>
+
         <span>Finish ({raceConfig?.RaceLaps || 0} Laps)</span>
       </div>
     </div>

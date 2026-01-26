@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Copy } from "lucide-react";
+import { Pencil, Copy, User } from "lucide-react";
 import {
   TyrePreferences,
   TimelineData,
@@ -15,10 +15,15 @@ import AIStrategySuggestion from "./AIStrategySuggestion";
 import DashNotes from "./DashNotes";
 import { AIStrategySettingsS } from "@/app/types/TyTypes";
 import WeatherMisc from "./WeatherMisc";
+import { rainLikelyLaps, redflagLikelyLaps } from "../TyreMath";
 
 interface DashboardViewProps {
   sessionName: string;
   readOnly?: boolean;
+  whoCreated: {
+    username: string;
+    pfp: string;
+  } | null;
 
   // Data
   SessionData: TySession;
@@ -61,6 +66,7 @@ interface DashboardViewProps {
 export default function DashboardView({
   sessionName,
   readOnly = false,
+  whoCreated,
   SessionData,
   timelineGenerated,
   autoTimelineData,
@@ -83,6 +89,19 @@ export default function DashboardView({
   onCopySession,
   onClearTyreData,
 }: DashboardViewProps) {
+  const rainIntervals = rainLikelyLaps(
+    SessionData.weather || [],
+    SessionData.miscStats?.raceStartTime || "",
+    SessionData.raceConfig.RaceLaps || 0,
+    SessionData.miscStats?.avgLapTime,
+  );
+  const redFlagLaps = redflagLikelyLaps(
+    SessionData.weather || [],
+    SessionData.miscStats?.raceStartTime || "",
+    SessionData.raceConfig.RaceLaps || 0,
+    SessionData.miscStats?.avgLapTime,
+  );
+
   return (
     <div className="flex h-full w-full flex-col gap-2 rounded-lg bg-zinc-100 p-4 dark:bg-neutral-800">
       <div className="flex flex-row items-center justify-between">
@@ -94,9 +113,33 @@ export default function DashboardView({
             </button>
           )}
           {readOnly && (
-            <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-sm font-normal text-neutral-500 dark:bg-neutral-900">
-              Read Only
-            </span>
+            <>
+              <span className="rounded-full bg-neutral-200 px-2 py-0.5 text-sm font-normal text-neutral-500 dark:bg-neutral-900">
+                Read Only
+              </span>
+              <div className="h-6 w-px bg-neutral-400" />
+              {whoCreated ? (
+                <>
+                  {whoCreated.pfp ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={whoCreated.pfp || undefined}
+                      alt="Profile Picture"
+                      className="h-6 w-6 rounded-full"
+                    />
+                  ) : (
+                    <User />
+                  )}
+                  <span className="flex flex-row items-center gap-1 text-sm font-normal text-neutral-500">
+                    {whoCreated.username}
+                  </span>
+                </>
+              ) : (
+                <span className="flex flex-row items-center gap-1 text-sm font-normal text-neutral-500">
+                  <User /> Anonymous
+                </span>
+              )}
+            </>
           )}
         </h2>
         {readOnly && onCopySession && (
@@ -127,6 +170,8 @@ export default function DashboardView({
         setIsManualMode={setIsManualMode}
         openDashShare={openDashShare || (() => {})}
         readOnly={readOnly}
+        rainIntervals={rainIntervals}
+        redFlagLaps={redFlagLaps}
       />
 
       {/* top tiles section - tyres and ai */}
@@ -166,6 +211,7 @@ export default function DashboardView({
           readOnly={readOnly}
           weather={SessionData.weather || []}
           setWeather={setWeather}
+          laps={SessionData.raceConfig.RaceLaps || 0}
           miscStats={
             SessionData.miscStats || {
               avgLapTime: "",

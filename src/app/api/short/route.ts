@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import redisClient from "@/app/db/redisClient";
 import { TySession } from "@/app/types/TyTypes";
 import { prisma } from "../../../../db";
+import { auth } from "../../../../auth";
+import { headers } from "next/headers";
 
 const restrictedFields = ["id", "folder"];
 const IsDevvingRatelimits = process.env.ENABLE_RDISPSTGRS_INDEV === "true";
@@ -48,7 +50,7 @@ export async function GET(req: Request) {
   try {
     const res = await prisma.shared_sessions.findUnique({
       where: { short_url: shortUrl },
-      select: { session_data: true },
+      select: { session_data: true, whoCreated: true },
     });
 
     if (!res) {
@@ -59,7 +61,17 @@ export async function GET(req: Request) {
     }
 
     const sessionData = res.session_data;
-    return NextResponse.json({ sessionData });
+    let whoGenPfp;
+    if (res.whoCreated && res.whoCreated !== "anon")
+      whoGenPfp = await prisma.user.findFirst({
+        where: { name: res.whoCreated },
+        select: { image: true },
+      });
+    const whoGenerated =
+      res.whoCreated === "anon"
+        ? null
+        : { username: res.whoCreated, pfp: whoGenPfp?.image || "" };
+    return NextResponse.json({ sessionData, whoGenerated });
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json({ error: "Database error" }, { status: 500 });
@@ -75,6 +87,12 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+
+  const headersList = await headers();
+  const session = await auth.api.getSession({
+    headers: headersList,
+  });
+  const username = session?.user?.name || "anon";
 
   // use redis for rate limiting (20 links per hour per IP)
   if (process.env.NODE_ENV !== "development" || IsDevvingRatelimits) {
@@ -165,6 +183,7 @@ export async function POST(req: Request) {
         data: {
           short_url: shortUrl,
           session_data: JSON.parse(JSON.stringify(sessionData)),
+          whoCreated: username,
           hashcheck: hashHex,
         },
       });
