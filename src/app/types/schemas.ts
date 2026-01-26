@@ -81,7 +81,7 @@ export const TySessionSchema = z.object({
 
   currentNotes: z.string().max(10000).optional(), // Max 10k chars for notes
 
-  currentSuggestion: z.string().max(5000).optional(),
+  currentSuggestion: z.string().max(15000).optional(),
 
   shortUrl: z.string().max(100).optional(),
 
