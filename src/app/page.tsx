@@ -84,16 +84,22 @@ export default function Home() {
           href="https://github.com/BananaJeanss/pbft-tyrestats"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-(--tyrestats-blue) opacity-50 hover:underline"
+          className="opacity-50 hover:text-(--tyrestats-blue) hover:underline"
         >
           GitHub
         </a>
         {" | "}
-        <Link href="/privacy" className="hover:text-(--tyrestats-blue) opacity-50 hover:underline">
+        <Link
+          href="/privacy"
+          className="opacity-50 hover:text-(--tyrestats-blue) hover:underline"
+        >
           Privacy Policy
         </Link>{" "}
         |{" "}
-        <Link href="/terms" className="hover:text-(--tyrestats-blue) opacity-50 hover:underline">
+        <Link
+          href="/terms"
+          className="opacity-50 hover:text-(--tyrestats-blue) hover:underline"
+        >
           Terms of Service
         </Link>
       </footer>

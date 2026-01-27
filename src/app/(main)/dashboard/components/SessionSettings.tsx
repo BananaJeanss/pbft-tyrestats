@@ -184,11 +184,13 @@ export default function SessionSettingsPage({
                     })
                   }
                 >
-                  {Object.entries(PlaceIconsMap).map(([key, { displayName }]) => (
-                    <option key={key} value={key}>
-                      {displayName || key}
-                    </option>
-                  ))}
+                  {Object.entries(PlaceIconsMap).map(
+                    ([key, { displayName }]) => (
+                      <option key={key} value={key}>
+                        {displayName || key}
+                      </option>
+                    ),
+                  )}
                 </select>
               </div>
               {config.selectedIcon === "custom" && (

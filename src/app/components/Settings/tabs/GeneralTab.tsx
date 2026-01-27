@@ -55,9 +55,7 @@ export default function GeneralTab() {
         <select
           value={showSearchAnyways}
           onChange={(e) =>
-            setShowSearchAnyways(
-              e.target.value as "always" | "never" | "auto",
-            )
+            setShowSearchAnyways(e.target.value as "always" | "never" | "auto")
           }
           className="rounded-md border border-neutral-700 bg-transparent p-2 text-sm"
         >

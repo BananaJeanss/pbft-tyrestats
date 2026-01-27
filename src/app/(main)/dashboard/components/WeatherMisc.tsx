@@ -332,24 +332,22 @@ export default function WeatherMisc({
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const calculateDuration = (avgLapTimeStr: string, totalLaps: number) => {
-  // Regex to match M:SS.ms
-  const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
-  if (!match || !totalLaps) return null;
+    // Regex to match M:SS.ms
+    const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
+    if (!match || !totalLaps) return null;
 
-  const minutes = parseInt(match[1]);
-  const seconds = parseFloat(match[2] + (match[3] || ""));
-  
-  const totalSeconds = (minutes * 60 + seconds) * totalLaps;
+    const minutes = parseInt(match[1]);
+    const seconds = parseFloat(match[2] + (match[3] || ""));
 
-  // Format back to HH:MM:SS
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = Math.floor(totalSeconds % 60);
+    const totalSeconds = (minutes * 60 + seconds) * totalLaps;
 
-  return h > 0 
-    ? `${h}h ${m}m ${s}s` 
-    : `${m}m ${s}s`;
-};
+    // Format back to HH:MM:SS
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = Math.floor(totalSeconds % 60);
+
+    return h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
+  };
 
   return (
     <>
@@ -420,7 +418,7 @@ export default function WeatherMisc({
         {/* misc stats place */}
         <div className="flex w-full shrink-0 grow flex-row items-center justify-between gap-4 px-4 text-center">
           <span
-            className="cursor-help font-bold flex flex-col gap-0"
+            className="flex cursor-help flex-col gap-0 font-bold"
             title="Expected average lap time, used for strategy calculations."
           >
             Average Lap Time
@@ -429,8 +427,7 @@ export default function WeatherMisc({
             </span>
             <span className="text-xs font-extralight opacity-70">
               (Est. Duration:{" "}
-              {calculateDuration(miscStats?.avgLapTime || "", laps) || "-"}
-              )
+              {calculateDuration(miscStats?.avgLapTime || "", laps) || "-"})
             </span>
           </span>
           <span

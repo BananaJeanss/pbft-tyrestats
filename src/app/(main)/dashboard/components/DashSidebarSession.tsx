@@ -34,8 +34,8 @@ export default function DashSidebarSession({
       ) : (
         <Image
           src={
-            (PlaceIconsMap[sessionData.meta.selectedIcon]?.path ||
-              PlaceIconsMap["default"].path)
+            PlaceIconsMap[sessionData.meta.selectedIcon]?.path ||
+            PlaceIconsMap["default"].path
           }
           alt="Track Logo"
           width={256}

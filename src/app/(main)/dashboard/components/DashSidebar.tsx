@@ -129,7 +129,6 @@ export default function DashSidebar({
     return activeFolderIds.has(`${folderId}-${source}`);
   };
 
-
   if (!mounted) {
     return (
       <div className="flex h-full w-1/4 items-center justify-center overflow-y-auto rounded-lg bg-zinc-100 p-4 dark:bg-neutral-800">

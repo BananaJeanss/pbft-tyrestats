@@ -66,6 +66,7 @@ export function useSessionManager() {
     };
 
     fetchCloudSessions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   // Fetch Cloud Folders on Mount/Login
@@ -92,6 +93,7 @@ export function useSessionManager() {
     };
 
     fetchCloudFolders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   // Combined Sessions for UI

@@ -44,7 +44,7 @@ export default function TermsPage() {
         href="/"
         className="mb-4 inline-block text-blue-600 hover:underline"
       >
-         &#8617; Back to Home
+        &#8617; Back to Home
       </Link>
       <BetterReactMD content={termsOfService} />
     </div>
