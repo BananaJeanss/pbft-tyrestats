@@ -16,7 +16,10 @@ import RaceSettings, {
 } from "./components/RaceSettings";
 import { RaceConfiguration } from "@/app/types/TyTypes";
 import { ManualStint } from "@/app/types/TyTypes";
-import DashSidebar from "./components/DashSidebar";
+import DashSidebar, {
+  DashSidebarRef,
+  NewSessionNewFolder,
+} from "./components/DashSidebar";
 import { generateOptimalTimeline } from "./TyreMath";
 import SessionSettingsPage, {
   SessionSettings,
@@ -29,6 +32,8 @@ import { DEFAULT_PREFERENCES } from "./components/TyreSettings";
 import DashShare from "./components/DashShare";
 import DashboardView from "./components/DashboardView";
 import { useSessionManager } from "@/hooks/useSessionManager";
+import Image from "next/image";
+import SuggestedSessionCard from "./components/SuggestedSessionCard";
 
 export default function Dashboard() {
   const [tyremanVis, settyremanVis] = useState(false);
@@ -47,6 +52,8 @@ export default function Dashboard() {
   // manual timeline states
   const [manualStints, setManualStints] = useState<ManualStint[]>([]);
   const [isManualMode, setIsManualMode] = useState(false);
+
+  const sidebarRef = useRef<DashSidebarRef>(null);
 
   const [raceSettingsVis, setRaceSettingsVis] = useState(false);
   const [raceConfig, setRaceConfig] = useState<RaceConfiguration>(
@@ -636,6 +643,7 @@ export default function Dashboard() {
       <div className="h-[calc(100vh-5rem)] overflow-hidden p-8">
         <div className="flex h-full flex-row gap-4 rounded-xl bg-zinc-200 p-4 dark:bg-neutral-900">
           <DashSidebar
+            ref={sidebarRef}
             currentSessionId={currentSessionId ?? ""}
             onSelectSession={loadSession}
             sessions={sessions}
@@ -708,10 +716,61 @@ export default function Dashboard() {
               />
             </div>
           ) : (
-            <div className="flex h-full w-3/4 flex-col items-center justify-center gap-2 rounded-lg bg-zinc-200 p-4 pl-4 dark:bg-neutral-800">
-              <p className="text-lg font-extralight">
-                No session selected. Please select a session from the sidebar.
-              </p>
+            <div className="z-0 flex h-full w-3/4 flex-col items-center justify-center gap-2 overflow-hidden rounded-lg bg-zinc-200 p-4 pl-4 dark:bg-neutral-800">
+              <Image
+                src="/tslogo.png"
+                alt="TyreStats Logo"
+                width={256}
+                height={256}
+                className="absolute z-[-1] mb-4 max-h-full max-w-full opacity-20"
+                style={{ filter: " grayscale(1)" }}
+              />
+              <div className="max-w-full text-xl font-bold">
+                {sessions.length === 0 ? (
+                  <div className="flex max-w-full flex-col items-center gap-2 overflow-x-scroll">
+                    No session selected. Try making your first session!
+                    <hr className="my-2 w-1/2 border-t border-zinc-300 dark:border-neutral-700" />
+                    <NewSessionNewFolder
+                      onCreateSessionClick={() => {
+                        sidebarRef.current?.openNewSessionAnyways();
+                      }}
+                      onCreateFolderClick={() => {
+                        sidebarRef.current?.openNewFolderAnyways();
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex max-w-full flex-col items-center gap-2">
+                    No session selected. Please select a session from the
+                    sidebar.
+                    <hr className="my-2 w-1/2 border-t border-zinc-300 dark:border-neutral-700" />
+                    <p className="text-center text-lg font-extralight">
+                      Suggested Sessions
+                    </p>
+                    {/* choose closest sessions to today */}
+                    <div className="mt-2 flex w-full flex-row gap-2 overflow-x-auto items-center justify-center pb-2">
+                      {sessions
+                        .sort((a, b) => {
+                          const dateA = new Date(a.meta.date).getTime();
+                          const dateB = new Date(b.meta.date).getTime();
+                          const today = new Date().getTime();
+                          return (
+                            Math.abs(today - dateA) - Math.abs(today - dateB)
+                          );
+                        })
+                        .slice(0, 5)
+                        .map((session) => (
+                          <div key={session.id} className="shrink-0">
+                            <SuggestedSessionCard
+                              session={session}
+                              onClick={() => loadSession(session)}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
