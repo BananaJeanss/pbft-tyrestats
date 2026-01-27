@@ -4,8 +4,20 @@ import { useState, useEffect } from "react";
 import AIStrategySettings from "./AIStrategySettings";
 import { AIStrategySettingsS } from "@/app/types/TyTypes";
 import FullscreenReader from "./FullscreenReader";
-import BetterReactMD from "./BetterReactMD";
 import { authClient } from "@/lib/auth-client";
+import dynamic from "next/dynamic";
+
+// This splits the 510KB Katex bundle into a separate chunk that only loads when needed.
+const BetterReactMD = dynamic(() => import("./BetterReactMD"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full animate-pulse space-y-2">
+      <div className="h-4 w-3/4 rounded bg-neutral-800"></div>
+      <div className="h-4 w-1/2 rounded bg-neutral-800"></div>
+      <div className="h-4 w-5/6 rounded bg-neutral-800"></div>
+    </div>
+  ),
+});
 
 export interface AIStrategySuggestionProps {
   onSave: (suggestion: string) => void;

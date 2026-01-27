@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
   generateBuildId: async () => {
     return commitHash;
   },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts", "rehype-katex"]
+  },
   images: {
     remotePatterns: [
       {
