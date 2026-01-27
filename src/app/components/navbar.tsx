@@ -100,6 +100,25 @@ function ToolMenuSubMenu({
   );
 }
 
+type NavClockProps = {
+  TimezoneLabel: string;
+  UTCTime: string;
+};
+
+function NavClock({ TimezoneLabel, UTCTime }: NavClockProps) {
+  return (
+    <>
+      <p
+        className="cursor-help font-mono text-sm font-extralight opacity-70"
+        title={TimezoneLabel}
+      >
+        {UTCTime}
+      </p>
+      <div className="h-8 w-px bg-neutral-700 dark:bg-neutral-200" />
+    </>
+  );
+}
+
 export default function Navbar() {
   const [settingsMenuOpen, setSettingsMenuOpen] = useState(false);
   const [DoesThisPersonNotHateClocks] = useLocalStorage<boolean>(
@@ -181,16 +200,27 @@ export default function Navbar() {
   }
 
   const lelelelelelemans = useCallback(() => {
-    if (konamiDebounce || !audioRef.current) return;
+    if (konamiDebounce) return;
+
     setKonamiDebounce(true);
     makeitspin();
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio("/lelelelemans.webm");
+      audioRef.current.onended = () => {
+        makeitunspin();
+        setKonamiDebounce(false);
+      };
+    }
     audioRef.current.currentTime = 0;
-    audioRef.current.play();
-    audioRef.current.onended = () => {
-      makeitunspin();
-      setKonamiDebounce(false);
-    };
-  }, [konamiDebounce, audioRef]);
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        makeitunspin();
+        setKonamiDebounce(false);
+      });
+    }
+  }, [konamiDebounce]);
 
   // im running out of ideas so konami code
   useEffect(() => {
@@ -260,7 +290,6 @@ export default function Navbar() {
           onClose={() => setTyreWearManOpen(false)}
         />
       )}
-      <audio ref={audioRef} src="/lelelelemans.mp3" />
       <nav className="flex max-h-20 w-full flex-row items-center justify-between bg-zinc-200 p-8 dark:bg-neutral-900">
         <div className="flex items-center gap-4 text-2xl font-bold">
           <Image
@@ -309,15 +338,7 @@ export default function Navbar() {
           <div className="h-8 w-px bg-neutral-700 dark:bg-neutral-200" />
 
           {DoesThisPersonNotHateClocks && (
-            <>
-              <p
-                className="cursor-help font-mono text-sm font-extralight opacity-70"
-                title={TimezoneLabel}
-              >
-                {UTCTime}
-              </p>
-              <div className="h-8 w-px bg-neutral-700 dark:bg-neutral-200" />
-            </>
+            <NavClock TimezoneLabel={TimezoneLabel} UTCTime={UTCTime} />
           )}
 
           <div className="relative" ref={toolsMenuRef}>
