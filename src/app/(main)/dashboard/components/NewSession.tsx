@@ -51,7 +51,7 @@ export default function NewSession({
       tyreData: {},
       manualStints: [],
       aiConfigSettings: {
-        model: "qwen/qwen3-32b",
+        model: "google/gemini-3-pro-preview",
         temperature: 0.7,
         top_p: 1,
         useExperimentalPrompt: false,

@@ -92,7 +92,19 @@ function SharedSessionContent() {
     const hasTyreData = Object.keys(tyreData || {}).length > 0;
 
     if (hasRaceConfig && hasTyreData) {
-      return generateOptimalTimeline(raceConfig, tyrePreferences, tyreData);
+      return generateOptimalTimeline(
+        raceConfig,
+        tyrePreferences,
+        tyreData,
+        sessionData.weather || [],
+        sessionData.miscStats || {
+          avgLapTime: "",
+          gridPosition: 0,
+          totalGridDrivers: 0,
+          raceStartTime: "",
+          pitLossTime: 0,
+        },
+      );
     }
     return null;
   }, [sessionData]);

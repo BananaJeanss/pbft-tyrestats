@@ -98,8 +98,7 @@ export default function DashboardView({
   const redFlagLaps = redflagLikelyLaps(
     SessionData.weather || [],
     SessionData.miscStats?.raceStartTime || "",
-    SessionData.raceConfig.RaceLaps || 0,
-    SessionData.miscStats?.avgLapTime,
+    SessionData.raceConfig.RaceLaps?.toString() || "",
   );
 
   return (

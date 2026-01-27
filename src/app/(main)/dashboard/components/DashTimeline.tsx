@@ -20,9 +20,11 @@ const validateTimelineData = (
   timelineData: TimelineData[],
   timelineStints: { tyreId: string }[],
 ) => {
-  // per FIT regulations 2 or more compounds must be used
+  // per FIT regulations 2 or more compounds must be used, unless if wet race
   if (timelineStints.length > 0) {
     const compounds = new Set(timelineStints.map((s) => s.tyreId));
+    // Allow single compound if it's wet
+    if (compounds.size === 1 && compounds.has("wet")) return true;
     return compounds.size >= 2;
   }
 

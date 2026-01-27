@@ -34,7 +34,7 @@ export default function AIStrategySuggestion({
   const [AISettingsOpen, setAISettingsOpen] = useState(false);
   const [AISettings, setAISettings] = useState<AIStrategySettingsS>(
     aiConfig || {
-      model: "qwen/qwen3-32b",
+      model: "google/gemini-3-pro-preview",
       temperature: 0.7,
       top_p: 1,
       useExperimentalPrompt: false,

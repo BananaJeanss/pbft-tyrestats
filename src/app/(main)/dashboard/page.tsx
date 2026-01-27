@@ -108,7 +108,7 @@ export default function Dashboard() {
   const [dashShareOpen, setDashShareOpen] = useState(false);
 
   const [aiConfigSettings, setAIConfigSettings] = useState({
-    model: "qwen/qwen3-32b",
+    model: "google/gemini-3-pro-preview",
     temperature: 0.7,
     top_p: 1,
     useExperimentalPrompt: false,
@@ -156,7 +156,7 @@ export default function Dashboard() {
 
     return manualStints.map((stint, index) => ({
       tyreId: stint.tyre,
-      key: `manual_${index}_${stint.tyre}`, // Must match the data key above
+      key: `manual_${index}_${stint.tyre}`,
       color: colors[stint.tyre],
       label: `${labels[stint.tyre]} (${stint.laps}L)`,
     }));
@@ -367,6 +367,8 @@ export default function Dashboard() {
         raceConfig,
         tyrePreferences,
         tyreData,
+        weather,
+        miscStats,
       );
       if (result) {
         setAutoTimelineData(result.timelineData);
@@ -380,7 +382,7 @@ export default function Dashboard() {
       ]);
       setAutoTimelineStints([]);
     }
-  }, [tyreData, raceConfig, tyrePreferences]);
+  }, [tyreData, raceConfig, tyrePreferences, miscStats, weather]);
 
   const loadSession = (session: TySession) => {
     isLoadingSession.current = true;
@@ -571,7 +573,7 @@ export default function Dashboard() {
                 setAIConfigSettings({
                   model:
                     duplicatedSession.aiConfigSettings?.model ||
-                    "qwen/qwen3-32b",
+                    "google/gemini-3-pro-preview",
                   temperature:
                     duplicatedSession.aiConfigSettings?.temperature || 0.7,
                   top_p: duplicatedSession.aiConfigSettings?.top_p || 1,

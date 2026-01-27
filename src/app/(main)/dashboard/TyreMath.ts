@@ -1,4 +1,5 @@
 import {
+  MiscStats,
   RaceConfiguration,
   Stint,
   TimelineData,
@@ -65,10 +66,58 @@ export const getEffectiveTyreData = (
   return null;
 };
 
+const balanceStrategy = (stints: StrategyStint[]) => {
+  if (!stints || stints.length === 0) return stints;
+
+  const balancedStints: StrategyStint[] = [];
+  let currentGroup: StrategyStint[] = [stints[0]];
+
+  // Group consecutive stints of the same tyre
+  for (let i = 1; i < stints.length; i++) {
+    if (stints[i].tyreId === stints[i - 1].tyreId) {
+      currentGroup.push(stints[i]);
+    } else {
+      // We hit a different tyre, so balance the previous group and push
+      pushBalancedGroup(currentGroup, balancedStints);
+      currentGroup = [stints[i]];
+    }
+  }
+  // Balance and push the final group
+  pushBalancedGroup(currentGroup, balancedStints);
+
+  return balancedStints;
+};
+
+const pushBalancedGroup = (
+  group: StrategyStint[],
+  targetArray: StrategyStint[],
+) => {
+  const totalLaps = group.reduce((sum, s) => sum + s.laps, 0);
+  const count = group.length;
+
+  // Basic integer division
+  const baseLaps = Math.floor(totalLaps / count);
+  const remainder = totalLaps % count;
+
+  group.forEach((stint, index) => {
+    // Distribute the remainder laps to the first few stints
+    // e.g. 25 laps / 3 stints = 8 laps each, with 1 remainder
+    // Result: 9, 8, 8
+    const laps = baseLaps + (index < remainder ? 1 : 0);
+
+    targetArray.push({
+      ...stint,
+      laps: laps,
+    });
+  });
+};
+
 export const generateOptimalTimeline = (
   raceConfig: RaceConfiguration,
   tyrePreferences: TyrePreferences,
   tyreData: Record<string, TyreWearData>,
+  weather: WeatherEntry[],
+  miscStats: MiscStats,
 ) => {
   // 1. Get Race Laps
   const totalLaps = raceConfig?.RaceLaps ? raceConfig.RaceLaps : 50;
@@ -78,12 +127,35 @@ export const generateOptimalTimeline = (
   // 2. Get Available Tyre Data & Max Laps
   const availableTyres: { id: string; maxLaps: number; color: string }[] = [];
 
+  // Determine if it's a full wet race BEFORE looping through tyre types
+  const rainIntervals = rainLikelyLaps(
+    weather,
+    miscStats.raceStartTime,
+    totalLaps,
+    miscStats.avgLapTime,
+  );
+
+  const isFullWet =
+    (Object.keys(tyreData).length === 1 && tyreData["wet"] !== undefined) ||
+    (rainIntervals.length === 1 &&
+      rainIntervals[0].startLap === 0 &&
+      rainIntervals[0].endLap >= totalLaps);
+
+  // find each tyre data for dry tyres
   TYRE_TYPES.forEach((t) => {
-    if (t.id === "wet") return; // Skip wet for dry strategy generation
-    const data = getEffectiveTyreData(t.id, tyreData, tyrePreferences);
+    // If it's full wet, ignore everything except the Wet tyre
+    if (isFullWet && t.id !== "wet") return;
+
+    // If it's DRY, ignore the Wet tyre (unless you want to allow it for mixed conditions)
+    if (!isFullWet && t.id === "wet") return;
+
+    const data =
+      t.id === "wet"
+        ? { wearPerLap: tyreData["wet"]?.wearPerLap || 0.5, isEstimated: false } // Default wet wear if missing
+        : getEffectiveTyreData(t.id, tyreData, tyrePreferences);
+
     if (data && data.wearPerLap > 0) {
       const usablePercentage = 100 - tyrePreferences.preferredSwitchoverPoint;
-      // Allow a buffer for "stretching" (e.g. +10% extra wear if needed to finish)
       const maxLaps = Math.floor(usablePercentage / data.wearPerLap);
 
       availableTyres.push({
@@ -94,7 +166,9 @@ export const generateOptimalTimeline = (
             ? "#dc2626"
             : t.id === "medium"
               ? "#eab308"
-              : "#ffffff",
+              : t.id === "wet"
+                ? "#1d4ed8"
+                : "#ffffff",
       });
     }
   });
@@ -107,6 +181,13 @@ export const generateOptimalTimeline = (
   // Helper to check if a strategy is valid (uses 2+ compounds)
   const isValidComposition = (stints: StrategyStint[]) => {
     if (!stints) return false;
+
+    // If it's a wet race, we are allowed to use just one compound (Wets)
+    if (isFullWet) return true;
+
+    // if we only have 1 tyre type available (e.g. fixed setup), it's valid
+    if (availableTyres.length === 1) return true;
+
     const compounds = new Set(stints.map((s) => s.tyreId));
     return compounds.size >= 2;
   };
@@ -115,13 +196,13 @@ export const generateOptimalTimeline = (
   const PACE_SCORE: Record<string, number> = {
     soft: 3,
     medium: 2,
+    wet: 1, // scoring doesnt really matter for wets here
     hard: 1,
   };
 
   const calculateScore = (stints: StrategyStint[]) => {
     // Heavy penalty for pit stops to prioritize fewer stops
-    // 500 points is more than max possible points from laps (e.g. 100 laps * 3 pts = 300)
-    const stopPenalty = (stints.length - 1) * 500;
+    const stopPenalty = (stints.length - 1) * 250;
 
     const performanceScore = stints.reduce((acc, stint) => {
       return acc + stint.laps * (PACE_SCORE[stint.tyreId] || 0);
@@ -152,6 +233,22 @@ export const generateOptimalTimeline = (
       return;
     }
 
+    // adjust max stins based on lap count cause otherwise performance adios
+    // dynamic didnt work that well so i'll just hardcore it fukitweball
+    switch (true) {
+      case currentLaps >= 200:
+        if (currentStints.length >= 20) return;
+        break;
+      case currentLaps >= 150:
+        if (currentStints.length >= 17) return;
+        break;
+      case currentLaps >= 100:
+        if (currentStints.length >= 14) return;
+        break;
+      default:
+        if (currentStints.length >= 12) return;
+        break;
+    }
     if (currentStints.length >= 12) return;
 
     // Try all available tyres
@@ -181,7 +278,12 @@ export const generateOptimalTimeline = (
   if (validStrategies.length > 0) {
     // Sort by score descending (Highest score wins)
     validStrategies.sort((a, b) => b.score - a.score);
-    bestStrategy = validStrategies[0].stints;
+
+    // greedy
+    const rawStrat = validStrategies[0].stints;
+
+    // greedy fixer
+    bestStrategy = balanceStrategy(rawStrat);
   }
 
   // 4. Map to Timeline Data
@@ -218,6 +320,39 @@ export const generateOptimalTimeline = (
   return null;
 };
 
+// New helper to fix the 'x1', 'x2' parsing issue
+const parseTimeToMinutes = (timeStr: string, raceStartTime: string): number => {
+  const parts = timeStr.split(":");
+  if (parts.length !== 2) return -1;
+
+  const hStr = parts[0].toLowerCase(); // Normalize to lower case
+  const m = parseInt(parts[1]);
+
+  if (isNaN(m) || m < 0 || m >= 60) return -1;
+
+  if (hStr.startsWith("x")) {
+    const startParts = raceStartTime.split(":");
+    if (startParts.length !== 2) return -1;
+
+    const startH = parseInt(startParts[0]);
+    if (isNaN(startH)) return -1;
+
+    let offset = 0;
+
+    const offsetStr = hStr.substring(1);
+    if (offsetStr.length > 0 && !isNaN(Number(offsetStr))) {
+      offset = Number(offsetStr);
+    }
+
+    return (startH + offset) * 60 + m;
+  }
+
+  const h = parseInt(hStr);
+  if (isNaN(h) || h < 0 || h >= 24) return -1;
+
+  return h * 60 + m;
+};
+
 export const rainLikelyLaps = (
   weather: WeatherEntry[],
   raceStartTime: string,
@@ -225,8 +360,9 @@ export const rainLikelyLaps = (
   avgLapTimeStr: string = "1:30.000",
 ): Array<{ startLap: number; endLap: number }> => {
   if (!weather || weather.length === 0 || !raceStartTime) return [];
+  let accumulatedRedFlagDelay = 0; // cause red flag means no racing but the weather still changes
 
-  // 1. Parse Avg Lap Time to Seconds
+  // 1. Parse Avg Lap Time
   let avgLapSeconds = 90;
   const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
   if (match) {
@@ -236,63 +372,38 @@ export const rainLikelyLaps = (
   }
   if (avgLapSeconds <= 0) avgLapSeconds = 90;
 
-  // 2. Parse Times to Minutes
-  const timeToMinutes = (timeStr: string) => {
-    // Handles "HH:MM", "xx:MM", "x1:MM", "x2:MM" as relative to race start hour
-    const parts = timeStr.split(":");
-    if (parts.length !== 2) return -1;
-    const hStr = parts[0];
-    const m = parseInt(parts[1]);
-    const h = parseInt(hStr);
-    if (isNaN(m) || m < 0 || m >= 60) return -1;
-
-    // Handle relative hour codes
-    if (hStr === "xx") {
-      // Parse raceStartTime hour
-      const startParts = raceStartTime.split(":");
-      if (startParts.length !== 2) return -1;
-      const startH = parseInt(startParts[0]);
-      if (isNaN(startH)) return -1;
-
-      let offset = 0;
-      // Handle x[n]:00 as n hours after race start (e.g. x1:00, x2:00)
-      if (
-        hStr.startsWith("x") &&
-        hStr.length === 2 &&
-        !isNaN(Number(hStr[1]))
-      ) {
-        offset = Number(hStr[1]);
-      } else if (hStr.at(1) === "1") offset = 1;
-
-      return (startH + offset) * 60 + m;
-    }
-
-    if (isNaN(h) || h < 0 || h >= 24) return -1;
-    return h * 60 + m;
-  };
-
-  const startMins = timeToMinutes(raceStartTime);
+  const startMins = parseTimeToMinutes(raceStartTime, raceStartTime);
   if (startMins === -1) return [];
 
-  // 3. Map Weather to Lap Numbers
+  // 2. Map Weather to Laps
   const points = weather
-    .map((w) => {
-      const wMins = timeToMinutes(w.time);
+    .map((w, index) => {
+      const wMins = parseTimeToMinutes(w.time, raceStartTime); // Use new helper
       if (wMins === -1) return null;
 
-      let diff = wMins - startMins;
-      // Handle simple day rollover (start 23:00, weather 01:00)
-      if (diff < -720) diff += 1440;
-      // Handle pre-race weather defined way before
-      if (diff < -60) return null;
+      let diff = wMins - startMins - accumulatedRedFlagDelay;
+      if (diff < -720) diff += 1440; // Handle midnight crossover
+      if (diff < -60) return null; // Ignore weather from >1h before start
 
-      // If diff is negative but small (e.g. -5 mins), treat as Lap 0
+      // Calculation: Simple linear projection (Note: Drifts if pace changes drastically)
       const lap = diff < 0 ? 0 : Math.floor((diff * 60) / avgLapSeconds);
 
+      if (w.condition.toUpperCase().includes("C4")) {
+        const nextW = weather[index + 1];
+
+        if (nextW) {
+          const nextMins = parseTimeToMinutes(nextW.time, raceStartTime);
+          let gap = nextMins - wMins;
+
+          if (gap < 0) gap += 1440; // Midnight crossover
+
+          accumulatedRedFlagDelay += gap;
+        }
+      }
+
       const isRain =
-        ["C1", "C2", "C3"].some(
-          (c) => w.condition.toUpperCase().includes(c), // Check short condition code
-        ) || w.condition.toLowerCase().includes("rain");
+        ["c1", "c2", "c3"].some((c) => w.condition.toLowerCase().includes(c)) ||
+        w.condition.toLowerCase().includes("rain");
 
       return { lap, isRain };
     })
@@ -301,48 +412,43 @@ export const rainLikelyLaps = (
 
   if (points.length === 0) return [];
 
-  // 4. Build Intervals
+  // 3. Build Intervals (Fixed Logic)
   const intervals: Array<{ startLap: number; endLap: number }> = [];
   let currentStart: number | null = null;
 
   for (let i = 0; i < points.length; i++) {
     const pt = points[i];
-    const nextPt = points[i + 1]; // undefined if last
+    const nextPt = points[i + 1];
 
-    // Determine the end of this weather block
-    // It ends at the next weather update, OR at the end of the race
     const blockEnd = nextPt ? nextPt.lap : totalLaps;
 
     if (pt.isRain) {
-      // It is raining in this block.
-      // If we aren't already tracking a rain interval, start one.
-      if (currentStart === null) {
-        currentStart = pt.lap;
-      }
+      if (currentStart === null) currentStart = pt.lap;
 
       if (!nextPt || !nextPt.isRain) {
-        // Close it
-        intervals.push({ startLap: currentStart, endLap: blockEnd });
+        // Clamp endLap to totalLaps to avoid displaying past race end
+        const finalEnd = Math.min(blockEnd, totalLaps);
+        if (currentStart < totalLaps) {
+          intervals.push({ startLap: currentStart, endLap: finalEnd });
+        }
         currentStart = null;
       }
     } else {
-      currentStart = null; // Safety
+      currentStart = null;
     }
   }
 
   return intervals;
 };
 
-// same logic as rainLikelyLaps but for red flag conditions (c4)
 export const redflagLikelyLaps = (
   weather: WeatherEntry[],
   raceStartTime: string,
-  totalLaps: number,
   avgLapTimeStr: string = "1:30.000",
 ): Array<{ lap: number }> => {
   if (!weather || weather.length === 0 || !raceStartTime) return [];
 
-  // 1. Parse Avg Lap Time to Seconds
+  // Reuse parsing logic
   let avgLapSeconds = 90;
   const match = avgLapTimeStr.match(/^(\d+):(\d{2})(\.\d+)?$/);
   if (match) {
@@ -352,70 +458,30 @@ export const redflagLikelyLaps = (
   }
   if (avgLapSeconds <= 0) avgLapSeconds = 90;
 
-  // 2. Parse Times to Minutes
-  const timeToMinutes = (timeStr: string) => {
-    const parts = timeStr.split(":");
-    if (parts.length !== 2) return -1;
-    const hStr = parts[0];
-    const m = parseInt(parts[1]);
-    const h = parseInt(hStr);
-    if (isNaN(m) || m < 0 || m >= 60) return -1;
-
-    if (hStr === "xx") {
-      const startParts = raceStartTime.split(":");
-      if (startParts.length !== 2) return -1;
-      const startH = parseInt(startParts[0]);
-      if (isNaN(startH)) return -1;
-
-      let offset = 0;
-      if (
-        hStr.startsWith("x") &&
-        hStr.length === 2 &&
-        !isNaN(Number(hStr[1]))
-      ) {
-        offset = Number(hStr[1]);
-      } else if (hStr.at(1) === "1") offset = 1;
-
-      return (startH + offset) * 60 + m;
-    }
-
-    if (isNaN(h) || h < 0 || h >= 24) return -1;
-    return h * 60 + m;
-  };
-
-  const startMins = timeToMinutes(raceStartTime);
+  const startMins = parseTimeToMinutes(raceStartTime, raceStartTime);
   if (startMins === -1) return [];
 
-  // 3. Map Weather to Lap Numbers
-  const points = weather
-    .map((w) => {
-      const wMins = timeToMinutes(w.time);
-      if (wMins === -1) return null;
-
-      let diff = wMins - startMins;
-      if (diff < -720) diff += 1440;
-      if (diff < -60) return null;
-
-      const lap = diff < 0 ? 0 : Math.floor((diff * 60) / avgLapSeconds);
-
-      const isRedFlag =
-        w.condition.toUpperCase().includes("C4") ||
-        w.condition.toLowerCase().includes("red flag");
-
-      return { lap, isRedFlag };
-    })
-    .filter((p): p is { lap: number; isRedFlag: boolean } => p !== null)
-    .sort((a, b) => a.lap - b.lap);
-
-  if (points.length === 0) return [];
-
-  // 4. Return lap where red flag happens
   const redFlagLaps: Array<{ lap: number }> = [];
-  for (const pt of points) {
-    if (pt.isRedFlag) {
-      redFlagLaps.push({ lap: pt.lap });
-    }
-  }
 
-  return redFlagLaps;
+  weather.forEach((w) => {
+    const wMins = parseTimeToMinutes(w.time, raceStartTime);
+    if (wMins === -1) return;
+
+    let diff = wMins - startMins;
+    if (diff < -720) diff += 1440;
+    if (diff < -60) return;
+
+    const lap = diff < 0 ? 0 : Math.floor((diff * 60) / avgLapSeconds);
+
+    // Strict C4 check or text check
+    const isRedFlag =
+      w.condition.toUpperCase().includes("C4") ||
+      w.condition.toLowerCase().includes("red flag");
+
+    if (isRedFlag) {
+      redFlagLaps.push({ lap });
+    }
+  });
+
+  return redFlagLaps.sort((a, b) => a.lap - b.lap);
 };
