@@ -101,7 +101,7 @@ export default function DashShare({
       TYRE_ORDER.forEach((tyreId) => {
         const effectiveData = getEffectiveTyreData(
           tyreId,
-          SessionData.tyreData,
+          SessionData.tyreData ?? {},
           mergedPrefs,
         );
 
@@ -183,6 +183,17 @@ export default function DashShare({
     }
   };
 
+  const [DataToInclude, setDataToInclude] = useState({
+    tyreData: true,
+    tyrePreferences: true,
+    weather: true,
+    miscStats: true,
+    manualStints: true,
+    aiConfigSettings: true,
+    currentNotes: true,
+    currentSuggestion: true,
+  });
+
   const handleShortUrlGenerated = (newShortUrl: string) => {
     setShortUrl(newShortUrl);
     onShortUrlUpdate(newShortUrl);
@@ -191,34 +202,69 @@ export default function DashShare({
 
   const handleShortUrlGeneration = async () => {
     setIsSending(true);
-    // send data to api to generate short link
-    fetch("/api/short", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ sessionData: SessionData }),
-    })
-      .then((response) => response.json())
-      .then((response) => {
-        if (response.error) {
-          throw new Error(response.error);
-        }
-        return response;
-      })
-      .then((data) => {
-        if (data.finalizedUrl) {
-          handleShortUrlGenerated(data.finalizedUrl);
-        } else {
-          console.error("Error generating short link: No URL returned");
-        }
-      })
-      .catch((err) => {
-        console.error("Error generating short link:", err);
-      })
-      .finally(() => {
-        setIsSending(false);
+
+    const sessionDataToSend: TySession = {
+      id: SessionData.id,
+      folder: null,
+      meta: SessionData.meta,
+      raceConfig: SessionData.raceConfig,
+
+      tyreData: DataToInclude.tyreData ? SessionData.tyreData : {},
+
+      manualStints: DataToInclude.manualStints ? SessionData.manualStints : [],
+
+      tyrePreferences: DataToInclude.tyrePreferences
+        ? SessionData.tyrePreferences
+        : DEFAULT_PREFERENCES,
+
+      aiConfigSettings: DataToInclude.aiConfigSettings
+        ? SessionData.aiConfigSettings
+        : {
+            model: "google/gemini-3-pro-preview",
+            temperature: 0.7,
+            top_p: 1,
+            useExperimentalPrompt: false,
+          },
+
+      weather: DataToInclude.weather ? SessionData.weather : undefined,
+
+      miscStats: DataToInclude.miscStats ? SessionData.miscStats : undefined,
+
+      currentNotes: DataToInclude.currentNotes
+        ? SessionData.currentNotes
+        : undefined,
+
+      currentSuggestion: DataToInclude.currentSuggestion
+        ? SessionData.currentSuggestion
+        : undefined,
+    };
+
+    try {
+      const response = await fetch("/api/short", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Send the constructed object, do not reassign the prop
+        body: JSON.stringify({ sessionData: sessionDataToSend }),
       });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.finalizedUrl) {
+        handleShortUrlGenerated(data.finalizedUrl);
+      } else {
+        console.error("Error generating short link: No URL returned");
+      }
+    } catch (err) {
+      console.error("Error generating short link:", err);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -309,6 +355,39 @@ export default function DashShare({
               </span>
             </div>
           )}
+          <details className="cursor-pointer text-sm text-neutral-500 dark:text-neutral-400">
+            <summary>Include</summary>
+            <div className="flex flex-wrap gap-2 py-2">
+              {[
+                { key: "tyreData", label: "Tyre Data" },
+                { key: "tyrePreferences", label: "Tyre Preferences" },
+                { key: "weather", label: "Weather" },
+                { key: "miscStats", label: "Misc Stats" },
+                { key: "manualStints", label: "Manual Stints" },
+                { key: "aiConfigSettings", label: "AI Config" },
+                { key: "currentNotes", label: "Notes" },
+                { key: "currentSuggestion", label: "AI Suggestion" },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={`cursor-pointer rounded border px-2 py-1 text-xs font-medium ${
+                    DataToInclude[item.key as keyof typeof DataToInclude]
+                      ? "border-(--tyrestats-blue) text-white"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setDataToInclude((prev) => ({
+                      ...prev,
+                      [item.key]: !prev[item.key as keyof typeof prev],
+                    }))
+                  }
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </details>
         </div>
 
         <hr className="border-neutral-800/50" />

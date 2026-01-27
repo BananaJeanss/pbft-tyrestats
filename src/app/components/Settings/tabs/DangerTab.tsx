@@ -33,7 +33,7 @@ function DeleteMyCloudDataDawg({ onClose }: LongNameProps) {
           </button>
         </div>
         <hr className="border-neutral-800" />
-        <p className="font-light text-red-500">
+        <div className="font-light text-red-500">
           This action will permanently delete your account and all related data.
           <br />
           This cannot be undone. Are you sure you want to proceed?
@@ -65,7 +65,7 @@ function DeleteMyCloudDataDawg({ onClose }: LongNameProps) {
               />
             </div>
           )}
-        </p>
+        </div>
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}

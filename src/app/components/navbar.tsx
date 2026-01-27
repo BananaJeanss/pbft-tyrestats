@@ -343,7 +343,7 @@ export default function Navbar() {
 
           <div className="relative" ref={toolsMenuRef}>
             <button
-              className="cursor-pointer transition hover:opacity-80"
+              className="cursor-pointer transition hover:opacity-80 flex items-center"
               onClick={() => {
                 setToolsMenuOpen((prev) => {
                   if (prev) {
