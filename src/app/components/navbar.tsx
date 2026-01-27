@@ -15,12 +15,22 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SettingsPage from "./Settings/SettingsMenu";
 import { authClient } from "@/lib/auth-client";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { PlaceIconsMap } from "../types/PlaceIconsMap";
 import TyreWearManager from "../(main)/dashboard/components/TyreWearManager";
+
+const RacePlaces = [
+  { key: "harju", id: 92094305951214 },
+  { key: "kubica", id: 117979390006737 },
+  { key: "petgear", id: 15633295036 },
+  { key: "panther", id: 18688750517 },
+  { key: "The 411 Ring", id: 16883765114 },
+  { key: "Autodromo La Fusilli", id: 113936050853805 },
+  { key: "Saharan Port Town Street Circuit", id: 17102423081 },
+];
 
 function ToolMenuEntry({
   label,
@@ -144,21 +154,82 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [konamiDebounce, setKonamiDebounce] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // applies spin animation to every child of navbar
+  function makeitspin() {
+    const navbar = document.querySelector("nav");
+    if (navbar) {
+      const children = navbar.children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement;
+        child.classList.add("animate-spin");
+      }
+    }
+  }
+
+  function makeitunspin() {
+    const navbar = document.querySelector("nav");
+    if (navbar) {
+      const children = navbar.children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement;
+        child.classList.remove("animate-spin");
+      }
+    }
+  }
+
+  const lelelelelelemans = useCallback(() => {
+    if (konamiDebounce || !audioRef.current) return;
+    setKonamiDebounce(true);
+    makeitspin();
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
+    audioRef.current.onended = () => {
+      makeitunspin();
+      setKonamiDebounce(false);
+    };
+  }, [konamiDebounce, audioRef]);
+
+  // im running out of ideas so konami code
+  useEffect(() => {
+    let konamiCodePosition = 0;
+    const konamiCode = [
+      "ArrowUp",
+      "ArrowUp",
+      "ArrowDown",
+      "ArrowDown",
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowLeft",
+      "ArrowRight",
+      "b",
+      "a",
+    ];
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === konamiCode[konamiCodePosition]) {
+        konamiCodePosition += 1;
+        if (konamiCodePosition === konamiCode.length) {
+          // Activate the easter egg
+          lelelelelelemans();
+          konamiCodePosition = 0;
+        }
+      } else {
+        konamiCodePosition = 0;
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lelelelelelemans]);
+
   const logoSrc = resolvedTheme === "light" ? "/tslogo.png" : "/tslogow.png";
 
   const isOnDashboard = pathname === "/dashboard" || pathname === "/dashboard/";
 
   const { data: session, isPending } = authClient.useSession();
-
-  const RacePlaces = [
-    { key: "harju", id: 92094305951214 },
-    { key: "kubica", id: 117979390006737 },
-    { key: "petgear", id: 15633295036 },
-    { key: "panther", id: 18688750517 },
-    { key: "The 411 Ring", id: 16883765114 },
-    { key: "Autodromo La Fusilli", id: 113936050853805 },
-    { key: "Saharan Port Town Street Circuit", id: 17102423081 },
-  ];
 
   const DocsList = [
     {
@@ -189,9 +260,16 @@ export default function Navbar() {
           onClose={() => setTyreWearManOpen(false)}
         />
       )}
+      <audio ref={audioRef} src="/lelelelemans.mp3" />
       <nav className="flex max-h-20 w-full flex-row items-center justify-between bg-zinc-200 p-8 dark:bg-neutral-900">
         <div className="flex items-center gap-4 text-2xl font-bold">
-          <Image src={logoSrc} alt="TyreStats Logo" width={64} height={64} />
+          <Image
+            src={logoSrc}
+            alt="TyreStats Logo"
+            width={64}
+            height={64}
+            className={`${konamiDebounce ? "animate-spin" : ""}`}
+          />
           <p className="underline">TyreStats</p>
           {!isOnDashboard && (
             <>
