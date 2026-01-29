@@ -51,7 +51,7 @@ export async function GET() {
           model.architecture?.input_modalities?.includes("text") &&
           model.architecture?.modality != "text+image->text+image",
       )
-      .map((model: GetModelsDataType) => ({ id: model.id }));
+      .map((model: GetModelsDataType) => ({ id: model.id, displayname: model.name }));
 
     // cache the models for future requests
     await redisClient.set("ai_models", JSON.stringify(filteredModels), {

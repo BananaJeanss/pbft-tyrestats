@@ -9,6 +9,7 @@ export interface AIStrategySettingsProps {
 
 interface Model {
   id: string;
+  displayname: string;
 }
 
 export default function AIStrategySettings({
@@ -73,11 +74,14 @@ export default function AIStrategySettings({
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
-            {availableModels.map((m) => (
+            {availableModels
+              .slice()
+              .sort((a, b) => a.displayname.localeCompare(b.displayname))
+              .map((m: Model) => (
               <option key={m.id} value={m.id}>
-                {m.id}
+                {m.displayname}
               </option>
-            ))}
+              ))}
           </select>
           <label className="text-md font-semibold">Temperature</label>
           <input
