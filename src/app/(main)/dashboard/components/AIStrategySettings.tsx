@@ -50,7 +50,7 @@ export default function AIStrategySettings({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [selectedModel]);
 
   return (
     <div className="absolute top-0 left-0 z-50 flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-950/95 p-8">

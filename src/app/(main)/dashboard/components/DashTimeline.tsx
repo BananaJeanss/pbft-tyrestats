@@ -78,7 +78,6 @@ export default function DashTimeline({
           <h3 className="flex items-center gap-1.5 text-lg font-bold">
             Timeline
           </h3>
-          {!readOnly && (
             <div className="flex items-center gap-1 rounded-lg border border-neutral-700 bg-transparent p-1">
               <span
                 className={`cursor-pointer px-2 text-xs font-bold transition ${
@@ -102,7 +101,6 @@ export default function DashTimeline({
                 Manual
               </span>
             </div>
-          )}
         </div>
 
         <div className="flex items-center gap-4">
