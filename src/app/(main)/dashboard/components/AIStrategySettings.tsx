@@ -38,6 +38,11 @@ export default function AIStrategySettings({
       .then((data) => {
         if (isMounted && data.models) {
           setAvailableModels(data.models);
+          const ids = data.models.map((m: Model) => m.id);
+          if (!ids.includes(selectedModel)) {
+            const defaultModel = ids.find((id: string) => id.includes("google/gemini-3"));
+            setSelectedModel(defaultModel || ids[0] || "");
+          }
         }
       })
       .catch(() => isMounted && setAvailableModels([]));
