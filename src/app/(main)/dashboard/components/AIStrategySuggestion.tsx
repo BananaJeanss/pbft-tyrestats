@@ -144,12 +144,28 @@ export default function AIStrategySuggestion({
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const [timeSpentLoading, setTimeSpentLoading] = useState<number>(0); // float
   const [generatedSuggestion, setGeneratedSuggestion] =
     useState(existingSuggestion);
 
   useEffect(() => {
     setGeneratedSuggestion(existingSuggestion);
   }, [existingSuggestion]);
+
+  // timer
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isLoading) {
+      timer = setInterval(() => {
+        setTimeSpentLoading((prev) => prev + 0.1);
+      }, 100);
+    } else {
+      setTimeSpentLoading(0);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isLoading]);
 
   return (
     <>
@@ -218,7 +234,7 @@ export default function AIStrategySuggestion({
         <hr className="border-neutral-700" />
 
         {isLoading && (
-          <p className="font-extralight">Generating suggestion...</p>
+          <p className="font-extralight opacity-50">Generating suggestion... ({timeSpentLoading.toFixed(1)}s)</p>
         )}
         {error && !isLoading && (
           <p className="text-sm font-light text-red-400">{error}</p>
