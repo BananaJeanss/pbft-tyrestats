@@ -151,8 +151,8 @@ export default function DashTimeline({
       </div>
 
       {timelineGenerated ? (
-        <div className="h-20 w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-20 w-full min-h-0 min-w-0" key={isManualMode ? "manual" : "auto"}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart
               layout="vertical"
               data={timelineData}

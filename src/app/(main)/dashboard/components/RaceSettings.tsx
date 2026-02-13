@@ -264,11 +264,11 @@ export default function RaceSettings({
             </div>
 
             {/* 2. Visual Timeline Preview */}
-            <div className="relative h-32 w-full rounded-lg border border-neutral-800 bg-zinc-100 p-2 dark:bg-neutral-950">
+            <div className="relative h-32 w-full min-h-0 min-w-0 rounded-lg border border-neutral-800 bg-zinc-100 p-2 dark:bg-neutral-950">
               <span className="absolute top-2 left-2 z-10 text-xs">
                 Projected Timeline
               </span>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart
                   layout="vertical"
                   data={previewData}
