@@ -17,18 +17,18 @@
     "prisma:migrate": "bun --bun prisma migrate dev"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.3.0",
-    "@prisma/client": "^7.3.0",
+    "@prisma/adapter-pg": "^7.4.0",
+    "@prisma/client": "^7.4.0",
     "@types/pg": "^8.16.0",
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^8.55.0",
+    "@typescript-eslint/parser": "^8.55.0",
     "@vercel/analytics": "^1.6.1",
     "better-auth": "^1.4.18",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "fuse.js": "^7.1.0",
-    "lucide-react": "^0.563.0",
+    "lucide-react": "^0.564.0",
     "next": "^16.1.6",
     "next-themes": "^0.4.6",
     "pg": "^8.18.0",
@@ -47,8 +47,8 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/node": "^25.2.2",
-    "@types/react": "^19.2.13",
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint-config-next": "16.1.6",
@@ -56,9 +56,9 @@
     "globals": "^17.3.0",
     "jiti": "^2.6.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "prisma": "^7.3.0",
+    "prisma": "^7.4.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.54.0"
+    "typescript-eslint": "^8.55.0"
   }
 }
